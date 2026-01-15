@@ -244,7 +244,7 @@ const HousingAndTransport = () => {
                       Private Vehicle
                     </p>
                     <p className="text-xs text-gray-500 text-center">
-                      Personal Car / Motorcycle
+                      Car / Motorcycle
                     </p>
                   </div>
                 </label>
