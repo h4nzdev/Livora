@@ -188,7 +188,10 @@ const LandingPage = () => {
             </p>
           </div>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+        <button
+          onClick={() => navigate("/login")}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+        >
           <User size={18} />
           <span className="text-sm">Get Started</span>
         </button>

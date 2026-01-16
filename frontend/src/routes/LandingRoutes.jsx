@@ -2,6 +2,8 @@ import React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import LandingPage from "../page/Landing/LandingPage";
 import Matching from "../page/Matching/Matching";
+import Login from "../page/Authentication/Login";
+import Register from "../page/Authentication/Register";
 
 const LandingRoutes = () => {
   return (
@@ -9,6 +11,10 @@ const LandingRoutes = () => {
       <Routes>
         {/* Landing Page */}
         <Route path="/" element={<LandingPage />} />
+
+        {/* Authentication Page */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Matching Flow */}
         <Route path="/matching" element={<Matching />} />
