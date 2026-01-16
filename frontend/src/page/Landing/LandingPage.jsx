@@ -1,439 +1,337 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  Home,
-  MapPin,
-  Heart,
-  Star,
-  Filter,
+  Sparkles,
   ChevronRight,
   Shield,
-  Bed,
-  Bath,
-  Maximize2,
-  Navigation,
   Building,
+  Building2,
   Waves,
   Trees,
-  Mountain,
-  Sparkles,
-  Building2,
+  Navigation,
+  CheckCircle,
+  Filter,
+  Handshake,
+  MessageCircle,
+  Target,
+  Clock,
+  Users,
+  Star,
+  Home,
+  Search,
+  Heart,
+  MessageSquare,
   User,
+  ArrowRight,
+  Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/Livora.png";
 
 const LandingPage = () => {
-  const [favorites, setFavorites] = useState(new Set());
   const navigate = useNavigate();
-
-  const toggleFavorite = (id) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(id)) {
-      newFavorites.delete(id);
-    } else {
-      newFavorites.add(id);
-    }
-    setFavorites(newFavorites);
-  };
 
   const handleStartMatching = () => {
     navigate("/matching");
   };
 
-  const featuredListings = [
-    {
-      id: 1,
-      price: 45000,
-      location: "IT Park, Cebu City",
-      title: "Modern Studio Loft",
-      image:
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      type: "condo",
-      bedrooms: 1,
-      bathrooms: 1,
-      sqm: 32,
-      tags: ["New", "Furnished"],
-      rating: 4.8,
-      reviews: 42,
-      color: "bg-green-100",
-      icon: <Building className="text-green-600" />,
-    },
-    {
-      id: 2,
-      price: 65000,
-      location: "Banilad, Cebu",
-      title: "Luxury 2BR Condo",
-      image:
-        "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      type: "condo",
-      bedrooms: 2,
-      bathrooms: 2,
-      sqm: 65,
-      tags: ["Premium", "Pool"],
-      rating: 4.9,
-      reviews: 28,
-      color: "bg-blue-100",
-      icon: <Building2 className="text-blue-600" />,
-    },
-    {
-      id: 3,
-      price: 85000,
-      location: "Mactan, Lapu-Lapu",
-      title: "Beachfront Villa",
-      image:
-        "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      type: "house",
-      bedrooms: 3,
-      bathrooms: 2,
-      sqm: 120,
-      tags: ["Beach", "Private"],
-      rating: 4.7,
-      reviews: 56,
-      color: "bg-amber-100",
-      icon: <Waves className="text-amber-600" />,
-    },
-    {
-      id: 4,
-      price: 35000,
-      location: "Talamban, Cebu",
-      title: "Cozy Family Home",
-      image:
-        "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      type: "house",
-      bedrooms: 2,
-      bathrooms: 1,
-      sqm: 75,
-      tags: ["Family", "Garden"],
-      rating: 4.6,
-      reviews: 34,
-      color: "bg-emerald-100",
-      icon: <Trees className="text-emerald-600" />,
-    },
-  ];
-
   const popularAreas = [
-    { name: "IT Park", count: 234, icon: <Building size={16} /> },
-    { name: "Banilad", count: 189, icon: <Building2 size={16} /> },
-    { name: "Mactan", count: 156, icon: <Waves size={16} /> },
-    { name: "Talamban", count: 142, icon: <Trees size={16} /> },
-    { name: "Mandaue", count: 128, icon: <Navigation size={16} /> },
-    { name: "Cebu City", count: 312, icon: <Building size={16} /> },
+    {
+      name: "IT Park",
+      count: 234,
+      icon: <Building size={20} />,
+      color: "bg-blue-100 text-blue-600",
+    },
+    {
+      name: "Banilad",
+      count: 189,
+      icon: <Building2 size={20} />,
+      color: "bg-emerald-100 text-emerald-600",
+    },
+    {
+      name: "Mactan",
+      count: 156,
+      icon: <Waves size={20} />,
+      color: "bg-cyan-100 text-cyan-600",
+    },
+    {
+      name: "Talamban",
+      count: 142,
+      icon: <Trees size={20} />,
+      color: "bg-green-100 text-green-600",
+    },
+    {
+      name: "Mandaue",
+      count: 128,
+      icon: <Navigation size={20} />,
+      color: "bg-purple-100 text-purple-600",
+    },
+    {
+      name: "Cebu City",
+      count: 312,
+      icon: <Building size={20} />,
+      color: "bg-orange-100 text-orange-600",
+    },
   ];
 
-  const propertyTypes = [
-    { type: "Condos", count: "450+", color: "bg-green-100 text-green-700" },
-    { type: "Houses", count: "320+", color: "bg-blue-100 text-blue-700" },
-    { type: "Apartments", count: "280+", color: "bg-amber-100 text-amber-700" },
+  const howItWorks = [
     {
-      type: "Townhouses",
-      count: "150+",
-      color: "bg-purple-100 text-purple-700",
+      icon: <CheckCircle size={28} />,
+      title: "Take the Quiz",
+      description: "Answer 5 quick questions about your lifestyle and budget.",
+      color: "bg-blue-500",
+      step: "01",
+    },
+    {
+      icon: <Target size={28} />,
+      title: "Get Smart Matches",
+      description:
+        "Our AI filters thousands of listings to find your top 3 picks.",
+      color: "bg-emerald-500",
+      step: "02",
+    },
+    {
+      icon: <MessageCircle size={28} />,
+      title: "Chat & Move In",
+      description: "Connect directly with owners and finalize your new home.",
+      color: "bg-purple-500",
+      step: "03",
+    },
+  ];
+
+  const successStories = [
+    {
+      name: "Marcus Tan",
+      role: "Remote Worker",
+      match: "98% Match",
+      quote:
+        "Found my IT Park condo in 5 minutes! The matching algorithm is actually scary accurate.",
+      avatarColor: "bg-blue-100",
+      textColor: "text-blue-600",
+      timeSaved: "Saved 12 hours",
+    },
+    {
+      name: "Sarah Jenkins",
+      role: "New Resident",
+      match: "92% Match",
+      quote:
+        "Way better than scrolling endlessly. Found a quiet place in Banilad that checked all my boxes.",
+      avatarColor: "bg-emerald-100",
+      textColor: "text-emerald-600",
+      timeSaved: "Saved 8 hours",
+    },
+  ];
+
+  const whyLivora = [
+    {
+      icon: <Filter size={24} />,
+      title: "Lifestyle-First Matching",
+      description:
+        "We prioritize commute times, pet policies, and neighborhood vibes over just price.",
+      gradient: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: <Shield size={24} />,
+      title: "No Hidden Fees",
+      description:
+        "The service is 100% free for renters. No brokerage surcharges or hidden service costs.",
+      gradient: "from-emerald-500 to-green-500",
+    },
+    {
+      icon: <Handshake size={24} />,
+      title: "Direct Owner Contact",
+      description:
+        "Skip the middleman. Chat directly with property owners and get answers instantly.",
+      gradient: "from-purple-500 to-pink-500",
+    },
+  ];
+
+  const trustMetrics = [
+    {
+      value: "10K+",
+      label: "Happy Renters",
+      icon: <Users size={20} />,
+      color: "text-blue-500",
+    },
+    {
+      value: "4.8/5",
+      label: "User Rating",
+      icon: <Star size={20} />,
+      color: "text-amber-500",
+    },
+    {
+      value: "96%",
+      label: "Satisfaction",
+      icon: <CheckCircle size={20} />,
+      color: "text-emerald-500",
+    },
+    {
+      value: "1 Week",
+      label: "Avg. Match Time",
+      icon: <Clock size={20} />,
+      color: "text-purple-500",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-display">
-      {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-white/90 backdrop-blur-md p-4 border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-display">
+      {/* Enhanced Header */}
+      <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-lg p-4 border-b border-gray-100 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
-            <img src={logo} alt="Livora Logo" />
+          <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+            <Home className="text-white" size={24} />
           </div>
           <div>
-            <h1 className="text-gray-900 text-xl font-bold leading-tight">
+            <h1 className="text-gray-900 text-2xl font-bold leading-tight bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
               Livora
             </h1>
-            <p className="text-gray-500 text-xs">
-              Your Home, Matched Perfectly
+            <p className="text-gray-500 text-xs font-medium">
+              Smart Home Matching
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors relative">
-            <Heart size={20} className="text-gray-600" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              3
-            </span>
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-            <Filter size={20} className="text-gray-600" />
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors">
-            <User size={20} />
-            <span className="hidden sm:inline">Login</span>
-          </button>
-        </div>
+        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+          <User size={18} />
+          <span className="text-sm">Get Started</span>
+        </button>
       </header>
 
-      <main className="pb-24">
-        {/* Hero Section */}
-        <section className="px-6 pt-8 pb-6">
-          <div className="max-w-2xl">
-            <h1 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-4">
-              Find your perfect <span className="text-green-600">home</span> in
-              the Philippines
-            </h1>
-            <p className="text-gray-600 text-lg mb-8">
-              Discover handpicked properties tailored to your island lifestyle.
-              Get personalized matches in minutes.
-            </p>
+      <main>
+        {/* Enhanced Match Finder CTA */}
+        <section className="px-6 mb-12 mt-8">
+          <div className="bg-gradient-to-br from-green-600 via-emerald-500 to-teal-500 rounded-3xl overflow-hidden shadow-2xl relative">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
 
-            {/* Search Bar */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-8">
-              <div className="flex-1">
-                <div className="relative">
-                  <MapPin
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={20}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search city, area, or property..."
-                    className="w-full pl-12 pr-4 py-4 bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-600/40 focus:border-transparent text-gray-900 placeholder-gray-400"
-                  />
-                </div>
-              </div>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-colors">
-                <Navigation size={20} />
-                Search
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Property Types */}
-        <section className="px-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-gray-900 text-xl font-bold">Browse by Type</h2>
-            <button className="text-green-600 text-sm font-bold">
-              View all
-            </button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {propertyTypes.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl p-4 border border-gray-200 hover:border-green-600/30 transition-colors"
-              >
-                <div
-                  className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3`}
-                >
-                  <Home size={24} />
-                </div>
-                <h3 className="text-gray-900 font-bold mb-1">{item.type}</h3>
-                <p className="text-gray-500 text-sm">{item.count} listings</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Featured Listings */}
-        <section className="px-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-gray-900 text-xl font-bold">
-                Featured Listings
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Handpicked properties in Metro Cebu
-              </p>
-            </div>
-            <button className="text-green-600 text-sm font-bold flex items-center gap-1">
-              See all
-              <ChevronRight size={16} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredListings.map((property) => (
-              <div
-                key={property.id}
-                className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300"
-              >
-                {/* Property Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={property.image}
-                    alt={property.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                  <button
-                    onClick={() => toggleFavorite(property.id)}
-                    className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
-                  >
-                    <Heart
-                      size={20}
-                      className={
-                        favorites.has(property.id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-600"
-                      }
-                    />
-                  </button>
-                  <div className="absolute bottom-3 left-3">
-                    <div className="flex gap-2">
-                      {property.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-gray-800"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Property Details */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="text-gray-900 font-bold text-lg mb-1">
-                        {property.title}
-                      </h3>
-                      <div className="flex items-center text-gray-500 text-sm">
-                        <MapPin size={14} className="mr-1" />
-                        {property.location}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded">
-                      <Star size={12} className="fill-green-700" />
-                      <span className="text-sm font-bold">
-                        {property.rating}
-                      </span>
-                      <span className="text-xs">({property.reviews})</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-gray-900">
-                      <span className="text-xl font-bold">
-                        ₱{property.price.toLocaleString()}
-                      </span>
-                      <span className="text-gray-500 text-sm">/month</span>
-                    </div>
-                    <div className={`p-2 rounded-lg ${property.color}`}>
-                      {property.icon}
-                    </div>
-                  </div>
-
-                  {/* Property Features */}
-                  <div className="flex items-center justify-between text-gray-500 text-sm border-t border-gray-100 pt-3">
-                    <div className="flex items-center gap-1">
-                      <Bed size={16} />
-                      <span>{property.bedrooms} bed</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Bath size={16} />
-                      <span>{property.bathrooms} bath</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Maximize2 size={16} />
-                      <span>{property.sqm} m²</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Match Finder CTA */}
-        <section className="px-6 mb-8">
-          <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl overflow-hidden shadow-xl">
-            <div className="p-8">
-              <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="p-8 relative z-10">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                      <Sparkles className="text-white" size={28} />
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center shadow-lg">
+                      <Sparkles className="text-white" size={32} />
                     </div>
                     <div>
-                      <h3 className="text-white text-2xl font-bold">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full mb-2">
+                        <span className="text-white text-xs font-bold uppercase tracking-widest">
+                          Powered by AI
+                        </span>
+                      </div>
+                      <h3 className="text-white text-3xl font-bold">
                         Smart Match Finder
                       </h3>
-                      <p className="text-white/90 text-sm font-medium uppercase tracking-widest">
-                        Powered by AI
-                      </p>
                     </div>
                   </div>
 
-                  <h4 className="text-white text-3xl font-bold mb-4">
-                    Not seeing what you like?
+                  <h4 className="text-white text-4xl font-bold mb-5 leading-tight">
+                    Find Your Perfect
+                    <br />
+                    Home Match
                   </h4>
 
-                  <p className="text-white/90 text-lg mb-6 max-w-2xl">
+                  <p className="text-white/90 text-lg mb-8 max-w-2xl leading-relaxed">
                     Take our 2-minute questionnaire to find your perfect match!
                     Get personalized property recommendations based on your
                     budget, lifestyle, and preferences.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                      <div className="text-white font-bold text-2xl mb-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
+                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                      <div className="text-white font-bold text-3xl mb-2">
                         5 Steps
                       </div>
-                      <div className="text-white/80 text-sm">Quick & Easy</div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                      <div className="text-white font-bold text-2xl mb-1">
-                        95% Match
+                      <div className="text-white/80 text-sm font-medium">
+                        Quick & Easy
                       </div>
-                      <div className="text-white/80 text-sm">Accuracy Rate</div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                      <div className="text-white font-bold text-2xl mb-1">
+                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                      <div className="text-white font-bold text-3xl mb-2">
+                        95%
+                      </div>
+                      <div className="text-white/80 text-sm font-medium">
+                        Match Accuracy
+                      </div>
+                    </div>
+                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                      <div className="text-white font-bold text-3xl mb-2">
                         100% Free
                       </div>
-                      <div className="text-white/80 text-sm">
+                      <div className="text-white/80 text-sm font-medium">
                         No Hidden Fees
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col sm:flex-row gap-5">
                     <button
                       onClick={handleStartMatching}
-                      className="bg-white text-green-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-xl flex items-center justify-center gap-2 text-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                      className="group bg-white hover:bg-gray-50 text-gray-900 font-bold py-5 px-10 rounded-2xl flex items-center justify-center gap-3 text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 shadow-lg"
                     >
-                      <Sparkles size={20} />
+                      <Sparkles size={22} className="text-emerald-600" />
                       Start Questionnaire
-                      <ChevronRight size={20} />
+                      <ArrowRight
+                        size={20}
+                        className="group-hover:translate-x-1 transition-transform"
+                      />
                     </button>
-                    <button className="bg-transparent border-2 border-white/30 hover:border-white text-white font-bold py-4 px-8 rounded-xl transition-colors">
+                    <button className="bg-transparent border-2 border-white/40 hover:border-white text-white font-bold py-5 px-10 rounded-2xl transition-all duration-300 hover:bg-white/10">
                       Browse All Properties
                     </button>
                   </div>
                 </div>
 
-                {/* Stats Sidebar */}
-                <div className="lg:w-80">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-                    <h5 className="text-white font-bold text-lg mb-4">
-                      This Week's Stats
-                    </h5>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="text-white/80 text-sm mb-1">
+                {/* Enhanced Stats Sidebar */}
+                <div className="lg:w-96">
+                  <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-7 border border-white/25">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Zap className="text-white" size={24} />
+                      <h5 className="text-white text-xl font-bold">
+                        Weekly Performance
+                      </h5>
+                    </div>
+                    <div className="space-y-6">
+                      <div className="pb-5 border-b border-white/10">
+                        <div className="text-white/80 text-sm font-medium mb-2">
                           Properties Matched
                         </div>
-                        <div className="text-white text-2xl font-bold">
-                          1,247
+                        <div className="flex items-end gap-3">
+                          <div className="text-white text-3xl font-bold">
+                            1,247
+                          </div>
+                          <div className="text-emerald-300 text-sm font-medium bg-emerald-500/20 px-2 py-1 rounded-full">
+                            +12%
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="text-white/80 text-sm mb-1">
+                      <div className="pb-5 border-b border-white/10">
+                        <div className="text-white/80 text-sm font-medium mb-2">
                           Average Time Saved
                         </div>
-                        <div className="text-white text-2xl font-bold">
-                          8.5 hours
+                        <div className="flex items-end gap-3">
+                          <div className="text-white text-3xl font-bold">
+                            8.5 hours
+                          </div>
+                          <div className="text-emerald-300 text-sm font-medium bg-emerald-500/20 px-2 py-1 rounded-full">
+                            Per User
+                          </div>
                         </div>
                       </div>
                       <div>
-                        <div className="text-white/80 text-sm mb-1">
+                        <div className="text-white/80 text-sm font-medium mb-2">
                           User Satisfaction
                         </div>
-                        <div className="text-white text-2xl font-bold">96%</div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-white text-3xl font-bold">
+                            96%
+                          </div>
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={16}
+                                className="fill-amber-400 text-amber-400"
+                              />
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -443,28 +341,117 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Popular Areas */}
-        <section className="px-6 mb-8">
-          <h2 className="text-gray-900 text-xl font-bold mb-4">
-            Popular Areas in Metro Cebu
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {popularAreas.map((area, index) => (
+        {/* Enhanced How It Works */}
+        <section className="px-6 mb-16">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full mb-4">
+              <span className="text-emerald-600 text-sm font-bold uppercase tracking-wider">
+                Process
+              </span>
+            </div>
+            <h2 className="text-gray-900 text-3xl font-bold mb-4">
+              How It Works
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Find your perfect home in just 3 simple steps with our intelligent
+              matching system
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting line for desktop */}
+            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-emerald-500 to-purple-500 -translate-y-1/2"></div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {howItWorks.map((step, index) => (
+                <div key={index} className="relative">
+                  <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group">
+                    {/* Step number */}
+                    <div className="absolute -top-4 -left-4 w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center">
+                      <div
+                        className={`${step.color} w-10 h-10 rounded-xl flex items-center justify-center`}
+                      >
+                        <span className="text-white font-bold text-lg">
+                          {step.step}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-white flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                      <div className="text-gray-700">{step.icon}</div>
+                    </div>
+                    <h3 className="text-gray-900 font-bold text-xl mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Enhanced Success Stories */}
+        <section className="px-6 mb-16">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-4">
+              <span className="text-blue-600 text-sm font-bold uppercase tracking-wider">
+                Testimonials
+              </span>
+            </div>
+            <h2 className="text-gray-900 text-3xl font-bold mb-4">
+              Success Stories
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Join thousands of happy renters who found their perfect home with
+              Livora
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {successStories.map((story, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl p-4 border border-gray-200 hover:border-green-600/30 transition-colors group cursor-pointer"
+                className="bg-white rounded-3xl p-7 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-gray-100 group-hover:bg-green-100 rounded-lg flex items-center justify-center transition-colors">
-                    {React.cloneElement(area.icon, {
-                      className: "text-gray-600 group-hover:text-green-600",
-                    })}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-14 h-14 ${story.avatarColor} rounded-2xl flex items-center justify-center`}
+                    >
+                      <span className={`${story.textColor} font-bold text-xl`}>
+                        {story.name.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-gray-900 font-bold text-lg">
+                        {story.name}
+                      </h3>
+                      <p className="text-gray-500 text-sm">{story.role}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-gray-900 font-bold">{area.name}</h3>
-                    <p className="text-gray-500 text-sm">
-                      {area.count} properties
-                    </p>
+                  <div className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl font-bold">
+                    {story.match}
+                  </div>
+                </div>
+                <p className="text-gray-700 text-lg italic leading-relaxed mb-6 border-l-4 border-emerald-500 pl-4">
+                  "{story.quote}"
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Clock size={16} />
+                    <span>{story.timeSaved}</span>
+                  </div>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className="fill-amber-400 text-amber-400"
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -472,44 +459,185 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Safety & Verification */}
-        <section className="px-6 mb-8">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <Shield className="text-white" size={32} />
-                  <h3 className="text-white text-2xl font-bold">
-                    Safe & Verified Listings Only
+        {/* Enhanced Why Livora */}
+        <section className="px-6 mb-16">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full mb-4">
+              <span className="text-purple-600 text-sm font-bold uppercase tracking-wider">
+                Benefits
+              </span>
+            </div>
+            <h2 className="text-gray-900 text-3xl font-bold mb-4">
+              Why Choose Livora?
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              We're changing how people find homes with intelligent technology
+              and human touch
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {whyLivora.map((item, index) => (
+              <div key={index} className="group">
+                <div className="bg-white rounded-3xl p-7 border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full">
+                  <div
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    <div className="text-white">{item.icon}</div>
+                  </div>
+                  <h3 className="text-gray-900 font-bold text-xl mb-3">
+                    {item.title}
                   </h3>
-                </div>
-                <p className="text-gray-300 text-lg mb-6">
-                  Every property on MatchPH undergoes thorough verification. We
-                  personally inspect each listing to ensure quality, safety, and
-                  accurate representation.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-white">Property Inspection</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-white">Background Checks</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-white">Legal Verification</span>
-                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                <div className="text-white text-center">
-                  <div className="text-4xl font-bold mb-2">100%</div>
-                  <div className="text-white/80">Verified Listings</div>
+            ))}
+          </div>
+
+          {/* Trust Metrics */}
+          <div className="mt-12 bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-10">
+            <div className="text-center mb-10">
+              <h3 className="text-white text-2xl font-bold mb-3">
+                Trusted by Thousands
+              </h3>
+              <p className="text-gray-300">Our numbers speak for themselves</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {trustMetrics.map((metric, index) => (
+                <div key={index} className="text-center">
+                  <div className="flex justify-center mb-3">
+                    <div
+                      className={`${metric.color} bg-white/10 w-12 h-12 rounded-xl flex items-center justify-center`}
+                    >
+                      {metric.icon}
+                    </div>
+                  </div>
+                  <div className="text-white text-3xl font-bold mb-2">
+                    {metric.value}
+                  </div>
+                  <div className="text-gray-300 text-sm font-medium">
+                    {metric.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Enhanced Popular Areas */}
+        <section className="px-6 mb-16">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-50 rounded-full mb-4">
+              <span className="text-cyan-600 text-sm font-bold uppercase tracking-wider">
+                Locations
+              </span>
+            </div>
+            <h2 className="text-gray-900 text-3xl font-bold mb-4">
+              Popular Areas in Metro Cebu
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Discover the most sought-after neighborhoods with verified
+              properties
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {popularAreas.map((area, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:border-gray-200 transition-all duration-300 group cursor-pointer hover:-translate-y-1"
+              >
+                <div
+                  className={`w-12 h-12 ${area.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                >
+                  {area.icon}
+                </div>
+                <h3 className="text-gray-900 font-bold mb-1">{area.name}</h3>
+                <p className="text-gray-500 text-sm font-medium">
+                  {area.count} properties
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Enhanced Safety & Verification */}
+        <section className="px-6 mb-12">
+          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl overflow-hidden shadow-2xl">
+            <div className="p-10">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center">
+                      <Shield className="text-emerald-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 backdrop-blur-sm rounded-full mb-2">
+                        <span className="text-emerald-300 text-xs font-bold uppercase tracking-widest">
+                          Security
+                        </span>
+                      </div>
+                      <h3 className="text-white text-3xl font-bold">
+                        Safe & Verified Listings Only
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-lg mb-8 leading-relaxed max-w-2xl">
+                    Every property on Livora undergoes a thorough 3-step
+                    verification process. We personally inspect each listing to
+                    ensure quality, safety, and accurate representation.
+                  </p>
+                  <div className="space-y-4">
+                    {[
+                      "Property Inspection",
+                      "Background Checks",
+                      "Legal Verification",
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-center gap-4">
+                        <div className="w-3 h-3 bg-emerald-500 rounded-full flex-shrink-0"></div>
+                        <span className="text-white font-medium">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
+                  <div className="text-center">
+                    <div className="text-white text-6xl font-bold mb-3">
+                      100%
+                    </div>
+                    <div className="text-emerald-300 text-lg font-bold uppercase tracking-wider mb-2">
+                      Verified Listings
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Zero compromise on quality
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="px-6 mb-16">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-12 text-center">
+            <h3 className="text-white text-3xl font-bold mb-6">
+              Ready to Find Your Perfect Home?
+            </h3>
+            <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+              Join thousands of happy renters who found their perfect match with
+              Livora
+            </p>
+            <button
+              onClick={handleStartMatching}
+              className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-bold py-5 px-12 rounded-2xl text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 shadow-lg"
+            >
+              <Sparkles size={22} className="text-emerald-600" />
+              Start Your Free Questionnaire
+              <ArrowRight size={20} />
+            </button>
           </div>
         </section>
       </main>
