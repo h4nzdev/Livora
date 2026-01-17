@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -10,10 +10,12 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/Livora.png"; // Make sure to import your logo
+import { AuthContext } from "../../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,10 +23,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", formData);
-    // For demo purposes, navigate to home
-    navigate("/");
+    login(true);
   };
 
   const handleChange = (e) => {

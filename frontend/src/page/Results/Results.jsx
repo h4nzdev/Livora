@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Added useNavigate
 import {
   ArrowLeft,
   Filter,
@@ -35,6 +36,7 @@ import {
 import { cebuProperties } from "../../data/propertyData";
 
 const Results = () => {
+  const navigate = useNavigate(); // Added navigation hook
   const [selectedFilters, setSelectedFilters] = React.useState({
     propertyType: "all",
     amenities: ["wifi", "gym"],
@@ -149,13 +151,26 @@ const Results = () => {
     }));
   };
 
+  // Check if amenity matches user preference (for highlighting)
+  const isPreferredAmenity = (amenity) => {
+    return selectedFilters.amenities.includes(amenity);
+  };
+
+  // Navigate to property details
+  const handleViewDetails = (propertyId) => {
+    navigate("/property");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-display">
       {/* Mobile Top Navigation Bar */}
       <div className="lg:hidden w-full p-4 bg-gray-50/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
         <div className="flex items-center justify-between h-14 max-w-[480px] mx-auto">
           <div className="flex items-center gap-3">
-            <button className="w-10 h-10 flex items-center justify-start text-green-600 hover:bg-gray-200 rounded-full transition-colors">
+            <button
+              onClick={() => navigate(-1)} // Added navigation back
+              className="w-10 h-10 flex items-center justify-start text-green-600 hover:bg-gray-200 rounded-full transition-colors"
+            >
               <ArrowLeft size={28} className="mr-[-6px]" />
             </button>
             <h1 className="text-gray-900 text-lg font-bold leading-tight tracking-tight">
@@ -258,7 +273,7 @@ const Results = () => {
                         )}
                       </div>
                     </label>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -556,18 +571,37 @@ const Results = () => {
                           {property.description}
                         </p>
 
-                        {/* Amenities */}
+                        {/* Amenities - Now with highlighted preferred amenities */}
                         <div className="flex flex-wrap gap-2 mb-6">
                           {property.amenities
                             .slice(0, 5)
                             .map((amenity, index) => (
                               <div
                                 key={index}
-                                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors"
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                                  isPreferredAmenity(amenity)
+                                    ? "bg-green-100 border border-green-200"
+                                    : "bg-gray-100 hover:bg-gray-200"
+                                }`}
                               >
-                                {renderAmenityIcon(amenity)}
-                                <span className="text-xs font-medium text-gray-700">
+                                <div
+                                  className={`${isPreferredAmenity(amenity) ? "text-green-600" : "text-gray-700"}`}
+                                >
+                                  {renderAmenityIcon(amenity)}
+                                </div>
+                                <span
+                                  className={`text-xs font-medium ${
+                                    isPreferredAmenity(amenity)
+                                      ? "text-green-700"
+                                      : "text-gray-700"
+                                  }`}
+                                >
                                   {renderAmenityLabel(amenity)}
+                                  {isPreferredAmenity(amenity) && (
+                                    <span className="ml-1 text-[10px] text-green-500">
+                                      ✓
+                                    </span>
+                                  )}
                                 </span>
                               </div>
                             ))}
@@ -585,9 +619,12 @@ const Results = () => {
                           <div className="flex items-center gap-4">
                             <div
                               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-                                property.petFriendly
-                                  ? "bg-green-50 text-green-700"
-                                  : "bg-gray-100 text-gray-600"
+                                property.petFriendly &&
+                                selectedFilters.petFriendly
+                                  ? "bg-green-50 text-green-700 border border-green-200"
+                                  : property.petFriendly
+                                    ? "bg-gray-100 text-gray-600"
+                                    : "bg-gray-100 text-gray-400"
                               }`}
                             >
                               <PawPrint size={14} />
@@ -596,12 +633,21 @@ const Results = () => {
                                   ? "Pet-friendly"
                                   : "No pets"}
                               </span>
+                              {property.petFriendly &&
+                                selectedFilters.petFriendly && (
+                                  <span className="text-[10px] text-green-500">
+                                    ✓
+                                  </span>
+                                )}
                             </div>
                             <span className="text-xs text-gray-500">
                               Available: {property.availableDate}
                             </span>
                           </div>
-                          <button className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md">
+                          <button
+                            onClick={() => handleViewDetails(property.id)}
+                            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md"
+                          >
                             View Details
                           </button>
                         </div>
@@ -622,10 +668,126 @@ const Results = () => {
         </div>
       </div>
 
-      {/* Mobile Layout (remains the same as before) */}
+      {/* Mobile Layout - Keep your existing mobile code */}
       <div className="lg:hidden flex-1 flex flex-col px-4 sm:px-6 md:px-8 pt-4 md:pt-8">
-        {/* Mobile content - same as your original mobile code */}
-        {/* ... (keep your existing mobile layout) ... */}
+        {/* Mobile content - with highlighted amenities */}
+        <div className="max-w-[480px] mx-auto w-full">
+          {/* Mobile Filters Bar */}
+          <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar">
+            <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full">
+              <span className="text-sm font-medium">All</span>
+            </button>
+            <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full">
+              <span className="text-sm font-medium">₱20k max</span>
+            </button>
+            <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full">
+              <PawPrint size={14} />
+              <span className="text-sm font-medium">Pet-friendly</span>
+            </button>
+            <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full">
+              <span className="text-sm font-medium">More</span>
+              <ChevronDown size={14} />
+            </button>
+          </div>
+
+          {/* Mobile Property List */}
+          <div className="space-y-4">
+            {cebuProperties.map((property) => {
+              const matchPercentage = calculateMatchPercentage(property);
+
+              return (
+                <div
+                  key={property.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+                >
+                  {/* Match Badge */}
+                  <div className="px-4 pt-4">
+                    <div className="flex justify-between items-center">
+                      <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full">
+                        <span className="text-xs font-bold">
+                          {matchPercentage}% MATCH
+                        </span>
+                      </div>
+                      <button>
+                        <Heart size={20} className="text-gray-400" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Property Info */}
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-bold text-gray-900">
+                          {property.name}
+                        </h3>
+                        <div className="flex items-center gap-1 mt-1">
+                          <MapPin size={14} className="text-gray-400" />
+                          <span className="text-gray-600 text-sm">
+                            {property.location}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-green-600 font-bold text-lg">
+                          ₱{property.price.toLocaleString()}
+                          <span className="text-sm font-normal text-gray-400">
+                            /mo
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Property Stats */}
+                    <div className="flex items-center gap-4 text-gray-500 text-sm mb-3">
+                      <div className="flex items-center gap-1">
+                        <Bed size={16} />
+                        <span>{property.bedrooms} BR</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Bath size={16} />
+                        <span>{property.bathrooms} BA</span>
+                      </div>
+                    </div>
+
+                    {/* Highlighted Amenities */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {property.amenities.slice(0, 4).map((amenity, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
+                            isPreferredAmenity(amenity)
+                              ? "bg-green-50 border border-green-200"
+                              : "bg-gray-100"
+                          }`}
+                        >
+                          {renderAmenityIcon(amenity)}
+                          <span
+                            className={`text-xs ${
+                              isPreferredAmenity(amenity)
+                                ? "text-green-700 font-semibold"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            {renderAmenityLabel(amenity)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      onClick={() => handleViewDetails(property.id)}
+                      className="w-full py-3 bg-green-600 text-white rounded-xl font-semibold"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Floating Map Button (Mobile only) */}
@@ -635,41 +797,6 @@ const Results = () => {
           <span className="text-sm font-bold tracking-wide">Map View</span>
         </button>
       </div>
-
-      {/* Bottom Navigation Bar (Mobile only) */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200">
-        <div className="max-w-[480px] mx-auto flex justify-around items-center h-20 px-4">
-          <a
-            href="#"
-            className="flex flex-col items-center gap-1 text-green-600"
-          >
-            <Home size={24} />
-            <span className="text-[10px] font-bold">Matches</span>
-          </a>
-          <a
-            href="#"
-            className="flex flex-col items-center gap-1 text-gray-400"
-          >
-            <Bookmark size={24} />
-            <span className="text-[10px] font-medium">Saved</span>
-          </a>
-          <a
-            href="#"
-            className="flex flex-col items-center gap-1 text-gray-400 relative"
-          >
-            <MessageCircle size={24} />
-            <span className="text-[10px] font-medium">Messages</span>
-            <div className="absolute top-0 right-0 size-2 bg-green-600 rounded-full border border-white"></div>
-          </a>
-          <a
-            href="#"
-            className="flex flex-col items-center gap-1 text-gray-400"
-          >
-            <User size={24} />
-            <span className="text-[10px] font-medium">Profile</span>
-          </a>
-        </div>
-      </nav>
     </div>
   );
 };

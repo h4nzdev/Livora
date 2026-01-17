@@ -25,6 +25,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/Livora.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -174,10 +175,10 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-display">
       {/* Enhanced Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-lg p-4 border-b border-gray-100 shadow-sm">
+      <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-lg py-4 px-6 border-b border-gray-100 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-            <Home className="text-white" size={24} />
+            <img src={logo} alt="Livora Logo" />
           </div>
           <div>
             <h1 className="text-gray-900 text-2xl font-bold leading-tight bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">

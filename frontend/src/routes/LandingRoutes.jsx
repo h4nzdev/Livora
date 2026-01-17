@@ -4,6 +4,8 @@ import LandingPage from "../page/Landing/LandingPage";
 import Matching from "../page/Matching/Matching";
 import Login from "../page/Authentication/Login";
 import Register from "../page/Authentication/Register";
+import Results from "../page/Results/Results";
+import PropertyDetails from "../page/PropertyDetails/PropertyDetails";
 
 const LandingRoutes = () => {
   return (
@@ -18,6 +20,8 @@ const LandingRoutes = () => {
 
         {/* Matching Flow */}
         <Route path="/matching" element={<Matching />} />
+        <Route path="/results" element={<Results />} />
+        <Route path="/property" element={<PropertyDetails />} />
 
         {/* Redirect any unknown paths to landing page */}
         <Route path="*" element={<LandingPage />} />

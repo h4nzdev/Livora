@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // Added import
 
 // Use your existing imports
 import BudgetRange from "../../components/MatchingComponents/BudgetRange";
@@ -7,16 +8,17 @@ import LifestyleAndFeatures from "../../components/MatchingComponents/LifestyleA
 import HousingAndTransport from "../../components/MatchingComponents/HousingAndTransport";
 import AreaPreference from "../../components/MatchingComponents/AreaPreference";
 import RegionSelection from "../../components/MatchingComponents/RegionSelection";
-import Results from "../Results/Results";
+// Remove Results import since we'll navigate instead
 import LeaseAndHousehold from "../../components/MatchingComponents/LeaseAndHousehold";
 import logo from "../../assets/Livora.png";
-import SplashScreen from "../../components/SplashScreen"; // Import the SplashScreen component
+import SplashScreen from "../../components/SplashScreen";
 
 const Matching = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
+  const navigate = useNavigate(); // Added navigate hook
 
-  // Array of step components in order matching your structure
+  // Updated steps array - removed Results component
   const steps = [
     {
       title: "Budget Range",
@@ -48,11 +50,7 @@ const Matching = () => {
       component: <LifestyleAndFeatures />,
       showFooter: true,
     },
-    {
-      title: "Property Matches",
-      component: <Results />,
-      showFooter: false, // Results has its own navigation
-    },
+    // Removed Results step - now we have navigation
   ];
 
   const totalSteps = steps.length;
@@ -66,19 +64,19 @@ const Matching = () => {
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
+    } else {
+      // When on last step, navigate to Results page
+      navigate("/results");
     }
   };
 
   const calculateProgress = () => {
-    // For Results (last step), show 100%
-    if (currentStep === totalSteps - 1) return 100;
     // Calculate progress based on current step
     return Math.round(((currentStep + 1) / totalSteps) * 100);
   };
 
   const getButtonText = () => {
-    if (currentStep === totalSteps - 2) return "Find My Matches";
-    if (currentStep === totalSteps - 1) return "Browse All Properties";
+    if (currentStep === totalSteps - 1) return "Find My Matches"; // Last step
     return "Continue";
   };
 
@@ -131,8 +129,8 @@ const Matching = () => {
                     index === currentStep
                       ? "bg-white text-green-600"
                       : index < currentStep
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-200 text-gray-500"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {index + 1}
@@ -163,10 +161,9 @@ const Matching = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={currentStep === totalSteps - 1}
               className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
                 currentStep === totalSteps - 1
-                  ? "bg-green-400 text-white cursor-not-allowed"
+                  ? "bg-green-600 text-white hover:bg-green-700"
                   : "bg-green-600 text-white hover:bg-green-700"
               }`}
             >
@@ -225,10 +222,9 @@ const Matching = () => {
 
           <button
             onClick={handleNext}
-            disabled={currentStep === totalSteps - 1}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
               currentStep === totalSteps - 1
-                ? "text-gray-400 cursor-not-allowed"
+                ? "text-green-600 hover:bg-green-600/10"
                 : "text-green-600 hover:bg-green-600/10"
             }`}
           >
@@ -240,18 +236,10 @@ const Matching = () => {
         {/* Current Step Component */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8">
           <div className="max-w-[480px] mx-auto lg:max-w-none lg:w-full">
-            {/* Different container for Results page vs other steps */}
-            {currentStep === totalSteps - 1 ? (
-              // Results page - full width
-              <div className="w-full px-4 lg:px-0">
-                {steps[currentStep].component}
-              </div>
-            ) : (
-              // All other steps - centered with reasonable max width
-              <div className="lg:max-w-3xl xl:max-w-4xl lg:mx-auto">
-                {steps[currentStep].component}
-              </div>
-            )}
+            {/* Centered container for all steps */}
+            <div className="lg:max-w-3xl xl:max-w-4xl lg:mx-auto">
+              {steps[currentStep].component}
+            </div>
           </div>
         </div>
 

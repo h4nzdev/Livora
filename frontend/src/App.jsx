@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import LandingRoutes from "./routes/LandingRoutes";
+import Role from "./routes/Role";
 
 const App = () => {
-  return <LandingRoutes />;
+  return <Role />;
 };
 
 export default App;
