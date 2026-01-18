@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 import {
   ArrowLeft,
   Share2,
@@ -20,6 +22,8 @@ import {
 const PropertyDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const propertyImages = [
     "https://lh3.googleusercontent.com/aida-public/AB6AXuDi3cprOA2uc9dLnOLgJze9fsZvb6XpFEkMAYrFbNJEdHHoRWmy4_Tcz2xGibCV8Cz-fLFr0iC7PZWyffrLzH6oVWxMXWc2eIbtgITVI6ufk5TegpRJ4jFM-bMprY7AVlXvGG95Yny1fOH4_GF60p7vdcgiuiFmNXIW6LBiUJ_LAa6j8cv_ZCpFDSSPKYTooqx2hn5JDZb6Z8OhBSVtr3zHD__XDroeCYresEALPDFkSW89gwv7MDbbgeCOofHzAPwnI7K-xGbVsyU",
@@ -64,6 +68,17 @@ const PropertyDetails = () => {
     setCurrentImage((prev) =>
       prev === propertyImages.length - 1 ? 0 : prev + 1,
     );
+  };
+
+  const handleMessageOwner = () => {
+    if (!user) {
+      // If user is not logged in, navigate to login page
+      navigate("/login");
+    } else {
+      // If user is logged in, proceed with messaging
+      console.log("User is logged in, proceed with messaging");
+      // You might want to open a chat modal or navigate to chat page
+    }
   };
 
   return (
@@ -222,7 +237,10 @@ const PropertyDetails = () => {
                   className={`w-6 h-6 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400"}`}
                 />
               </button>
-              <button className="flex-1 h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all">
+              <button
+                onClick={handleMessageOwner}
+                className="flex-1 h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all"
+              >
                 <MessageCircle className="w-5 h-5" />
                 Message Owner
               </button>
@@ -414,7 +432,10 @@ const PropertyDetails = () => {
                       {isFavorite ? "Saved" : "Save Property"}
                     </span>
                   </button>
-                  <button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-3 transition-all">
+                  <button
+                    onClick={handleMessageOwner}
+                    className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-3 transition-all"
+                  >
                     <MessageCircle className="w-5 h-5" />
                     Message Property Owner
                   </button>

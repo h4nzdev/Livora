@@ -73,7 +73,7 @@ const RegionSelection = () => {
         </div>
 
         {/* Selection List */}
-        <div className="max-w-[480px] md:max-w-2xl lg:max-w-3xl mx-auto w-full">
+        <div className="max-w-[480px] md:max-w-2xl lg:max-w-4xl mx-auto w-full">
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6">
             {/* Metro Manila */}
             <label className="group relative flex items-center gap-4 rounded-xl md:rounded-lg border-2 border-transparent bg-white p-5 md:p-6 shadow-sm transition-all hover:border-green-600/20 cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/[0.02]">
