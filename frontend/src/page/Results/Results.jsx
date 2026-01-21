@@ -34,6 +34,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { cebuProperties } from "../../data/propertyData";
+import SplashScreen from "../../components/SplashScreen";
 
 const Results = () => {
   const navigate = useNavigate(); // Added navigation hook
@@ -46,6 +47,18 @@ const Results = () => {
     parking: false,
     security: true,
   });
+
+  // Add splash screen state
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  React.useEffect(() => {
+    // Hide splash screen after 2 seconds
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Calculate match percentages based on sample logic
   const calculateMatchPercentage = (property) => {
@@ -160,6 +173,11 @@ const Results = () => {
   const handleViewDetails = (propertyId) => {
     navigate("/property");
   };
+
+  // Render splash screen if showing
+  if (showSplash) {
+    return <SplashScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-display">

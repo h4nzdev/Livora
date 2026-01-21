@@ -1,27 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Added import
+import { useNavigate } from "react-router-dom";
 
 // Use your existing imports
 import BudgetRange from "../../components/MatchingComponents/BudgetRange";
 import LifestyleAndFeatures from "../../components/MatchingComponents/LifestyleAndFeatures";
-import HousingAndTransport from "../../components/MatchingComponents/HousingAndTransport";
 import AreaPreference from "../../components/MatchingComponents/AreaPreference";
 import RegionSelection from "../../components/MatchingComponents/RegionSelection";
-// Remove Results import since we'll navigate instead
 import LeaseAndHousehold from "../../components/MatchingComponents/LeaseAndHousehold";
 import logo from "../../assets/Livora.png";
-import SplashScreen from "../../components/SplashScreen";
+import ProfilingSplashScreen from "../../components/ProfilingSplashScreen";
 
 const Matching = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
-  const navigate = useNavigate(); // Added navigate hook
+  const navigate = useNavigate();
 
-  // Updated steps array - removed Results component
+  const handleSplashFinish = () => {
+    setShowSplash(false);
+  };
+
+  useEffect(() => {
+    // Hide splash screen after 1.5 seconds as fallback
+    const timer = setTimeout(() => {
+      if (showSplash) {
+        setShowSplash(false);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Updated steps array
   const steps = [
     {
-      title: "Budget Range",
+      title: "Lease Terms",
       component: <BudgetRange />,
       showFooter: true,
     },
@@ -36,13 +49,8 @@ const Matching = () => {
       showFooter: true,
     },
     {
-      title: "Lease & Household",
+      title: "Household Setup",
       component: <LeaseAndHousehold />,
-      showFooter: true,
-    },
-    {
-      title: "Housing & Transport",
-      component: <HousingAndTransport />,
       showFooter: true,
     },
     {
@@ -50,7 +58,6 @@ const Matching = () => {
       component: <LifestyleAndFeatures />,
       showFooter: true,
     },
-    // Removed Results step - now we have navigation
   ];
 
   const totalSteps = steps.length;
@@ -80,22 +87,18 @@ const Matching = () => {
     return "Continue";
   };
 
-  const handleSplashFinish = () => {
-    setShowSplash(false);
-  };
-
   // If splash screen is still showing, only render the splash screen
   if (showSplash) {
-    return <SplashScreen onFinish={handleSplashFinish} />;
+    return <ProfilingSplashScreen onFinish={handleSplashFinish} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
-      {/* Desktop Sidebar - Hidden on mobile, visible on large screens and up */}
-      <div className="hidden lg:flex lg:w-80 xl:w-96 bg-white border-r border-gray-200 flex-col p-6">
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row overflow-hidden">
+      {/* Desktop Sidebar - Fixed position */}
+      <div className="hidden lg:flex lg:w-80 xl:w-96 bg-white border-r border-gray-200 flex-col p-6 fixed left-0 top-0 bottom-0 z-20">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8  flex items-center justify-center rounded">
+            <div className="w-8 h-8 flex items-center justify-center rounded">
               <img src={logo} alt="" />
             </div>
             <h1 className="text-xl font-bold text-gray-900">Livora</h1>
@@ -111,8 +114,8 @@ const Matching = () => {
           </div>
         </div>
 
-        {/* Step List */}
-        <div className="space-y-2">
+        {/* Step List - Scrollable if needed */}
+        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
           {steps.map((step, index) => (
             <button
               key={index}
@@ -141,8 +144,8 @@ const Matching = () => {
           ))}
         </div>
 
-        {/* Desktop Footer */}
-        <div className="mt-auto pt-6 border-t border-gray-200">
+        {/* Desktop Footer - Fixed at bottom of sidebar */}
+        <div className="pt-6 border-t border-gray-200 mt-auto">
           <p className="text-gray-500 text-sm mb-4">
             Complete all steps to get personalized property matches
           </p>
@@ -174,8 +177,8 @@ const Matching = () => {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full">
+      {/* Main Content Area - Scrollable */}
+      <div className="flex-1 flex flex-col w-full lg:ml-80 xl:ml-96">
         {/* Mobile Progress Bar at Top */}
         <div className="lg:hidden w-full px-4 pt-4">
           <div className="max-w-[480px] mx-auto">
@@ -233,7 +236,7 @@ const Matching = () => {
           </button>
         </div>
 
-        {/* Current Step Component */}
+        {/* Current Step Component - Scrollable main content */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8">
           <div className="max-w-[480px] mx-auto lg:max-w-none lg:w-full">
             {/* Centered container for all steps */}

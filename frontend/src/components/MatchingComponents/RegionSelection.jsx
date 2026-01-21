@@ -215,7 +215,7 @@ const RegionSelection = () => {
         </div>
 
         {/* Desktop Help Text */}
-        <div className="hidden md:block max-w-2xl mx-auto w-full mt-8">
+        <div className="hidden md:block max-w-4xl mx-auto w-full mt-8">
           <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-600">
             <p className="text-green-800 text-sm">
               <span className="font-bold">Tip:</span> Selecting a specific

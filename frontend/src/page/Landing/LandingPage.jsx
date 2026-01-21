@@ -76,7 +76,7 @@ const LandingPage = () => {
   const howItWorks = [
     {
       icon: <CheckCircle size={28} />,
-      title: "Take the Quiz",
+      title: "Fill-up your profile",
       description: "Answer 5 quick questions about your lifestyle and budget.",
       color: "bg-blue-500",
       step: "01",
@@ -165,7 +165,7 @@ const LandingPage = () => {
       color: "text-emerald-500",
     },
     {
-      value: "1 Week",
+      value: "3 to 4 days",
       label: "Avg. Match Time",
       icon: <Clock size={20} />,
       color: "text-purple-500",
@@ -185,7 +185,7 @@ const LandingPage = () => {
               Livora
             </h1>
             <p className="text-gray-500 text-xs font-medium">
-              Smart Home Matching
+              From "Finding the One" to "Loving the Stay"
             </p>
           </div>
         </div>
@@ -214,27 +214,27 @@ const LandingPage = () => {
                       <Sparkles className="text-white" size={32} />
                     </div>
                     <div>
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full mb-2">
+                      <h3 className="text-white text-3xl font-bold mb-2">
+                        Intelligent Profiling
+                      </h3>
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
                         <span className="text-white text-xs font-bold uppercase tracking-widest">
                           Powered by AI
                         </span>
                       </div>
-                      <h3 className="text-white text-3xl font-bold">
-                        Smart Match Finder
-                      </h3>
                     </div>
                   </div>
 
                   <h4 className="text-white text-4xl font-bold mb-5 leading-tight">
-                    Find Your Perfect
+                    Your Perfect
                     <br />
-                    Home Match
+                    Match
                   </h4>
 
                   <p className="text-white/90 text-lg mb-8 max-w-2xl leading-relaxed">
-                    Take our 2-minute questionnaire to find your perfect match!
-                    Get personalized property recommendations based on your
-                    budget, lifestyle, and preferences.
+                    Find your perfect match in just 2 minutes! Get personalized
+                    property matches based on your budget, lifestyle, and
+                    preferences.
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
@@ -254,14 +254,6 @@ const LandingPage = () => {
                         Match Accuracy
                       </div>
                     </div>
-                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
-                      <div className="text-white font-bold text-3xl mb-2">
-                        100% Free
-                      </div>
-                      <div className="text-white/80 text-sm font-medium">
-                        No Hidden Fees
-                      </div>
-                    </div>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-5">
@@ -270,14 +262,14 @@ const LandingPage = () => {
                       className="group bg-white hover:bg-gray-50 text-gray-900 font-bold py-5 px-10 rounded-2xl flex items-center justify-center gap-3 text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 shadow-lg"
                     >
                       <Sparkles size={22} className="text-emerald-600" />
-                      Start Questionnaire
+                      Start your journey
                       <ArrowRight
                         size={20}
                         className="group-hover:translate-x-1 transition-transform"
                       />
                     </button>
                     <button className="bg-transparent border-2 border-white/40 hover:border-white text-white font-bold py-5 px-10 rounded-2xl transition-all duration-300 hover:bg-white/10">
-                      Browse All Properties
+                      Get Started
                     </button>
                   </div>
                 </div>

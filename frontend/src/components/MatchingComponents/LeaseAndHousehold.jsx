@@ -12,6 +12,14 @@ import {
   Info,
   Baby,
   Sparkles,
+  Building,
+  Home as HomeIcon,
+  House,
+  Bus,
+  Car,
+  Bike,
+  CarTaxiFront,
+  Building2,
 } from "lucide-react";
 
 const LeaseAndHousehold = () => {
@@ -36,12 +44,12 @@ const LeaseAndHousehold = () => {
 
       {/* Desktop Header */}
       <div className="hidden md:block p-6 border-b border-gray-200">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto w-full">
           <h1 className="text-gray-900 text-3xl font-bold leading-tight">
-            Lease & Household Preferences
+            Household & Housing Preferences
           </h1>
           <p className="mt-2 text-lg text-gray-600">
-            Tell us about your rental timeline and who you'll be living with.
+            Tell us about your living arrangement and housing preferences
           </p>
         </div>
       </div>
@@ -50,7 +58,9 @@ const LeaseAndHousehold = () => {
         {/* Mobile Progress Indicator */}
         <div className="md:hidden flex flex-col gap-3 mb-6">
           <div className="flex items-center justify-between">
-            <p className="text-gray-900 text-xl font-bold">Lease & Household</p>
+            <p className="text-gray-900 text-xl font-bold">
+              Household & Housing
+            </p>
             <span className="text-green-600 text-sm font-bold">
               Step 4 & 5 of 8
             </span>
@@ -77,54 +87,12 @@ const LeaseAndHousehold = () => {
           </div>
         </div>
 
-        {/* Desktop Two-Column Layout */}
+        {/* Desktop Combined Layout */}
         <div className="hidden md:block max-w-4xl mx-auto w-full">
-          <div className="grid grid-cols-2 gap-8">
-            {/* Lease Duration Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
-                  <Calendar size={24} />
-                </div>
-                <div>
-                  <h2 className="text-gray-900 text-xl font-bold">
-                    Lease Duration
-                  </h2>
-                  <p className="text-gray-500 text-sm">
-                    How long are you planning to rent?
-                  </p>
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm mb-6">
-                Choose your preferred rental period to find verified contracts.
-              </p>
-              <div className="flex flex-col gap-3">
-                <button className="flex items-center justify-between p-4 rounded-xl border-2 border-green-600 bg-green-600/5 text-green-600 font-bold transition-all hover:bg-green-600/10">
-                  <span>Short-term (1-6 months)</span>
-                  <span className="text-xs px-2 py-1 bg-green-600/10 rounded">
-                    Flexible
-                  </span>
-                </button>
-                <button className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-semibold transition-all hover:border-green-600/30">
-                  <span>Long-term (1+ years)</span>
-                  <span className="text-xs px-2 py-1 bg-gray-200 rounded">
-                    Popular
-                  </span>
-                </button>
-                <div className="relative">
-                  <button className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-semibold transition-all hover:border-green-600/30">
-                    <span>Flexible (open to options)</span>
-                  </button>
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">
-                    New
-                  </span>
-                </div>
-              </div>
-            </div>
-
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             {/* Household Setup Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
                 <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
                   <Users size={24} />
                 </div>
@@ -137,11 +105,8 @@ const LeaseAndHousehold = () => {
                   </p>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm mb-6">
-                Select your living arrangement for space recommendations.
-              </p>
 
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-4 gap-4 mb-8">
                 {/* Solo */}
                 <button className="flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30">
                   <User size={24} />
@@ -168,49 +133,155 @@ const LeaseAndHousehold = () => {
               </div>
 
               {/* Shared Living Conditional Options */}
-              <div className="mt-6 pt-6 border-t border-gray-100 space-y-6">
-                {/* Roommate Preference */}
-                <div>
-                  <p className="text-sm font-bold text-gray-700 mb-3">
-                    Roommate Preference
-                  </p>
-                  <div className="flex bg-gray-100 p-1 rounded-xl">
-                    <button className="flex-1 py-3 text-sm font-bold rounded-lg bg-white shadow-sm text-green-600">
-                      Any Gender
-                    </button>
-                    <button className="flex-1 py-3 text-sm font-bold text-gray-500">
-                      Male Only
-                    </button>
-                    <button className="flex-1 py-3 text-sm font-bold text-gray-500">
-                      Female Only
-                    </button>
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <div className="grid grid-cols-2 gap-8">
+                  {/* Roommate Preference */}
+                  <div>
+                    <p className="text-sm font-bold text-gray-700 mb-3">
+                      Roommate Preference
+                    </p>
+                    <div className="flex bg-gray-100 p-1 rounded-xl">
+                      <button className="flex-1 py-3 text-sm font-bold rounded-lg bg-white shadow-sm text-green-600">
+                        Any Gender
+                      </button>
+                      <button className="flex-1 py-3 text-sm font-bold text-gray-500">
+                        Male Only
+                      </button>
+                      <button className="flex-1 py-3 text-sm font-bold text-gray-500">
+                        Female Only
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Lifestyle Habits */}
-                <div>
-                  <p className="text-sm font-bold text-gray-700 mb-3">
-                    Lifestyle Preferences
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-green-600 bg-green-600/10 text-green-600 text-sm font-bold hover:bg-green-600/20">
-                      <Smile size={16} />
-                      Non-Smoker
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-bold hover:border-green-600/30">
-                      <Wine size={16} />
-                      No Alcohol
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-bold hover:border-green-600/30">
-                      <PawPrint size={16} />
-                      Pet Friendly
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-bold hover:border-green-600/30">
-                      <Sparkles size={16} />
-                      Early Riser
-                    </button>
+                  {/* Lifestyle Habits */}
+                  <div>
+                    <p className="text-sm font-bold text-gray-700 mb-3">
+                      Lifestyle Preferences
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-green-600 bg-green-600/10 text-green-600 text-sm font-bold hover:bg-green-600/20">
+                        <Smile size={16} />
+                        Non-Smoker
+                      </button>
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-bold hover:border-green-600/30">
+                        <Wine size={16} />
+                        No Alcohol
+                      </button>
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-bold hover:border-green-600/30">
+                        <PawPrint size={16} />
+                        Pet Friendly
+                      </button>
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-bold hover:border-green-600/30">
+                        <Sparkles size={16} />
+                        Early Riser
+                      </button>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200 mb-12"></div>
+
+            {/* Housing Type Section */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+                    <Building2 size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-gray-900 text-xl font-bold">
+                      Housing Type
+                    </h2>
+                    <p className="text-gray-500 text-sm">
+                      Select your preferred home type
+                    </p>
+                  </div>
+                </div>
+                <span className="bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  Required
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-6">
+                {/* Apartment Option */}
+                <label className="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-white border-2 border-transparent cursor-pointer shadow-sm hover:shadow-md transition-all hover:border-green-600/20">
+                  <input
+                    defaultChecked
+                    className="peer hidden"
+                    name="housing"
+                    type="radio"
+                    value="apartment"
+                  />
+                  <div className="absolute inset-0 border-2 border-transparent peer-checked:border-green-600 rounded-2xl transition-colors"></div>
+                  <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center z-10">
+                    <Building size={24} />
+                  </div>
+                  <div className="text-center z-10">
+                    <p className="text-gray-900 text-lg font-bold">Apartment</p>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Flexible living in urban areas
+                    </p>
+                  </div>
+                  <div className="size-6 border-2 border-gray-200 rounded-full flex items-center justify-center peer-checked:border-green-600 z-10 transition-colors mt-2">
+                    <div className="size-3 bg-green-600 rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                  </div>
+                </label>
+
+                {/* Condominium Option */}
+                <label className="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-white border-2 border-transparent cursor-pointer shadow-sm hover:shadow-md transition-all hover:border-green-600/20">
+                  <input
+                    className="peer hidden"
+                    name="housing"
+                    type="radio"
+                    value="condominium"
+                  />
+                  <div className="absolute inset-0 border-2 border-transparent peer-checked:border-green-600 rounded-2xl transition-colors"></div>
+                  <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center z-10">
+                    <HomeIcon size={24} />
+                  </div>
+                  <div className="text-center z-10">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <p className="text-gray-900 text-lg font-bold">
+                        Condominium
+                      </p>
+                      <span className="bg-green-600/10 text-green-600 text-xs font-bold px-2 py-0.5 rounded">
+                        Popular
+                      </span>
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      Modern amenities and security
+                    </p>
+                  </div>
+                  <div className="size-6 border-2 border-gray-200 rounded-full flex items-center justify-center peer-checked:border-green-600 z-10 transition-colors mt-2">
+                    <div className="size-3 bg-green-600 rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                  </div>
+                </label>
+
+                {/* House Option */}
+                <label className="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-white border-2 border-transparent cursor-pointer shadow-sm hover:shadow-md transition-all hover:border-green-600/20">
+                  <input
+                    className="peer hidden"
+                    name="housing"
+                    type="radio"
+                    value="house"
+                  />
+                  <div className="absolute inset-0 border-2 border-transparent peer-checked:border-green-600 rounded-2xl transition-colors"></div>
+                  <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center z-10">
+                    <House size={24} />
+                  </div>
+                  <div className="text-center z-10">
+                    <p className="text-gray-900 text-lg font-bold">House</p>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Spacious living for families
+                    </p>
+                  </div>
+                  <div className="size-6 border-2 border-gray-200 rounded-full flex items-center justify-center peer-checked:border-green-600 z-10 transition-colors mt-2">
+                    <div className="size-3 bg-green-600 rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                  </div>
+                </label>
               </div>
             </div>
           </div>
@@ -221,15 +292,37 @@ const LeaseAndHousehold = () => {
               <Info size={24} className="text-green-600 mt-0.5 flex-shrink-0" />
               <div>
                 <h4 className="text-green-800 font-bold text-lg mb-2">
-                  Did you know about shared living?
+                  Smart Matching Based on Your Setup
                 </h4>
-                <p className="text-green-700 leading-relaxed">
-                  "Bedspacing" is a popular, cost-effective way to live near
-                  central business districts like Makati or BGC. Many young
-                  professionals choose shared living to save costs while
-                  enjoying premium locations. We only list verified co-living
-                  spaces with proper amenities and security.
+                <p className="text-green-700 leading-relaxed mb-4">
+                  Knowing your household size helps us recommend the right space
+                  and layout. "Bedspacing" is a popular, cost-effective way to
+                  live near central business districts like Makati or BGC. Many
+                  young professionals choose shared living to save costs while
+                  enjoying premium locations.
                 </p>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div className="text-center">
+                    <div className="text-green-600 font-bold text-lg">
+                      Solo/Couple
+                    </div>
+                    <div className="text-gray-600 text-sm">Studios & 1BR</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-green-600 font-bold text-lg">
+                      Family
+                    </div>
+                    <div className="text-gray-600 text-sm">2-3BR Houses</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-green-600 font-bold text-lg">
+                      Shared
+                    </div>
+                    <div className="text-gray-600 text-sm">
+                      Co-living Spaces
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -237,50 +330,17 @@ const LeaseAndHousehold = () => {
 
         {/* Mobile Layout */}
         <div className="md:hidden max-w-[480px] mx-auto w-full">
-          {/* Section 1: Lease Duration */}
-          <div className="mb-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar size={20} className="text-green-600" />
-                <h2 className="text-gray-900 text-lg font-bold">
-                  Lease Duration
-                </h2>
-              </div>
-              <p className="text-gray-600 text-sm mb-6">
-                How long are you looking to rent? This helps us filter verified
-                contracts.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <button className="flex h-11 items-center justify-center px-5 rounded-xl border-2 border-green-600 bg-green-600/5 text-green-600 font-bold transition-all">
-                  Short-term
-                </button>
-                <button className="flex h-11 items-center justify-center px-5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-semibold transition-all">
-                  Long-term
-                </button>
-                <div className="relative">
-                  <button className="flex h-11 items-center justify-center px-5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-semibold transition-all">
-                    Flexible
-                  </button>
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">
-                    New
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Household Setup */}
-          <div className="mb-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-2">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            {/* Household Setup Section */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
                 <Users size={20} className="text-green-600" />
                 <h2 className="text-gray-900 text-lg font-bold">
                   Household Setup
                 </h2>
               </div>
-              <p className="text-gray-600 text-sm mb-6">
-                Tell us who's moving in with you to ensure enough space for
-                everyone.
+              <p className="text-gray-500 text-sm mb-6">
+                Who will be living with you?
               </p>
 
               <div className="grid grid-cols-2 gap-3 mb-6">
@@ -351,10 +411,109 @@ const LeaseAndHousehold = () => {
                 </div>
               </div>
             </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200 my-6"></div>
+
+            {/* Housing Type Section */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Building2 size={20} className="text-green-600" />
+                  <h2 className="text-gray-900 text-lg font-bold">
+                    Housing Type
+                  </h2>
+                </div>
+                <span className="bg-red-500/10 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Required
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {/* Apartment Option */}
+                <label className="group relative flex items-center gap-4 rounded-xl bg-white border-2 border-transparent p-4 cursor-pointer shadow-sm hover:shadow-md transition-all">
+                  <input
+                    defaultChecked
+                    className="peer hidden"
+                    name="housing"
+                    type="radio"
+                    value="apartment"
+                  />
+                  <div className="absolute inset-0 border-2 border-transparent peer-checked:border-green-600 rounded-xl transition-colors"></div>
+                  <div className="size-12 rounded-lg bg-green-600/10 text-green-600 flex items-center justify-center z-10">
+                    <Building size={20} />
+                  </div>
+                  <div className="flex grow flex-col z-10">
+                    <p className="text-gray-900 text-base font-bold">
+                      Apartment
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      Flexible living in urban areas
+                    </p>
+                  </div>
+                  <div className="size-6 border-2 border-gray-200 rounded-full flex items-center justify-center peer-checked:border-green-600 z-10 transition-colors">
+                    <div className="size-3 bg-green-600 rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                  </div>
+                </label>
+
+                {/* Condominium Option */}
+                <label className="group relative flex items-center gap-4 rounded-xl bg-white border-2 border-transparent p-4 cursor-pointer shadow-sm hover:shadow-md transition-all">
+                  <input
+                    className="peer hidden"
+                    name="housing"
+                    type="radio"
+                    value="condominium"
+                  />
+                  <div className="absolute inset-0 border-2 border-transparent peer-checked:border-green-600 rounded-xl transition-colors"></div>
+                  <div className="size-12 rounded-lg bg-green-600/10 text-green-600 flex items-center justify-center z-10">
+                    <HomeIcon size={20} />
+                  </div>
+                  <div className="flex grow flex-col z-10">
+                    <div className="flex items-center gap-2">
+                      <p className="text-gray-900 text-base font-bold">
+                        Condominium
+                      </p>
+                      <span className="bg-green-600/10 text-green-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                        Popular
+                      </span>
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      Modern amenities and security
+                    </p>
+                  </div>
+                  <div className="size-6 border-2 border-gray-200 rounded-full flex items-center justify-center peer-checked:border-green-600 z-10 transition-colors">
+                    <div className="size-3 bg-green-600 rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                  </div>
+                </label>
+
+                {/* House Option */}
+                <label className="group relative flex items-center gap-4 rounded-xl bg-white border-2 border-transparent p-4 cursor-pointer shadow-sm hover:shadow-md transition-all">
+                  <input
+                    className="peer hidden"
+                    name="housing"
+                    type="radio"
+                    value="house"
+                  />
+                  <div className="absolute inset-0 border-2 border-transparent peer-checked:border-green-600 rounded-xl transition-colors"></div>
+                  <div className="size-12 rounded-lg bg-green-600/10 text-green-600 flex items-center justify-center z-10">
+                    <House size={20} />
+                  </div>
+                  <div className="flex grow flex-col z-10">
+                    <p className="text-gray-900 text-base font-bold">House</p>
+                    <p className="text-gray-500 text-sm">
+                      Spacious living for families
+                    </p>
+                  </div>
+                  <div className="size-6 border-2 border-gray-200 rounded-full flex items-center justify-center peer-checked:border-green-600 z-10 transition-colors">
+                    <div className="size-3 bg-green-600 rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
 
           {/* Mobile Cultural Note Component */}
-          <div className="mb-6">
+          <div className="mt-6">
             <div className="bg-green-50 p-4 rounded-xl flex gap-3 items-start border-l-4 border-green-600">
               <Info size={20} className="text-green-600 mt-0.5" />
               <p className="text-xs leading-relaxed text-green-800 font-medium">
