@@ -26,6 +26,7 @@ const Matching = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [hasLoadedSavedData, setHasLoadedSavedData] = useState(false);
   const navigate = useNavigate();
 
   // Initialize form state with all required fields
@@ -103,7 +104,7 @@ const Matching = () => {
         lastUpdated: new Date().toISOString(),
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
-      console.log("Saved preferences to localStorage");
+      console.log("Saved preferences to localStorage:", dataToSave);
     } catch (error) {
       console.error("Error saving to localStorage:", error);
     }
@@ -116,21 +117,19 @@ const Matching = () => {
       if (savedData) {
         const parsedData = JSON.parse(savedData);
 
-        // Check if data is not too old (optional - you can remove this if you want to keep data forever)
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        const lastUpdated = new Date(parsedData.lastUpdated);
-
-        if (lastUpdated > oneWeekAgo) {
-          setFormData(parsedData.formData || formData);
-          setCurrentStep(parsedData.currentStep || 0);
-          setStepValidation(parsedData.stepValidation || stepValidation);
-          console.log("Loaded preferences from localStorage");
-          return true;
-        } else {
-          console.log("LocalStorage data is too old, clearing...");
-          localStorage.removeItem(LOCAL_STORAGE_KEY);
+        // Always load data if it exists (remove the expiration check for now)
+        if (parsedData.formData) {
+          setFormData(parsedData.formData);
         }
+        if (parsedData.currentStep !== undefined) {
+          setCurrentStep(parsedData.currentStep);
+        }
+        if (parsedData.stepValidation) {
+          setStepValidation(parsedData.stepValidation);
+        }
+
+        console.log("Loaded preferences from localStorage:", parsedData);
+        return true;
       }
     } catch (error) {
       console.error("Error loading from localStorage:", error);
@@ -152,32 +151,39 @@ const Matching = () => {
 
   // Save form data to localStorage whenever it changes
   useEffect(() => {
-    saveToLocalStorage();
-  }, [formData, currentStep, stepValidation]);
+    if (hasLoadedSavedData) {
+      saveToLocalStorage();
+    }
+  }, [formData, currentStep, stepValidation, hasLoadedSavedData]);
 
   // Load saved data when component mounts
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (showSplash) {
+    // Check if we have saved data immediately
+    const hasSavedData = loadFromLocalStorage();
+    setHasLoadedSavedData(true);
+
+    if (hasSavedData) {
+      // Skip splash quickly if we have saved data
+      const timer = setTimeout(() => {
         setShowSplash(false);
-      }
-    }, 1500);
-
-    // Load saved data after splash screen
-    const loadDataTimer = setTimeout(() => {
-      loadFromLocalStorage();
-    }, 1600);
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(loadDataTimer);
-    };
+      }, 800);
+      return () => clearTimeout(timer);
+    } else {
+      // Normal splash for new users
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const handleSplashFinish = () => {
+    // Load data if not already loaded
+    if (!hasLoadedSavedData) {
+      loadFromLocalStorage();
+      setHasLoadedSavedData(true);
+    }
     setShowSplash(false);
-    // Load saved data immediately when user manually skips splash
-    loadFromLocalStorage();
   };
 
   const steps = [
