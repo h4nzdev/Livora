@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { propertyService } from "../../services/api";
 import {
   ArrowLeft,
   Share2,
@@ -25,140 +24,87 @@ import {
   Shield,
   Check,
   X,
-  AlertCircle,
 } from "lucide-react";
 
 const PropertyDetails = () => {
-  const [propertyData, setPropertyData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Get property ID from location state or URL params
-  const propertyId = location.state?.propertyId;
+  // Mock property data with all fields from your schema
+  const propertyData = {
+    id: 1,
+    landlord_id: 123,
+    name: "Avida Towers Riala",
+    description:
+      "This modern studio unit in Avida Towers Riala offers a perfect blend of urban living and convenience. Located at the heart of Cebu IT Park, it's ideal for professionals working nearby. The unit comes fully furnished with high-quality appliances and high-speed fiber internet readiness. The building features 24/7 security, swimming pool, fitness gym, and multiple function rooms. Walking distance to restaurants, cafes, and shopping centers.",
+    location: "IT Park, Cebu City, Philippines",
+    price: 22500,
+    type: "Condominium",
+    bedrooms: "Studio",
+    bathrooms: 1,
+    floor_area: 28,
+    furnishing: "Fully Furnished",
+    amenities: [
+      "Wifi",
+      "Air Conditioning",
+      "Pet Friendly",
+      "Swimming Pool",
+      "Gym",
+      "24/7 Security",
+      "Private Bathroom",
+      "Cooking Allowed",
+    ],
+    images: [
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDi3cprOA2uc9dLnOLgJze9fsZvb6XpFEkMAYrFbNJEdHHoRWmy4_Tcz2xGibCV8Cz-fLFr0iC7PZWyffrLzH6oVWxMXWc2eIbtgITVI6ufk5TegpRJ4jFM-bMprY7AVlXvGG95Yny1fOH4_GF60p7vdcgiuiFmNXIW6LBiUJ_LAa6j8cv_ZCpFDSSPKYTooqx2hn5JDZb6Z8OhBSVtr3zHD__XDroeCYresEALPDFkSW89gwv7MDbbgeCOofHzAPwnI7K-xGbVsyU",
+      "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w-800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1616594039635-d7b2d8ddfa85?w=800&auto=format&fit=crop",
+    ],
+    pet_friendly: true,
+    lease_duration: "12 months",
+    rating: 4.7,
+    is_available: true,
+    created_at: "2024-01-15T10:30:00Z",
+  };
 
-  useEffect(() => {
-    const fetchProperty = async () => {
-      if (!propertyId) {
-        setError("Property ID not found");
-        setLoading(false);
-        navigate("/results");
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch property data from API
-        const response = await propertyService.getPropertyById(propertyId);
-        setPropertyData(response.property || response);
-      } catch (err) {
-        console.error("Error fetching property:", err);
-        setError(
-          err.response?.data?.error || "Failed to load property details",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperty();
-  }, [propertyId, navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading property details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !propertyData) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Failed to Load Property
-          </h2>
-          <p className="text-gray-600 mb-4">{error || "Property not found"}</p>
-          <div className="space-y-3">
-            <button
-              onClick={() => navigate("/results")}
-              className="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700"
-            >
-              Back to Results
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
-            >
-              Go Home
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Ensure amenities is always an array
-  const amenities = Array.isArray(propertyData.amenities)
-    ? propertyData.amenities
-    : typeof propertyData.amenities === "string"
-      ? propertyData.amenities.split(",")
-      : [];
-
-  // Prepare match analysis based on property data
   const matchAnalysis = [
-    `Fits your ₱${propertyData.price?.toLocaleString() || "0"} budget`,
-    `Located in ${propertyData.location || "the area"}`,
+    `Fits your ₱${propertyData.price.toLocaleString()} budget perfectly`,
+    `Located near IT Park (5 min walk)`,
     propertyData.pet_friendly
       ? "Matches Pet-friendly preference"
       : "Not pet-friendly",
-    amenities.includes("Wifi") ||
-    amenities.some((a) => a.toLowerCase().includes("wifi"))
+    propertyData.amenities.includes("Wifi")
       ? "High-speed internet available"
       : "No WiFi available",
     "Modern amenities included",
   ];
 
-  // Prepare key features
   const keyFeatures = [
     {
       icon: <Wifi className="w-5 h-5" />,
       label: "Fast WiFi",
-      available:
-        amenities.includes("Wifi") ||
-        amenities.some((a) => a.toLowerCase().includes("wifi")),
+      available: propertyData.amenities.includes("Wifi"),
     },
     {
       icon: <Snowflake className="w-5 h-5" />,
       label: "AC Unit",
-      available:
-        amenities.includes("Air Conditioning") ||
-        amenities.some((a) => a.toLowerCase().includes("air")),
+      available: propertyData.amenities.includes("Air Conditioning"),
     },
     {
       icon: <PawPrint className="w-5 h-5" />,
       label: "Pet-friendly",
-      available: propertyData.pet_friendly || false,
+      available: propertyData.pet_friendly,
     },
     {
       icon: <Home className="w-5 h-5" />,
-      label: propertyData.bedrooms || "Studio",
+      label: propertyData.bedrooms,
       available: true,
     },
     {
       icon: <Bath className="w-5 h-5" />,
-      label: `${propertyData.bathrooms || 1} Bath`,
+      label: `${propertyData.bathrooms} Bath`,
       available: true,
     },
     {
@@ -168,41 +114,39 @@ const PropertyDetails = () => {
     },
   ];
 
-  // Prepare property specs
   const propertySpecs = [
     {
       label: "Property Type",
-      value: propertyData.type || "Condominium",
+      value: propertyData.type,
       icon: <Building className="w-4 h-4" />,
     },
     {
       label: "Floor Area",
-      value: `${propertyData.floor_area || "28"} sqm`,
+      value: `${propertyData.floor_area} sqm`,
       icon: <Ruler className="w-4 h-4" />,
     },
     {
       label: "Bedrooms",
-      value: propertyData.bedrooms || "Studio",
+      value: propertyData.bedrooms,
       icon: <Home className="w-4 h-4" />,
     },
     {
       label: "Bathrooms",
-      value: `${propertyData.bathrooms || 1}`,
+      value: `${propertyData.bathrooms}`,
       icon: <Bath className="w-4 h-4" />,
     },
     {
       label: "Furnishing",
-      value: propertyData.furnishing || "Fully Furnished",
+      value: propertyData.furnishing,
       icon: <Sofa className="w-4 h-4" />,
     },
     {
       label: "Lease Duration",
-      value: propertyData.lease_duration || "12 months",
+      value: propertyData.lease_duration,
       icon: <Calendar className="w-4 h-4" />,
     },
   ];
 
-  // Handle image navigation
   const handlePreviousImage = () => {
     setCurrentImage((prev) =>
       prev === 0 ? propertyData.images.length - 1 : prev - 1,
@@ -226,7 +170,6 @@ const PropertyDetails = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return "Recently";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
@@ -235,20 +178,34 @@ const PropertyDetails = () => {
     });
   };
 
-  // Calculate match percentage
+  // Calculate match percentage (example logic)
   const calculateMatchPercentage = () => {
-    if (!propertyData.match_score && !propertyData.matchScore) {
-      return 85; // Default fallback
-    }
-    return propertyData.match_score || propertyData.matchScore;
+    let matchScore = 0;
+    const totalCriteria = 5;
+
+    // Budget match
+    matchScore += 1; // Assume it matches
+
+    // Location match
+    matchScore += 1; // Assume it matches
+
+    // Pet friendly match
+    matchScore += propertyData.pet_friendly ? 1 : 0;
+
+    // Amenities match
+    const requiredAmenities = ["Wifi", "Air Conditioning"];
+    const matchedAmenities = propertyData.amenities.filter((amenity) =>
+      requiredAmenities.includes(amenity),
+    ).length;
+    matchScore += matchedAmenities / requiredAmenities.length;
+
+    // Type match
+    matchScore += 1; // Assume it matches
+
+    return Math.round((matchScore / totalCriteria) * 100);
   };
 
   const matchPercentage = calculateMatchPercentage();
-  const propertyImages = propertyData.images || [
-    "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w-800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1616594039635-d7b2d8ddfa85?w=800&auto=format&fit=crop",
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -260,7 +217,7 @@ const PropertyDetails = () => {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: `url(${propertyImages[currentImage]})`,
+                backgroundImage: `url(${propertyData.images[currentImage]})`,
               }}
             >
               <div className="absolute inset-0 bg-black/5"></div>
@@ -283,7 +240,7 @@ const PropertyDetails = () => {
 
             {/* Image Counter */}
             <div className="absolute bottom-6 right-4 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 text-xs font-medium border border-gray-200">
-              {currentImage + 1} / {propertyImages.length}
+              {currentImage + 1} / {propertyData.images.length}
             </div>
 
             {/* Image Navigation Arrows */}
@@ -334,14 +291,12 @@ const PropertyDetails = () => {
                     <CheckCircle className="w-3 h-3" />
                     {matchPercentage}% MATCH
                   </span>
-                  {propertyData.rating && (
-                    <div className="flex items-center gap-1 text-amber-600">
-                      <Star className="w-3.5 h-3.5 fill-amber-400" />
-                      <span className="text-xs font-bold">
-                        {propertyData.rating}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1 text-amber-600">
+                    <Star className="w-3.5 h-3.5 fill-amber-400" />
+                    <span className="text-xs font-bold">
+                      {propertyData.rating}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-start">
                   <h1 className="text-2xl font-bold tracking-tight text-gray-900">
@@ -349,13 +304,13 @@ const PropertyDetails = () => {
                   </h1>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-emerald-600">
-                      ₱{propertyData.price?.toLocaleString() || "0"}
+                      ₱{propertyData.price.toLocaleString()}
                       <span className="text-sm font-normal text-gray-500">
                         /mo
                       </span>
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {propertyData.lease_duration || "12 months"} minimum
+                      {propertyData.lease_duration} minimum
                     </p>
                   </div>
                 </div>
@@ -414,7 +369,7 @@ const PropertyDetails = () => {
                 About this property
               </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
-                {propertyData.description || "No description available."}
+                {propertyData.description}
               </p>
             </section>
 
@@ -439,21 +394,19 @@ const PropertyDetails = () => {
             </section>
 
             {/* Amenities */}
-            {amenities.length > 0 && (
-              <section className="space-y-4">
-                <h3 className="text-lg font-bold text-gray-900">Amenities</h3>
-                <div className="flex flex-wrap gap-2">
-                  {amenities.slice(0, 6).map((amenity, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100"
-                    >
-                      {amenity}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )}
+            <section className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900">Amenities</h3>
+              <div className="flex flex-wrap gap-2">
+                {propertyData.amenities.slice(0, 6).map((amenity, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100"
+                  >
+                    {amenity}
+                  </span>
+                ))}
+              </div>
+            </section>
 
             {/* Property Info */}
             <section className="bg-gray-50 rounded-xl p-4">
@@ -505,7 +458,7 @@ const PropertyDetails = () => {
                 {/* Main Image */}
                 <div className="relative h-[500px] rounded-3xl overflow-hidden mb-4 border border-gray-200 shadow-sm">
                   <img
-                    src={propertyImages[currentImage]}
+                    src={propertyData.images[currentImage]}
                     alt="Property"
                     className="w-full h-full object-cover"
                   />
@@ -555,32 +508,30 @@ const PropertyDetails = () => {
                   </div>
 
                   <div className="absolute bottom-6 right-6 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 text-sm font-medium border border-gray-200">
-                    {currentImage + 1} / {propertyImages.length}
+                    {currentImage + 1} / {propertyData.images.length}
                   </div>
                 </div>
 
                 {/* Thumbnail Images */}
-                {propertyImages.length > 1 && (
-                  <div className="grid grid-cols-4 gap-3">
-                    {propertyImages.map((img, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImage(index)}
-                        className={`relative h-32 rounded-xl overflow-hidden transition-all border ${
-                          currentImage === index
-                            ? "ring-2 ring-emerald-500 border-emerald-300"
-                            : "border-gray-200 opacity-80 hover:opacity-100"
-                        }`}
-                      >
-                        <img
-                          src={img}
-                          alt={`Property view ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <div className="grid grid-cols-4 gap-3">
+                  {propertyData.images.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImage(index)}
+                      className={`relative h-32 rounded-xl overflow-hidden transition-all border ${
+                        currentImage === index
+                          ? "ring-2 ring-emerald-500 border-emerald-300"
+                          : "border-gray-200 opacity-80 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Property view ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -593,15 +544,13 @@ const PropertyDetails = () => {
                     <CheckCircle className="w-4 h-4" />
                     {matchPercentage}% MATCH
                   </span>
-                  {propertyData.rating && (
-                    <div className="flex items-center gap-1 text-amber-600">
-                      <Star className="w-5 h-5 fill-amber-400" />
-                      <span className="font-bold">{propertyData.rating}</span>
-                      <span className="text-gray-500 text-sm">
-                        ({propertyData.rating}/5)
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1 text-amber-600">
+                    <Star className="w-5 h-5 fill-amber-400" />
+                    <span className="font-bold">{propertyData.rating}</span>
+                    <span className="text-gray-500 text-sm">
+                      ({propertyData.rating}/5)
+                    </span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-start">
                   <div>
@@ -615,14 +564,14 @@ const PropertyDetails = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-3xl font-bold text-emerald-600">
-                      ₱{propertyData.price?.toLocaleString() || "0"}
+                      ₱{propertyData.price.toLocaleString()}
                       <span className="text-lg font-normal text-gray-500">
                         /month
                       </span>
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      {propertyData.lease_duration || "12 months"} minimum •
-                      Security deposit required
+                      {propertyData.lease_duration} minimum • Security deposit
+                      required
                     </p>
                   </div>
                 </div>
@@ -696,29 +645,27 @@ const PropertyDetails = () => {
               </div>
 
               {/* Amenities Section */}
-              {amenities.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Included Amenities
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {amenities.map((amenity, index) => (
-                      <span
-                        key={index}
-                        className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-full border border-blue-100"
-                      >
-                        {amenity}
-                      </span>
-                    ))}
-                  </div>
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Included Amenities
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {propertyData.amenities.map((amenity, index) => (
+                    <span
+                      key={index}
+                      className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-full border border-blue-100"
+                    >
+                      {amenity}
+                    </span>
+                  ))}
                 </div>
-              )}
+              </div>
 
               {/* Description */}
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-900">Description</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  {propertyData.description || "No description available."}
+                  {propertyData.description}
                 </p>
               </div>
 
@@ -760,7 +707,7 @@ const PropertyDetails = () => {
               </div>
 
               {/* Desktop Action Buttons */}
-              <div className="sticky bottom-8 pt-8">
+              <div className="sticky bottom-8 pt-8 ">
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setIsFavorite(!isFavorite)}

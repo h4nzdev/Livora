@@ -8,7 +8,7 @@ const sampleUser = {
   full_name: "Juan Dela Cruz",
   email: "juan@example.com",
   mobile_number: "09123456789",
-  role: "admin",
+  role: "landlord",
   tenant_type: "owner",
   profile_image: "https://via.placeholder.com/150",
   is_verified: true,
@@ -18,10 +18,7 @@ const sampleUser = {
 // 2. Create the provider
 export const AuthProvider = ({ children }) => {
   // Initialize state from sessionStorage if it exists
-  const [user, setUser] = useState(() => {
-    const storedUser = sessionStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useState(sampleUser);
 
   // simple login function
   const login = (userData) => {
