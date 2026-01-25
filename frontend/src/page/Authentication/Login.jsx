@@ -1,15 +1,7 @@
 import React, { useContext, useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  ArrowLeft,
-  Home,
-  Sparkles,
-  Shield,
-  Zap,
-} from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, Home, Lock, Mail, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/Livora.png"; // Make sure to import your logo
+import logo from "../../assets/Livora.png";
 import { AuthContext } from "../../context/AuthContext";
 
 const Login = () => {
@@ -34,113 +26,114 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // Handle Google login logic here
     console.log("Google login");
   };
 
   return (
     <div className="min-h-screen bg-white">
       {/* Desktop Layout */}
-      <div className="hidden lg:flex min-h-screen ">
-        {/* Left Column - Livora Showcase (Desktop Only) - REVERSED */}
-        <div className="hidden fixed lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-600/10 via-emerald-500/10 to-teal-500/10"></div>
+      <div className="hidden lg:flex min-h-screen">
+        {/* Left Column - Video Placeholder */}
+        <div className="flex-1 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          <div className="relative h-full flex items-center justify-center p-12">
+            {/* Video Placeholder */}
+            <div className="relative w-full h-full max-w-3xl flex items-center justify-center">
+              {/* Decorative Elements */}
+              <div className="absolute top-1/4 -left-16 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-1/4 -right-16 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-1/4 -left-16 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 -right-16 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
+              {/* Video Container */}
+              <div className="relative z-10 w-full h-[500px] bg-gray-800/80 rounded-2xl overflow-hidden border-2 border-gray-700/50 flex flex-col items-center justify-center">
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-900/40 to-gray-800/60">
+                  <div className="w-24 h-24 bg-green-600/90 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-700 transition-all duration-300 group shadow-2xl">
+                    <Play className="text-white w-10 h-10 ml-1 group-hover:scale-110 transition-transform" />
+                  </div>
+                </div>
 
-          <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center fixed">
-            <div className="mb-8">
-              {/* Updated Logo - Using your imported logo */}
-              <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-400 rounded-3xl flex items-center justify-center mb-6 shadow-2xl">
-                {/* You can use your logo image or keep the Home icon */}
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt="Livora"
-                    className="w-16 h-16 object-contain"
-                  />
-                ) : (
-                  <Home className="text-white w-12 h-12" />
-                )}
-              </div>
-              <h1 className="text-5xl font-bold text-white mb-2">Livora</h1>
-              <p className="text-xl text-gray-300 max-w-md">
-                Smart Home Matching Platform
-              </p>
-            </div>
+                {/* Video Info */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-gray-900/90 to-transparent">
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Welcome to Livora
+                  </h3>
+                  <p className="text-gray-300">
+                    Discover how we help thousands find their perfect home match
+                  </p>
+                </div>
 
-            <div className="mt-12 space-y-8 max-w-md">
-              <div className="text-left bg-white/5 backdrop-blur-sm rounded-2xl p-6">
-                <div className="flex items-start gap-4 mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-400 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="text-white w-6 h-6" />
+                {/* Branding */}
+                <div className="absolute top-6 left-6 flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg">
+                    {logo ? (
+                      <img
+                        src={logo}
+                        alt="Livora"
+                        className="w-8 h-8 object-contain"
+                      />
+                    ) : (
+                      <Home className="text-white w-6 h-6" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      AI-Powered Matching
-                    </h3>
-                    <p className="text-gray-300 text-sm">
-                      Intelligent algorithms that understand your lifestyle and
-                      preferences
+                    <h2 className="text-xl font-bold text-white">Livora</h2>
+                    <p className="text-gray-400 text-sm">
+                      Find Your Perfect Home
                     </p>
                   </div>
                 </div>
-              </div>
 
-              <div className="text-left bg-white/5 backdrop-blur-sm rounded-2xl p-6">
-                <div className="flex items-start gap-4 mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Shield className="text-white w-6 h-6" />
+                {/* Placeholder Text */}
+                <div className="text-center p-8">
+                  <div className="inline-block px-4 py-2 bg-gray-700/50 rounded-full mb-4">
+                    <span className="text-gray-300 text-sm font-medium">
+                      Video Coming Soon
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      Verified Properties
-                    </h3>
-                    <p className="text-gray-300 text-sm">
-                      Every listing is personally inspected for your peace of
-                      mind
-                    </p>
-                  </div>
+                  <p className="text-gray-400 max-w-md">
+                    This area is reserved for showcasing how Livora helps people
+                    find their perfect homes. You can integrate a video tour or
+                    customer testimonials here.
+                  </p>
                 </div>
               </div>
 
-              <div className="text-left bg-white/5 backdrop-blur-sm rounded-2xl p-6">
-                <div className="flex items-start gap-4 mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Zap className="text-white w-6 h-6" />
+              {/* Stats Bar */}
+              <div className="absolute -bottom-10 left-0 right-0 flex justify-center gap-8">
+                {[
+                  { value: "10K+", label: "Happy Users" },
+                  { value: "5K+", label: "Properties" },
+                  { value: "98%", label: "Satisfaction" },
+                ].map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-2xl font-bold text-white">
+                      {stat.value}
+                    </div>
+                    <div className="text-gray-400 text-sm">{stat.label}</div>
                   </div>
-                  <div>
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      Time-Saving
-                    </h3>
-                    <p className="text-gray-300 text-sm">
-                      Get personalized matches in minutes, not hours of
-                      scrolling
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column - Login Form - REVERSED */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8 xl:p-16 ">
-          <div className="w-full pl-214">
+        {/* Right Column - Login Form */}
+        <div className="flex-1 flex flex-col items-center justify-center p-8 xl:p-12">
+          <div className="w-full max-w-md">
             {/* Back Button */}
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-12 transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors group"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft
+                size={20}
+                className="group-hover:-translate-x-1 transition-transform"
+              />
               <span className="font-medium">Back</span>
             </button>
 
-            {/* Logo and Heading - Updated with better logo */}
+            {/* Logo and Heading */}
             <div className="flex flex-col items-center mb-10">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-green-600/20">
+              <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center mb-6 shadow-md shadow-green-600/20 border-4 border-white">
                 {logo ? (
                   <img
                     src={logo}
@@ -152,10 +145,10 @@ const Login = () => {
                 )}
               </div>
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                Welcome back
+                Welcome Back
               </h1>
-              <p className="text-gray-500 mt-2 text-lg">
-                Find your perfect home match
+              <p className="text-gray-500 mt-2 text-base">
+                Sign in to continue your home search
               </p>
             </div>
 
@@ -163,13 +156,14 @@ const Login = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <label
-                  className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-1"
+                  className="text-sm font-semibold text-gray-700 flex items-center gap-2"
                   htmlFor="email"
                 >
+                  <Mail size={16} className="text-green-600" />
                   Email Address
                 </label>
                 <input
-                  className="w-full h-14 px-4 bg-gray-50 border border-gray-100 rounded-xl focus:border-green-600 focus:bg-white focus:ring-2 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium outline-none"
+                  className="w-full h-14 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-base outline-none shadow-sm"
                   id="email"
                   type="email"
                   placeholder="name@example.com"
@@ -181,24 +175,25 @@ const Login = () => {
 
               <div className="space-y-2">
                 <label
-                  className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-1"
+                  className="text-sm font-semibold text-gray-700 flex items-center gap-2"
                   htmlFor="password"
                 >
+                  <Lock size={16} className="text-green-600" />
                   Password
                 </label>
                 <div className="relative">
                   <input
-                    className="w-full h-14 px-4 bg-gray-50 border border-gray-100 rounded-xl focus:border-green-600 focus:bg-white focus:ring-2 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium outline-none pr-12"
+                    className="w-full h-14 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-base outline-none shadow-sm pr-14"
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleChange}
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -206,7 +201,20 @@ const Login = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end pt-1">
+              <div className="flex justify-between items-center pt-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-600"
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 text-sm text-gray-600"
+                  >
+                    Remember me
+                  </label>
+                </div>
                 <a
                   href="#"
                   className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors"
@@ -216,20 +224,20 @@ const Login = () => {
               </div>
 
               <button
-                className="w-full h-14 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-green-600/20 hover:shadow-green-600/30 active:scale-[0.98] transition-all duration-300 mt-2 hover:-translate-y-0.5"
+                className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 mt-2 active:scale-[0.98]"
                 type="submit"
               >
-                Login
+                Sign In
               </button>
             </form>
 
             {/* Divider */}
-            <div className="relative my-10">
+            <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-100"></div>
+                <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-white px-4 text-gray-400 font-medium uppercase tracking-widest text-xs">
+                <span className="bg-white px-4 text-gray-400 font-medium text-sm">
                   Or continue with
                 </span>
               </div>
@@ -238,7 +246,7 @@ const Login = () => {
             {/* Google Login Button */}
             <button
               onClick={handleGoogleLogin}
-              className="w-full h-14 flex items-center justify-center gap-3 border border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all duration-300 group hover:-translate-y-0.5"
+              className="w-full h-14 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 text-base hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] shadow-sm"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -262,14 +270,18 @@ const Login = () => {
             </button>
 
             {/* Sign Up Link */}
-            <div className="mt-12 pt-8 text-center border-t border-gray-100">
-              <p className="text-gray-600 font-medium">
+            <div className="mt-10 pt-8 text-center border-t border-gray-200">
+              <p className="text-gray-600 text-base">
                 Don't have an account?{" "}
                 <a
                   href="/register"
-                  className="text-green-600 font-bold hover:text-green-700 transition-colors"
+                  className="text-green-600 font-semibold hover:text-green-700 transition-colors inline-flex items-center gap-1 group"
                 >
-                  Sign Up
+                  Sign up now
+                  <ArrowLeft
+                    size={16}
+                    className="rotate-180 group-hover:translate-x-1 transition-transform"
+                  />
                 </a>
               </p>
             </div>
@@ -277,23 +289,46 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Mobile Layout - Unchanged */}
-      <div className="lg:hidden relative flex min-h-screen w-full flex-col max-w-[480px] mx-auto bg-white px-6">
-        {/* Mobile Header */}
-        <header className="flex items-center justify-between py-4">
+      {/* Mobile Layout */}
+      <div className="lg:hidden min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-4 py-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center justify-center w-10 h-10 -ml-2 text-gray-600 hover:text-gray-900"
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 group"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft
+              size={20}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+            <span className="font-medium">Back</span>
           </button>
-        </header>
+        </div>
 
-        {/* Mobile Main Content */}
-        <main className="flex-1 flex flex-col pt-4 pb-8">
+        {/* Video Placeholder (Mobile) */}
+        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+          <div className="relative bg-gray-800/80 rounded-xl overflow-hidden border border-gray-700/50">
+            <div className="aspect-video flex items-center justify-center">
+              <div className="w-16 h-16 bg-green-600/90 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-700 transition-all duration-300 group">
+                <Play className="text-white w-8 h-8 ml-1" />
+              </div>
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-bold text-white mb-1">
+                Welcome to Livora
+              </h3>
+              <p className="text-gray-300 text-sm">
+                Discover how we help thousands find their perfect home match
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col p-6">
           {/* Logo and Heading */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-green-600/20">
+          <div className="flex flex-col items-center mb-8 pt-4">
+            <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mb-4 shadow-md shadow-green-600/20 border-4 border-white">
               {logo ? (
                 <img
                   src={logo}
@@ -305,10 +340,10 @@ const Login = () => {
               )}
             </div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-              Welcome back
+              Welcome Back
             </h1>
-            <p className="text-gray-500 mt-1 text-sm">
-              Find your perfect home match
+            <p className="text-gray-500 mt-1 text-sm text-center">
+              Sign in to continue your home search
             </p>
           </div>
 
@@ -316,13 +351,14 @@ const Login = () => {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1">
               <label
-                className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-1"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-2"
                 htmlFor="email"
               >
+                <Mail size={14} className="text-green-600" />
                 Email Address
               </label>
               <input
-                className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl focus:border-green-600 focus:bg-white focus:ring-2 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none"
+                className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-1 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none"
                 id="email"
                 type="email"
                 placeholder="name@example.com"
@@ -334,24 +370,25 @@ const Login = () => {
 
             <div className="space-y-1">
               <label
-                className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-1"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-2"
                 htmlFor="password"
               >
+                <Lock size={14} className="text-green-600" />
                 Password
               </label>
               <div className="relative">
                 <input
-                  className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl focus:border-green-600 focus:bg-white focus:ring-2 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none pr-12"
+                  className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-1 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none pr-12"
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
                   required
                 />
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -359,7 +396,20 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex justify-end pt-1">
+            <div className="flex justify-between items-center pt-1">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="remember-mobile"
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-600"
+                />
+                <label
+                  htmlFor="remember-mobile"
+                  className="ml-2 text-xs text-gray-600"
+                >
+                  Remember me
+                </label>
+              </div>
               <a
                 href="#"
                 className="text-xs font-semibold text-green-600 hover:text-green-700 transition-colors"
@@ -369,20 +419,20 @@ const Login = () => {
             </div>
 
             <button
-              className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white rounded-xl font-bold text-base shadow-lg shadow-green-600/20 active:scale-[0.98] transition-all duration-300 mt-2 hover:-translate-y-0.5"
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm shadow-md active:scale-[0.98] transition-all duration-300 mt-2"
               type="submit"
             >
-              Login
+              Sign In
             </button>
           </form>
 
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100"></div>
+              <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-white px-4 text-gray-400 font-medium uppercase tracking-widest text-[10px]">
+              <span className="bg-gray-50 px-3 text-gray-400 text-xs">
                 Or continue with
               </span>
             </div>
@@ -391,7 +441,7 @@ const Login = () => {
           {/* Google Login Button */}
           <button
             onClick={handleGoogleLogin}
-            className="w-full h-12 flex items-center justify-center gap-3 border border-gray-200 rounded-xl font-semibold text-gray-700 text-sm hover:bg-gray-50 active:bg-gray-100 transition-all duration-300 hover:-translate-y-0.5"
+            className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 text-sm hover:bg-gray-50 transition-all duration-300 active:scale-[0.98]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -415,22 +465,21 @@ const Login = () => {
           </button>
 
           {/* Sign Up Link */}
-          <div className="mt-auto pt-6 text-center">
-            <p className="text-gray-500 text-sm font-medium">
+          <div className="mt-auto pt-8 text-center border-t border-gray-200">
+            <p className="text-gray-600 text-sm">
               Don't have an account?{" "}
               <a
-                href="#"
-                className="text-green-600 font-bold hover:text-green-700 transition-colors"
+                href="/register"
+                className="text-green-600 font-semibold hover:text-green-700 transition-colors inline-flex items-center gap-1 group"
               >
-                Sign Up
+                Sign up now
+                <ArrowLeft
+                  size={12}
+                  className="rotate-180 group-hover:translate-x-1 transition-transform"
+                />
               </a>
             </p>
           </div>
-        </main>
-
-        {/* Mobile Bottom Indicator */}
-        <div className="flex justify-center pb-2">
-          <div className="w-32 h-1.5 bg-gray-200 rounded-full"></div>
         </div>
       </div>
     </div>
