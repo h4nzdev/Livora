@@ -1,0 +1,77 @@
+[
+  {
+    "description": "DATA STRUCTURE EXAMPLE: THE SEARCHER (Tenant looking for a home)",
+    "user_profile": {
+      "id": "d0a3b2c1-uuid-4567-8901-23456789abcd",
+      "full_name": "Alice Searcher",
+      "email": "alice@example.com",
+      "role": "tenant",
+      "tenant_type": "searcher",
+      "is_verified": true,
+      "profile_image": "https://supabase.../alice.jpg"
+    },
+    "related_data": {
+      "tenant_preferences": {
+        "budget_min": 10000,
+        "budget_max": 25000,
+        "regions": ["Makati", "BGC"],
+        "move_in_date": "2024-12-01",
+        "pet_friendly": true
+      }
+    }
+  },
+  {
+    "description": "DATA STRUCTURE EXAMPLE: THE DWELLER (Tenant living in a home)",
+    "user_profile": {
+      "id": "e1b4c3d2-uuid-5678-9012-34567890bcde",
+      "full_name": "Bob Dweller",
+      "email": "bob@example.com",
+      "role": "tenant",
+      "tenant_type": "dweller",
+      "is_verified": true,
+      "profile_image": "https://supabase.../bob.jpg"
+    },
+    "related_data": {
+      "active_lease": {
+        "property_name": "Avida Towers Unit 505",
+        "start_date": "2024-01-01",
+        "end_date": "2025-01-01",
+        "rent_amount": 18000,
+        "status": "active"
+      },
+      "maintenance_requests": [
+        {
+          "title": "Leaking Faucet",
+          "status": "open",
+          "priority": "low"
+        }
+      ]
+    }
+  },
+  {
+    "description": "DATA STRUCTURE EXAMPLE: THE LANDLORD (Property Owner)",
+    "user_profile": {
+      "id": "f2c5d4e3-uuid-6789-0123-45678901cdef",
+      "full_name": "Charlie Landlord",
+      "email": "charlie@properties.com",
+      "role": "landlord",
+      "tenant_type": null,
+      "is_verified": true,
+      "profile_image": "https://supabase.../charlie.jpg"
+    },
+    "related_data": {
+      "properties_owned": [
+        {
+          "name": "Avida Towers Unit 505",
+          "location": "Cebu IT Park",
+          "is_available": false
+        },
+        {
+          "name": "Solinea Condo",
+          "location": "Cebu Business Park",
+          "is_available": true
+        }
+      ]
+    }
+  }
+]

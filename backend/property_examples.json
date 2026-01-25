@@ -1,0 +1,61 @@
+{
+  "properties_structure": {
+    "description": "Detailed Property Listing based on Landlord Input Form",
+    "example_data": {
+      "id": "prop-uuid-1234-5678",
+      "landlord_id": "user-uuid-landlord-01",
+      "images": [
+        "https://.../outside_view.jpg",
+        "https://.../indoor_view.jpg",
+        "https://.../window_view.jpg",
+        "https://.../extra_kitchen.jpg"
+      ],
+      "location": "Avida Towers Riala, Cebu IT Park, Cebu City",
+      "coordinates": {
+        "lat": 10.329,
+        "lng": 123.906
+      },
+      "price_monthly": 25000,
+      "price_condo_dues": 2500,
+      "deposit_months": 2,
+      "advance_months": 1,
+      "min_contract_months": 12,
+      "property_type": "condo",
+      "floor_level": "15th Floor",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "bathroom_type": "own",
+      "floor_area_sqm": 35.5,
+      "furnishing_status": "fully-furnished",
+      "allow_shared_living": false,
+      "shared_living_gender": null,
+      "amenities": [
+        "pool",
+        "gym",
+        "study_hall"
+      ],
+      "curfew_time": null,
+      "visitor_policy": "no_overnight",
+      "pet_policy": "small_caged_only",
+      "is_gated": true,
+      "signal_strength": {
+        "smart": 5,
+        "globe": 3,
+        "dito": 1
+      },
+      "connectivity_type": "fiber_active",
+      "unit_orientation": "interior_view",
+      "laundry_provision": "washing_machine_included",
+      "cooking_policy": "allowed_electric",
+      "has_own_submeter_water": true,
+      "has_own_submeter_electric": true,
+      "parking_type": "paid_offsite",
+      "aircon_details": {
+        "type": "split",
+        "inverter": true,
+        "hp": 1.5
+      },
+      "verification_status": "verified"
+    }
+  }
+}

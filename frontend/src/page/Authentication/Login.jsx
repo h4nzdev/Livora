@@ -13,9 +13,19 @@ const Login = () => {
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(true);
+    const { email, password } = formData;
+
+    // Call the Supabase login function
+    const { error } = await login(email, password);
+
+    if (error) {
+      alert("Login failed: " + error.message);
+    } else {
+      // Navigate to dashboard or home on success
+      navigate("/role"); // Assuming 'Role' is the next step as per App.jsx
+    }
   };
 
   const handleChange = (e) => {

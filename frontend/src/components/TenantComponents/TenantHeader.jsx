@@ -14,15 +14,17 @@ import { useNavigate } from "react-router-dom";
 const TenantHeader = ({ onNavigate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notificationsCount, setNotificationsCount] = useState(3);
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const userProfile = {
-    name: "Alex Johnson",
-    email: "alex@example.com",
+    name: user?.user_metadata?.full_name || user?.email || "Guest User",
+    email: user?.email || "No email",
     avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop",
-    matchScore: 92,
+      user?.user_metadata?.avatar_url || // Check for avatar in metadata
+      user?.user_metadata?.picture || // Check for picture (common in OAuth)
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop", // Fallback
+    matchScore: 92, // This could come from a context or prop later
   };
 
   // Navigation handler function - FIXED
@@ -108,9 +110,8 @@ const TenantHeader = ({ onNavigate }) => {
               )}
 
               <ChevronDown
-                className={`w-4 h-4 text-gray-500 transition-transform ${
-                  isProfileOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 text-gray-500 transition-transform ${isProfileOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 

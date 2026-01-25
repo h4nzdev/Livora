@@ -176,11 +176,10 @@ const Chat = () => {
                 <div className="flex gap-6">
                   <button
                     onClick={() => setActiveTab("inquiries")}
-                    className={`relative pb-1 text-sm font-bold transition-colors ${
-                      activeTab === "inquiries"
+                    className={`relative pb-1 text-sm font-bold transition-colors ${activeTab === "inquiries"
                         ? "text-gray-900"
                         : "text-gray-400"
-                    }`}
+                      }`}
                   >
                     Inquiries
                     {activeTab === "inquiries" && (
@@ -220,11 +219,10 @@ const Chat = () => {
                               )}
                             </div>
                             <span
-                              className={`text-xs ${
-                                conversation.unread
+                              className={`text-xs ${conversation.unread
                                   ? "font-bold text-emerald-600"
                                   : "font-medium text-gray-500"
-                              }`}
+                                }`}
                             >
                               {conversation.time}
                             </span>
@@ -233,11 +231,10 @@ const Chat = () => {
                             {conversation.property}
                           </p>
                           <p
-                            className={`text-sm truncate ${
-                              conversation.unread
+                            className={`text-sm truncate ${conversation.unread
                                 ? "font-bold text-gray-900"
                                 : "font-medium text-gray-500"
-                            }`}
+                              }`}
                           >
                             {conversation.lastMessage}
                           </p>
@@ -304,19 +301,17 @@ const Chat = () => {
                     className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-2xl p-3 ${
-                        msg.sender === "me"
+                      className={`max-w-[80%] rounded-2xl p-3 ${msg.sender === "me"
                           ? "bg-emerald-500 text-white rounded-tr-none"
                           : "bg-gray-100 text-gray-900 rounded-tl-none"
-                      }`}
+                        }`}
                     >
                       <p className="text-sm">{msg.text}</p>
                       <div
-                        className={`flex items-center gap-1 mt-1 text-xs ${
-                          msg.sender === "me"
+                        className={`flex items-center gap-1 mt-1 text-xs ${msg.sender === "me"
                             ? "text-emerald-100"
                             : "text-gray-500"
-                        }`}
+                          }`}
                       >
                         <span>{msg.time}</span>
                         {msg.sender === "me" && (
@@ -406,11 +401,10 @@ const Chat = () => {
               <div className="flex gap-4 mb-6">
                 <button
                   onClick={() => setActiveTab("inquiries")}
-                  className={`px-4 py-2 rounded-lg font-medium ${
-                    activeTab === "inquiries"
+                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "inquiries"
                       ? "bg-emerald-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Inquiries
                 </button>
@@ -423,9 +417,8 @@ const Chat = () => {
                 <button
                   key={conversation.id}
                   onClick={() => setSelectedChat(conversation)}
-                  className={`w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors ${
-                    selectedChat?.id === conversation.id ? "bg-emerald-50" : ""
-                  }`}
+                  className={`w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors ${selectedChat?.id === conversation.id ? "bg-emerald-50" : ""
+                    }`}
                 >
                   <div className="relative">
                     <img
@@ -522,19 +515,17 @@ const Chat = () => {
                       className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-lg rounded-2xl p-4 ${
-                          msg.sender === "me"
+                        className={`max-w-lg rounded-2xl p-4 ${msg.sender === "me"
                             ? "bg-emerald-500 text-white rounded-tr-none"
                             : "bg-white text-gray-900 border border-gray-200 rounded-tl-none"
-                        }`}
+                          }`}
                       >
                         <p className="text-sm">{msg.text}</p>
                         <div
-                          className={`flex items-center gap-2 mt-2 text-xs ${
-                            msg.sender === "me"
+                          className={`flex items-center gap-2 mt-2 text-xs ${msg.sender === "me"
                               ? "text-emerald-100"
                               : "text-gray-500"
-                          }`}
+                            }`}
                         >
                           <span>{msg.time}</span>
                           {msg.sender === "me" && (

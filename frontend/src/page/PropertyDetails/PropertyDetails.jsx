@@ -260,11 +260,10 @@ const PropertyDetails = () => {
             {/* Availability Badge */}
             <div className="absolute bottom-6 left-4">
               <div
-                className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 ${
-                  propertyData.is_available
+                className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 ${propertyData.is_available
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     : "bg-red-50 text-red-700 border border-red-200"
-                }`}
+                  }`}
               >
                 {propertyData.is_available ? (
                   <>
@@ -344,11 +343,10 @@ const PropertyDetails = () => {
                 {keyFeatures.slice(0, 6).map((feature, index) => (
                   <div
                     key={index}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border ${
-                      feature.available
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border ${feature.available
                         ? "bg-emerald-50 border-emerald-100"
                         : "bg-gray-50 border-gray-100 opacity-50"
-                    }`}
+                      }`}
                   >
                     <div
                       className={`mb-2 ${feature.available ? "text-emerald-600" : "text-gray-400"}`}
@@ -432,11 +430,10 @@ const PropertyDetails = () => {
               <button
                 onClick={handleMessageOwner}
                 disabled={!propertyData.is_available}
-                className={`flex-1 h-14 font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${
-                  propertyData.is_available
+                className={`flex-1 h-14 font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${propertyData.is_available
                     ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-gray-300/20"
-                }`}
+                  }`}
               >
                 <MessageCircle className="w-5 h-5" />
                 {propertyData.is_available
@@ -487,11 +484,10 @@ const PropertyDetails = () => {
                   {/* Availability Badge */}
                   <div className="absolute bottom-6 left-4">
                     <div
-                      className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${
-                        propertyData.is_available
+                      className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${propertyData.is_available
                           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           : "bg-red-50 text-red-700 border border-red-200"
-                      }`}
+                        }`}
                     >
                       {propertyData.is_available ? (
                         <>
@@ -518,11 +514,10 @@ const PropertyDetails = () => {
                     <button
                       key={index}
                       onClick={() => setCurrentImage(index)}
-                      className={`relative h-32 rounded-xl overflow-hidden transition-all border ${
-                        currentImage === index
+                      className={`relative h-32 rounded-xl overflow-hidden transition-all border ${currentImage === index
                           ? "ring-2 ring-emerald-500 border-emerald-300"
                           : "border-gray-200 opacity-80 hover:opacity-100"
-                      }`}
+                        }`}
                     >
                       <img
                         src={img}
@@ -602,11 +597,10 @@ const PropertyDetails = () => {
                   {keyFeatures.map((feature, index) => (
                     <div
                       key={index}
-                      className={`flex flex-col items-center justify-center p-5 rounded-xl border transition-colors ${
-                        feature.available
+                      className={`flex flex-col items-center justify-center p-5 rounded-xl border transition-colors ${feature.available
                           ? "bg-white border-gray-200 hover:border-emerald-300"
                           : "bg-gray-50 border-gray-200 opacity-50"
-                      }`}
+                        }`}
                     >
                       <div
                         className={`mb-3 ${feature.available ? "text-emerald-600" : "text-gray-400"}`}
@@ -723,11 +717,10 @@ const PropertyDetails = () => {
                   <button
                     onClick={handleMessageOwner}
                     disabled={!propertyData.is_available}
-                    className={`flex-1 font-bold py-3 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-all ${
-                      propertyData.is_available
+                    className={`flex-1 font-bold py-3 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-all ${propertyData.is_available
                         ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-gray-300/20"
-                    }`}
+                      }`}
                   >
                     <MessageCircle className="w-5 h-5" />
                     {propertyData.is_available

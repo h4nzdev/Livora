@@ -1,0 +1,81 @@
+{
+  "tenant_verification_structure": {
+    "description": "Tenant Verification (Financial & Quality Check) Data Structure",
+    "scenarios": [
+      {
+        "type": "Local Employee",
+        "data": {
+          "user_id": "user-uuid-tenant-1",
+          "employment_type": "local_employed",
+          "monthly_income": 45000,
+          "financial_documents": {
+            "coe_url": "https://supa.../coe.pdf",
+            "payslip_url": "https://supa.../payslip.pdf",
+            "company_id_url": "https://supa.../id.jpg"
+          },
+          "quality_filter_responses": {
+            "move_in_date": "2024-03-01",
+            "occupants_count": 2,
+            "has_pets": true,
+            "pet_details": "1 Small Dog",
+            "is_smoker": false
+          },
+          "trust_score": 80
+        }
+      },
+      {
+        "type": "Freelancer",
+        "data": {
+          "user_id": "user-uuid-tenant-2",
+          "employment_type": "freelancer",
+          "monthly_income": 80000,
+          "financial_documents": {
+            "earnings_cert_url": "https://supa.../upwork_cert.pdf",
+            "transaction_history_url": "https://supa.../paypal_history.pdf",
+            "contract_url": "https://supa.../contract.pdf"
+          },
+          "quality_filter_responses": {
+            "move_in_date": "2024-02-15",
+            "occupants_count": 1,
+            "has_pets": false,
+            "is_smoker": false
+          },
+          "trust_score": 90
+        }
+      },
+      {
+        "type": "Business Owner",
+        "data": {
+          "user_id": "user-uuid-tenant-3",
+          "employment_type": "business_owner",
+          "monthly_income": 150000,
+          "financial_documents": {
+            "dti_sec_url": "https://supa.../dti.pdf",
+            "business_permit_url": "https://supa.../permit.pdf"
+          },
+          "quality_filter_responses": {
+            "move_in_date": "2024-04-01",
+            "occupants_count": 4,
+            "has_pets": true,
+            "pet_details": "2 Cats",
+            "is_smoker": true
+          },
+          "trust_score": 100
+        }
+      }
+    ]
+  },
+  "user_verification_update": {
+    "description": "Updated Identity Verification with Social Media Link",
+    "data": {
+      "user_id": "user-uuid-tenant-1",
+      "legal_name": "Juan Dela Cruz",
+      "id_type": "passport",
+      "id_number": "P12345678A",
+      "id_image_url": "https://supa.../passport_front.jpg",
+      "social_media_link": "https://linkedin.com/in/juandelacruz",
+      "selfie_image_url": "https://supa.../selfie.jpg",
+      "status": "pending"
+    }
+  }
+}

@@ -41,140 +41,81 @@ def format_response_keys(response_data):
     else:
         return response_data
 
-# Import properties
+# Supabase Configuration
+from dotenv import load_dotenv
+from supabase import create_client, Client
+
+load_dotenv()
+
+supabase_url: str = os.environ.get("SUPABASE_URL")
+supabase_key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+
+if not supabase_url or not supabase_key:
+    # Fallback for development if env vars are missing
+    print("⚠ Supabase credentials missing. Falling back to local data if available.")
+    supabase = None
+else:
+    supabase: Client = create_client(supabase_url, supabase_key)
+
+def fetch_properties_from_supabase():
+    """Fetch properties from Supabase and return as list of dicts"""
+    if not supabase:
+        raise Exception("Supabase client not initialized")
+    
+    try:
+        response = supabase.table("properties").select("*").execute()
+        # Transform Supabase data to match expected internal format
+        # Schema: location, price_monthly, etc. -> internal: location, price, etc.
+        data = []
+        for record in response.data:
+            mapped = {
+                "id": record.get("id"), # UUID
+                "name": f"{record.get('property_type', 'Property').title()} in {record.get('location')}", # Generate name if missing
+                "type": record.get("property_type", "").title(),
+                "location": record.get("location"),
+                "price": float(record.get("price_monthly", 0)),
+                "bedrooms": record.get("bedrooms"),
+                "bathrooms": record.get("bathrooms"),
+                "amenities": record.get("amenities", []),
+                "pet_friendly": "pet" in (record.get("pet_policy") or "").lower(), # Infer from policy
+                "lease_duration": "flexible", # Default or fetch if available
+                "rating": float(record.get("rating") or 0),
+                "furnished": record.get("furnishing_status") in ["semi-furnished", "fully-furnished"],
+                "distance_to_it_park_km": 0, # Need to calculate or add to DB
+                # Add other fields as needed
+            }
+            data.append(mapped)
+        print(f"✓ Fetched {len(data)} properties from Supabase")
+        return data
+    except Exception as e:
+        print(f"Error fetching from Supabase: {e}")
+        return []
+
+# Load properties
 try:
+    if supabase:
+        properties = fetch_properties_from_supabase()
+        if not properties:
+             raise ImportError("No data in Supabase")
+    else:
+        raise ImportError("Supabase not configured")
+
+except (ImportError, Exception) as e:
+    print(f"⚠ Failed to load from Supabase: {e}")
+    print("⚠ Falling back to local data")
+    
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(current_dir, 'data')
     sys.path.append(data_dir)
-    from properties import properties
-    print(f"✓ Imported {len(properties)} properties")
-except ImportError:
-    # Enhanced properties with budget-friendly options
-    properties = [
-        {
-            "id": 1,
-            "name": "IT Park Shared Dorm",
-            "type": "Shared",
-            "location": "IT Park, Cebu City",
-            "price": 3500,
-            "bedrooms": 1,
-            "bathrooms": 1,
-            "amenities": ["wifi", "aircon", "shared bathroom", "study area"],
-            "pet_friendly": False,
-            "lease_duration": "short-term",
-            "rating": 3.9,
-            "furnished": True,
-            "parking_available": False,
-            "distance_to_it_park_km": 0.3,
-            "noise_level": "medium",
-            "kitchen_type": "shared",
-            "commute_type": "walking",
-            "fiber_available": True
-        },
-        {
-            "id": 2,
-            "name": "Lahug Student Room",
-            "type": "Shared",
-            "location": "Lahug, Cebu City",
-            "price": 2800,
-            "bedrooms": 1,
-            "bathrooms": 1,
-            "amenities": ["wifi", "fan", "shared kitchen"],
-            "pet_friendly": False,
-            "lease_duration": "short-term",
-            "rating": 3.5,
-            "furnished": True,
-            "parking_available": False,
-            "distance_to_it_park_km": 1.5,
-            "noise_level": "low",
-            "kitchen_type": "shared",
-            "commute_type": "jeepney",
-            "fiber_available": False
-        },
-        {
-            "id": 3,
-            "name": "Talamban Budget Unit",
-            "type": "Apartment",
-            "location": "Talamban, Cebu City",
-            "price": 4500,
-            "bedrooms": 1,
-            "bathrooms": 1,
-            "amenities": ["wifi", "aircon", "private bathroom"],
-            "pet_friendly": False,
-            "lease_duration": "short-term",
-            "rating": 4.0,
-            "furnished": False,
-            "parking_available": False,
-            "distance_to_it_park_km": 4.0,
-            "noise_level": "low",
-            "kitchen_type": "induction",
-            "commute_type": "jeepney",
-            "fiber_available": True
-        },
-        {
-            "id": 4,
-            "name": "Mabolo Studio",
-            "type": "Apartment",
-            "location": "Mabolo, Cebu City",
-            "price": 5000,
-            "bedrooms": 1,
-            "bathrooms": 1,
-            "amenities": ["wifi", "aircon", "private bathroom", "security"],
-            "pet_friendly": False,
-            "lease_duration": "short-term",
-            "rating": 4.2,
-            "furnished": True,
-            "parking_available": False,
-            "distance_to_it_park_km": 2.5,
-            "noise_level": "medium",
-            "kitchen_type": "induction",
-            "commute_type": "jeepney",
-            "fiber_available": True
-        },
-        {
-            "id": 5,
-            "name": "Cebu City Dormitory",
-            "type": "Dormitory",
-            "location": "Cebu City Proper",
-            "price": 2500,
-            "bedrooms": 1,
-            "bathrooms": 1,
-            "amenities": ["wifi", "fan", "shared bathroom", "laundry"],
-            "pet_friendly": False,
-            "lease_duration": "short-term",
-            "rating": 3.7,
-            "furnished": True,
-            "parking_available": False,
-            "distance_to_it_park_km": 3.0,
-            "noise_level": "high",
-            "kitchen_type": "shared",
-            "commute_type": "jeepney",
-            "fiber_available": False
-        },
-        {
-            "id": 6,
-            "name": "IT Park Premium Studio",
-            "type": "Apartment",
-            "location": "IT Park, Cebu City",
-            "price": 8000,
-            "bedrooms": 1,
-            "bathrooms": 1,
-            "amenities": ["wifi", "aircon", "private bathroom", "gym", "pool"],
-            "pet_friendly": False,
-            "lease_duration": "short-term",
-            "rating": 4.5,
-            "furnished": True,
-            "parking_available": False,
-            "distance_to_it_park_km": 0.2,
-            "noise_level": "medium",
-            "kitchen_type": "induction",
-            "commute_type": "walking",
-            "fiber_available": True
-        }
-    ]
-    print("⚠ Using budget-friendly properties dataset")
+    try:
+        from properties import properties
+        print(f"✓ Imported {len(properties)} properties from local file")
+    except ImportError:
+         print("⚠ Local data not found. Using empty list.")
+         properties = []
 
 properties_df = pd.DataFrame(properties)
+
 
 class TenantProfiler:
     """Handles tenant lifestyle profiling"""

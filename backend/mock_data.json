@@ -1,0 +1,863 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "full_name": "Alice Searcher",
+      "email": "alice@example.com",
+      "role": "tenant",
+      "tenant_type": "searcher",
+      "profile_image": "https://example.com/alice.jpg",
+      "is_verified": true
+    },
+    {
+      "id": "user-2",
+      "full_name": "Bob Searcher",
+      "email": "bob@example.com",
+      "role": "tenant",
+      "tenant_type": "searcher",
+      "profile_image": "https://example.com/bob.jpg",
+      "is_verified": false
+    },
+    {
+      "id": "user-3",
+      "full_name": "Charlie Dweller",
+      "email": "charlie@example.com",
+      "role": "tenant",
+      "tenant_type": "dweller",
+      "profile_image": "https://example.com/charlie.jpg",
+      "is_verified": true
+    },
+    {
+      "id": "user-4",
+      "full_name": "Diana Dweller",
+      "email": "diana@example.com",
+      "role": "tenant",
+      "tenant_type": "dweller",
+      "profile_image": "https://example.com/diana.jpg",
+      "is_verified": true
+    },
+    {
+      "id": "user-5",
+      "full_name": "Evan Landlord",
+      "email": "evan@example.com",
+      "role": "landlord",
+      "tenant_type": null,
+      "profile_image": "https://example.com/evan.jpg",
+      "is_verified": true,
+      "payment_details": { "gcash_qr": "https://qr.com/evan", "bank_name": "BDO" }
+    }
+  ],
+  "properties": [
+    {
+      "id": "prop-1",
+      "landlord_id": "user-5",
+      "location": "Makati CBD",
+      "price_monthly": 25000,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "property_type": "condo",
+      "verification_status": "verified",
+      "images": ["https://example.com/prop1a.jpg", "https://example.com/prop1b.jpg"],
+      "amenities": ["Gym", "Pool"],
+      "unit_orientation": "East"
+    },
+    {
+      "id": "prop-2",
+      "landlord_id": "user-5",
+      "location": "BGC",
+      "price_monthly": 45000,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "property_type": "condo",
+      "verification_status": "verified",
+      "images": ["https://example.com/prop2.jpg"],
+      "amenities": ["Gym", "Pool", "Parking"],
+      "unit_orientation": "West"
+    },
+    {
+      "id": "prop-3",
+      "landlord_id": "user-5",
+      "location": "Ortigas",
+      "price_monthly": 15000,
+      "bedrooms": 0,
+      "bathrooms": 1,
+      "property_type": "apartment",
+      "verification_status": "pending",
+      "images": ["https://example.com/prop3.jpg"],
+      "amenities": [],
+      "unit_orientation": "North"
+    },
+    {
+      "id": "prop-4",
+      "landlord_id": "user-5",
+      "location": "Mandaluyong",
+      "price_monthly": 18000,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "property_type": "condo",
+      "verification_status": "verified",
+      "images": ["https://example.com/prop4.jpg"],
+      "amenities": ["Pool"],
+      "unit_orientation": "South"
+    },
+    {
+      "id": "prop-5",
+      "landlord_id": "user-5",
+      "location": "Quezon City",
+      "price_monthly": 12000,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "property_type": "house",
+      "verification_status": "unverified",
+      "images": ["https://example.com/prop5.jpg"],
+      "amenities": ["Parking"],
+      "unit_orientation": "East"
+    }
+  ],
+  "tenant_preferences": [
+    {
+      "user_id": "user-1",
+      "budget_min": 10000,
+      "budget_max": 30000,
+      "preferred_areas": ["Makati", "BGC"],
+      "preferred_orientation": "East",
+      "parking_requirement": "none"
+    },
+    {
+      "user_id": "user-2",
+      "budget_min": 5000,
+      "budget_max": 20000,
+      "preferred_areas": ["Ortigas"],
+      "preferred_orientation": "West",
+      "parking_requirement": "motorcycle"
+    },
+    {
+      "user_id": "user-3",
+      "budget_min": 20000,
+      "budget_max": 50000,
+      "preferred_areas": ["BGC"],
+      "preferred_orientation": "North",
+      "parking_requirement": "car"
+    },
+    {
+      "user_id": "user-4",
+      "budget_min": 15000,
+      "budget_max": 25000,
+      "preferred_areas": ["Mandaluyong"],
+      "preferred_orientation": "South",
+      "parking_requirement": "both"
+    },
+    {
+      "user_id": "user-5",
+      "budget_min": 0,
+      "budget_max": 0,
+      "preferred_areas": [],
+      "preferred_orientation": null,
+      "parking_requirement": "none"
+    }
+  ],
+  "dweller_settings": [
+    {
+      "user_id": "user-3",
+      "is_night_shift_worker": true,
+      "quiet_hours_start": "08:00:00",
+      "quiet_hours_end": "16:00:00",
+      "notify_utility_outages": true
+    },
+    {
+      "user_id": "user-4",
+      "is_night_shift_worker": false,
+      "quiet_hours_start": "22:00:00",
+      "quiet_hours_end": "06:00:00",
+      "notify_utility_outages": true
+    },
+    {
+      "user_id": "user-1",
+      "is_night_shift_worker": false,
+      "quiet_hours_start": "22:00",
+      "quiet_hours_end": "06:00",
+      "notify_utility_outages": false
+    },
+    {
+      "user_id": "user-2",
+      "is_night_shift_worker": true,
+      "quiet_hours_start": "10:00",
+      "quiet_hours_end": "18:00",
+      "notify_utility_outages": true
+    },
+    {
+      "user_id": "user-5",
+      "is_night_shift_worker": false,
+      "quiet_hours_start": "23:00",
+      "quiet_hours_end": "05:00",
+      "notify_utility_outages": true
+    }
+  ],
+  "amenity_bookings": [
+    {
+      "id": "book-1",
+      "property_id": "prop-1",
+      "user_id": "user-3",
+      "amenity_name": "Gym",
+      "booking_date": "2023-11-01",
+      "start_time": "08:00:00",
+      "end_time": "09:00:00",
+      "status": "confirmed"
+    },
+    {
+      "id": "book-2",
+      "property_id": "prop-1",
+      "user_id": "user-3",
+      "amenity_name": "Pool",
+      "booking_date": "2023-11-02",
+      "start_time": "10:00:00",
+      "end_time": "12:00:00",
+      "status": "confirmed"
+    },
+    {
+      "id": "book-3",
+      "property_id": "prop-2",
+      "user_id": "user-4",
+      "amenity_name": "Function Room",
+      "booking_date": "2023-11-05",
+      "start_time": "18:00:00",
+      "end_time": "22:00:00",
+      "status": "pending"
+    },
+    {
+      "id": "book-4",
+      "property_id": "prop-2",
+      "user_id": "user-4",
+      "amenity_name": "Gym",
+      "booking_date": "2023-11-06",
+      "start_time": "07:00:00",
+      "end_time": "08:00:00",
+      "status": "cancelled"
+    },
+    {
+      "id": "book-5",
+      "property_id": "prop-1",
+      "user_id": "user-3",
+      "amenity_name": "Gym",
+      "booking_date": "2023-11-03",
+      "start_time": "08:00:00",
+      "end_time": "09:00:00",
+      "status": "confirmed"
+    }
+  ],
+  "community_perks": [
+    {
+      "id": "perk-1",
+      "property_id": "prop-1",
+      "title": "20% Off Laundry",
+      "partner_name": "Suds & Bubbles",
+      "discount_code": "LIVORA20",
+      "expiry_date": "2024-12-31"
+    },
+    {
+      "id": "perk-2",
+      "property_id": "prop-1",
+      "title": "Free Coffee",
+      "partner_name": "Corner Cafe",
+      "discount_code": "FREECUP",
+      "expiry_date": "2024-06-30"
+    },
+    {
+      "id": "perk-3",
+      "property_id": "prop-2",
+      "title": "Gym Membership Discount",
+      "partner_name": "Anytime Fitness",
+      "discount_code": "AF_LIVORA",
+      "expiry_date": "2025-01-01"
+    },
+    {
+      "id": "perk-4",
+      "property_id": "prop-2",
+      "title": "Internet Promo",
+      "partner_name": "Globe Fiber",
+      "discount_code": "GLOBE_LIV",
+      "expiry_date": "2024-03-01"
+    },
+    {
+      "id": "perk-5",
+      "property_id": "prop-3",
+      "title": "Move-in Truck",
+      "partner_name": "Lalamove",
+      "discount_code": "MOVEIT",
+      "expiry_date": "2024-12-31"
+    }
+  ],
+  "marketplace_listings": [
+    {
+      "id": "item-1",
+      "property_id": "prop-1",
+      "seller_id": "user-3",
+      "title": "Study Table",
+      "price": 1500,
+      "category": "furniture",
+      "status": "active"
+    },
+    {
+      "id": "item-2",
+      "property_id": "prop-1",
+      "seller_id": "user-3",
+      "title": "Microwave",
+      "price": 2000,
+      "category": "appliances",
+      "status": "sold"
+    },
+    {
+      "id": "item-3",
+      "property_id": "prop-2",
+      "seller_id": "user-4",
+      "title": "Gaming Chair",
+      "price": 5000,
+      "category": "furniture",
+      "status": "active"
+    },
+    {
+      "id": "item-4",
+      "property_id": "prop-2",
+      "seller_id": "user-4",
+      "title": "Blender",
+      "price": 800,
+      "category": "appliances",
+      "status": "reserved"
+    },
+    {
+      "id": "item-5",
+      "property_id": "prop-1",
+      "seller_id": "user-3",
+      "title": "Curtains",
+      "price": 500,
+      "category": "other",
+      "status": "active"
+    }
+  ],
+  "maintenance_requests": [
+    {
+      "id": "req-1",
+      "property_id": "prop-1",
+      "tenant_id": "user-3",
+      "title": "Leaky Faucet",
+      "priority": "low",
+      "status": "resolved",
+      "ai_priority_score": 20,
+      "tenant_rating": 5
+    },
+    {
+      "id": "req-2",
+      "property_id": "prop-1",
+      "tenant_id": "user-3",
+      "title": "AC Not Cooling",
+      "priority": "high",
+      "status": "in_progress",
+      "ai_priority_score": 85
+    },
+    {
+      "id": "req-3",
+      "property_id": "prop-2",
+      "tenant_id": "user-4",
+      "title": "Busted Light",
+      "priority": "low",
+      "status": "open",
+      "ai_priority_score": 10
+    },
+    {
+      "id": "req-4",
+      "property_id": "prop-2",
+      "tenant_id": "user-4",
+      "title": "No Water",
+      "priority": "emergency",
+      "status": "open",
+      "ai_priority_score": 95
+    },
+    {
+      "id": "req-5",
+      "property_id": "prop-1",
+      "tenant_id": "user-3",
+      "title": "Door Lock Jammed",
+      "priority": "medium",
+      "status": "resolved",
+      "ai_priority_score": 60,
+      "tenant_rating": 4
+    }
+  ],
+  "maintenance_timeline": [
+    {
+      "id": "time-1",
+      "request_id": "req-1",
+      "status": "open",
+      "details": "Ticket created"
+    },
+    {
+      "id": "time-2",
+      "request_id": "req-1",
+      "status": "in_progress",
+      "details": "Plumber assigned"
+    },
+    {
+      "id": "time-3",
+      "request_id": "req-1",
+      "status": "resolved",
+      "details": "Faucet replaced"
+    },
+    {
+      "id": "time-4",
+      "request_id": "req-2",
+      "status": "open",
+      "details": "Ticket created"
+    },
+    {
+      "id": "time-5",
+      "request_id": "req-2",
+      "status": "in_progress",
+      "details": "Technician scheduled for tomorrow"
+    }
+  ],
+  "vendors": [
+    {
+      "id": "vend-1",
+      "landlord_id": "user-5",
+      "name": "Mario Plumbing",
+      "service_category": "Plumbing",
+      "contact_number": "0917-111-2222",
+      "rating": 4.5
+    },
+    {
+      "id": "vend-2",
+      "landlord_id": "user-5",
+      "name": "Cool Breeze AC",
+      "service_category": "HVAC",
+      "contact_number": "0917-333-4444",
+      "rating": 4.8
+    },
+    {
+      "id": "vend-3",
+      "landlord_id": "user-5",
+      "name": "Sparky Electric",
+      "service_category": "Electrical",
+      "contact_number": "0917-555-6666",
+      "rating": 4.2
+    },
+    {
+      "id": "vend-4",
+      "landlord_id": "user-5",
+      "name": "Clean Queens",
+      "service_category": "Cleaning",
+      "contact_number": "0917-777-8888",
+      "rating": 4.9
+    },
+    {
+      "id": "vend-5",
+      "landlord_id": "user-5",
+      "name": "Secure Locks",
+      "service_category": "Locksmith",
+      "contact_number": "0917-999-0000",
+      "rating": 4.0
+    }
+  ],
+  "property_announcements": [
+    {
+      "id": "ann-1",
+      "property_id": "prop-1",
+      "landlord_id": "user-5",
+      "title": "Water Interruption",
+      "message": "Scheduled maintenance on Nov 10, 10am-2pm.",
+      "type": "utility",
+      "target_audience": "all"
+    },
+    {
+      "id": "ann-2",
+      "property_id": "prop-1",
+      "landlord_id": "user-5",
+      "title": "New Gym Equipment",
+      "message": "We have added new treadmills!",
+      "type": "community",
+      "target_audience": "all"
+    },
+    {
+      "id": "ann-3",
+      "property_id": "prop-2",
+      "landlord_id": "user-5",
+      "title": "Fire Drill",
+      "message": "Annual fire drill on Nov 15.",
+      "type": "emergency",
+      "target_audience": "all"
+    },
+    {
+      "id": "ann-4",
+      "property_id": "prop-2",
+      "landlord_id": "user-5",
+      "title": "Elevator Maintenance",
+      "message": "Elevator B will be down tomorrow.",
+      "type": "general",
+      "target_audience": "all"
+    },
+    {
+      "id": "ann-5",
+      "property_id": "prop-1",
+      "landlord_id": "user-5",
+      "title": "Rent Reminder",
+      "message": "Rent is due on the 5th.",
+      "type": "general",
+      "target_audience": "all"
+    }
+  ],
+  "inspections": [
+    {
+      "id": "insp-1",
+      "property_id": "prop-1",
+      "tenant_id": "user-1",
+      "landlord_id": "user-5",
+      "scheduled_date": "2023-11-20T10:00:00Z",
+      "status": "scheduled",
+      "rsvp_status": "confirmed"
+    },
+    {
+      "id": "insp-2",
+      "property_id": "prop-2",
+      "tenant_id": "user-2",
+      "landlord_id": "user-5",
+      "scheduled_date": "2023-11-21T14:00:00Z",
+      "status": "scheduled",
+      "rsvp_status": "pending"
+    },
+    {
+      "id": "insp-3",
+      "property_id": "prop-3",
+      "tenant_id": "user-1",
+      "landlord_id": "user-5",
+      "scheduled_date": "2023-11-22T09:00:00Z",
+      "status": "completed",
+      "rsvp_status": "confirmed"
+    },
+    {
+      "id": "insp-4",
+      "property_id": "prop-4",
+      "tenant_id": "user-2",
+      "landlord_id": "user-5",
+      "scheduled_date": "2023-11-23T16:00:00Z",
+      "status": "cancelled",
+      "rsvp_status": "reschedule_requested"
+    },
+    {
+      "id": "insp-5",
+      "property_id": "prop-1",
+      "tenant_id": "user-2",
+      "landlord_id": "user-5",
+      "scheduled_date": "2023-11-25T11:00:00Z",
+      "status": "scheduled",
+      "rsvp_status": "pending"
+    }
+  ],
+  "rental_applications": [
+    {
+      "id": "app-1",
+      "property_id": "prop-1",
+      "tenant_id": "user-1",
+      "status": "negotiating",
+      "offer_rent": 24000
+    },
+    {
+      "id": "app-2",
+      "property_id": "prop-2",
+      "tenant_id": "user-2",
+      "status": "pending",
+      "offer_rent": 45000
+    },
+    {
+      "id": "app-3",
+      "property_id": "prop-3",
+      "tenant_id": "user-1",
+      "status": "rejected",
+      "offer_rent": 10000
+    },
+    {
+      "id": "app-4",
+      "property_id": "prop-4",
+      "tenant_id": "user-2",
+      "status": "lease_sent",
+      "offer_rent": 18000
+    },
+    {
+      "id": "app-5",
+      "property_id": "prop-1",
+      "tenant_id": "user-2",
+      "status": "cancelled",
+      "offer_rent": 25000
+    }
+  ],
+  "leases": [
+    {
+      "id": "lease-1",
+      "property_id": "prop-1",
+      "tenant_id": "user-3",
+      "status": "active",
+      "rent_amount": 25000,
+      "start_date": "2023-01-01",
+      "end_date": "2024-01-01"
+    },
+    {
+      "id": "lease-2",
+      "property_id": "prop-2",
+      "tenant_id": "user-4",
+      "status": "active",
+      "rent_amount": 45000,
+      "start_date": "2023-06-01",
+      "end_date": "2024-06-01"
+    },
+    {
+      "id": "lease-3",
+      "property_id": "prop-3",
+      "tenant_id": "user-3",
+      "status": "expired",
+      "rent_amount": 15000,
+      "start_date": "2022-01-01",
+      "end_date": "2023-01-01"
+    },
+    {
+      "id": "lease-4",
+      "property_id": "prop-4",
+      "tenant_id": "user-4",
+      "status": "terminated",
+      "rent_amount": 18000,
+      "start_date": "2022-06-01",
+      "end_date": "2022-09-01"
+    },
+    {
+      "id": "lease-5",
+      "property_id": "prop-1",
+      "tenant_id": "user-3",
+      "status": "pending",
+      "rent_amount": 26000,
+      "start_date": "2024-01-02",
+      "end_date": "2025-01-02"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "txn-1",
+      "payer_id": "user-3",
+      "receiver_id": "user-5",
+      "amount": 25000,
+      "status": "verified",
+      "transaction_type": "rent",
+      "receipt_url": "https://example.com/receipt1.jpg"
+    },
+    {
+      "id": "txn-2",
+      "payer_id": "user-3",
+      "receiver_id": "user-5",
+      "amount": 25000,
+      "status": "pending_verification",
+      "transaction_type": "rent",
+      "receipt_url": "https://example.com/receipt2.jpg"
+    },
+    {
+      "id": "txn-3",
+      "payer_id": "user-4",
+      "receiver_id": "user-5",
+      "amount": 45000,
+      "status": "verified",
+      "transaction_type": "rent",
+      "receipt_url": "https://example.com/receipt3.jpg"
+    },
+    {
+      "id": "txn-4",
+      "payer_id": "user-4",
+      "receiver_id": "user-5",
+      "amount": 45000,
+      "status": "rejected",
+      "transaction_type": "rent",
+      "receipt_url": "https://example.com/receipt4.jpg"
+    },
+    {
+      "id": "txn-5",
+      "payer_id": "user-3",
+      "receiver_id": "user-5",
+      "amount": 2000,
+      "status": "verified",
+      "transaction_type": "utility",
+      "receipt_url": "https://example.com/receipt5.jpg"
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conv-1",
+      "property_id": "prop-1",
+      "last_message": "Is this still available?",
+      "unread_count": 1
+    },
+    {
+      "id": "conv-2",
+      "property_id": "prop-2",
+      "last_message": "Yes, viewing is confirmed.",
+      "unread_count": 0
+    },
+    {
+      "id": "conv-3",
+      "property_id": "prop-1",
+      "last_message": "Thanks!",
+      "unread_count": 0
+    },
+    {
+      "id": "conv-4",
+      "property_id": "prop-3",
+      "last_message": "How much is the deposit?",
+      "unread_count": 2
+    },
+    {
+      "id": "conv-5",
+      "property_id": "prop-4",
+      "last_message": "I sent the application.",
+      "unread_count": 0
+    }
+  ],
+  "conversation_participants": [
+    { "conversation_id": "conv-1", "user_id": "user-1" },
+    { "conversation_id": "conv-1", "user_id": "user-5" },
+    { "conversation_id": "conv-2", "user_id": "user-2" },
+    { "conversation_id": "conv-2", "user_id": "user-5" },
+    { "conversation_id": "conv-3", "user_id": "user-3" },
+    { "conversation_id": "conv-3", "user_id": "user-5" },
+    { "conversation_id": "conv-4", "user_id": "user-1" },
+    { "conversation_id": "conv-4", "user_id": "user-5" },
+    { "conversation_id": "conv-5", "user_id": "user-2" },
+    { "conversation_id": "conv-5", "user_id": "user-5" }
+  ],
+  "messages": [
+    { "id": "msg-1", "conversation_id": "conv-1", "sender_id": "user-1", "text": "Hi, is this available?", "status": "read" },
+    { "id": "msg-2", "conversation_id": "conv-1", "sender_id": "user-5", "text": "Yes it is.", "status": "sent" },
+    { "id": "msg-3", "conversation_id": "conv-2", "sender_id": "user-2", "text": "Can I view it tomorrow?", "status": "read" },
+    { "id": "msg-4", "conversation_id": "conv-2", "sender_id": "user-5", "text": "Sure, 2pm?", "status": "read" },
+    { "id": "msg-5", "conversation_id": "conv-2", "sender_id": "user-2", "text": "Perfect.", "status": "read" },
+    { "id": "msg-6", "conversation_id": "conv-3", "sender_id": "user-3", "text": "Rent paid.", "status": "read" },
+    { "id": "msg-7", "conversation_id": "conv-3", "sender_id": "user-5", "text": "Received, thanks!", "status": "read" },
+    { "id": "msg-8", "conversation_id": "conv-4", "sender_id": "user-1", "text": "Deposit amount?", "status": "sent" },
+    { "id": "msg-9", "conversation_id": "conv-5", "sender_id": "user-2", "text": "Application sent.", "status": "read" },
+    { "id": "msg-10", "conversation_id": "conv-5", "sender_id": "user-5", "text": "I will review it.", "status": "read" },
+    { "id": "msg-11", "conversation_id": "conv-1", "sender_id": "user-1", "text": "Great, thanks.", "status": "sent" },
+    { "id": "msg-12", "conversation_id": "conv-2", "sender_id": "user-5", "text": "See you.", "status": "read" },
+    { "id": "msg-13", "conversation_id": "conv-3", "sender_id": "user-3", "text": "Receipt uploaded.", "status": "read" },
+    { "id": "msg-14", "conversation_id": "conv-4", "sender_id": "user-1", "text": "Hello?", "status": "sent" },
+    { "id": "msg-15", "conversation_id": "conv-5", "sender_id": "user-5", "text": "Approved.", "status": "sent" }
+  ],
+  "user_verifications": [
+    {
+      "user_id": "user-1",
+      "legal_name": "Alice Wonderland",
+      "id_type": "Passport",
+      "status": "verified"
+    },
+    {
+      "user_id": "user-2",
+      "legal_name": "Bob Builder",
+      "id_type": "Driver License",
+      "status": "pending"
+    },
+    {
+      "user_id": "user-3",
+      "legal_name": "Charlie Chaplin",
+      "id_type": "UMID",
+      "status": "verified"
+    },
+    {
+      "user_id": "user-4",
+      "legal_name": "Diana Prince",
+      "id_type": "Passport",
+      "status": "verified"
+    },
+    {
+      "user_id": "user-5",
+      "legal_name": "Evan Almighty",
+      "id_type": "TIN",
+      "status": "verified"
+    }
+  ],
+  "tenant_verifications": [
+    {
+      "user_id": "user-1",
+      "profile_status": "high_intent",
+      "trust_score": 85,
+      "monthly_income": 80000
+    },
+    {
+      "user_id": "user-2",
+      "profile_status": "guest",
+      "trust_score": 20,
+      "monthly_income": 0
+    },
+    {
+      "user_id": "user-3",
+      "profile_status": "verified",
+      "trust_score": 60,
+      "monthly_income": 50000
+    },
+    {
+      "user_id": "user-4",
+      "profile_status": "high_intent",
+      "trust_score": 90,
+      "monthly_income": 120000
+    },
+    {
+      "user_id": "user-5",
+      "profile_status": "guest",
+      "trust_score": 0,
+      "monthly_income": 0
+    }
+  ],
+  "tenant_pipeline_summary": [
+    {
+      "tenant_id": "user-1",
+      "property_id": "prop-1",
+      "stage": "application",
+      "detailed_status": "negotiating"
+    },
+    {
+      "tenant_id": "user-1",
+      "property_id": "prop-3",
+      "stage": "viewing",
+      "detailed_status": "completed"
+    },
+    {
+      "tenant_id": "user-2",
+      "property_id": "prop-2",
+      "stage": "inquiry",
+      "detailed_status": "active"
+    },
+    {
+      "tenant_id": "user-2",
+      "property_id": "prop-4",
+      "stage": "lease",
+      "detailed_status": "lease_sent"
+    },
+    {
+      "tenant_id": "user-1",
+      "property_id": "prop-2",
+      "stage": "browsing",
+      "detailed_status": "active"
+    }
+  ],
+  "verification_logs": [
+    { "id": "log-1", "entity_id": "user-1", "status": "approved", "admin_id": "admin-1" },
+    { "id": "log-2", "entity_id": "user-2", "status": "pending", "admin_id": null },
+    { "id": "log-3", "entity_id": "prop-1", "status": "approved", "admin_id": "admin-1" },
+    { "id": "log-4", "entity_id": "txn-1", "status": "approved", "admin_id": "landlord-1" },
+    { "id": "log-5", "entity_id": "user-3", "status": "approved", "admin_id": "admin-2" }
+  ],
+  "message_read_receipts": [
+    { "message_id": "msg-1", "user_id": "user-5", "read_at": "2023-11-01T10:00:00Z" },
+    { "message_id": "msg-2", "user_id": "user-1", "read_at": "2023-11-01T10:05:00Z" },
+    { "message_id": "msg-3", "user_id": "user-5", "read_at": "2023-11-02T14:00:00Z" },
+    { "message_id": "msg-4", "user_id": "user-2", "read_at": "2023-11-02T14:10:00Z" },
+    { "message_id": "msg-5", "user_id": "user-5", "read_at": "2023-11-02T14:15:00Z" }
+  ],
+  "property_verifications": [
+    { "property_id": "prop-1", "status": "verified", "verifier": "admin-1" },
+    { "property_id": "prop-2", "status": "verified", "verifier": "admin-1" },
+    { "property_id": "prop-3", "status": "pending", "verifier": null },
+    { "property_id": "prop-4", "status": "verified", "verifier": "admin-2" },
+    { "property_id": "prop-5", "status": "unverified", "verifier": null }
+  ]
+}

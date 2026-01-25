@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { supabase } from "../../services/supabaseClient";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   Edit,
@@ -35,35 +38,86 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [verificationLevel, setVerificationLevel] = useState(1); // 1=Guest, 2=Verified, 3=High Intent
   const [uploading, setUploading] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // User profile data matching the register component format
   const [userProfile, setUserProfile] = useState({
-    full_name: "Juan Dela Cruz",
-    email: "juan.delacruz@example.com",
-    mobile_number: "+63 917 123 4567",
+    full_name: "",
+    email: "",
+    mobile_number: "",
     role: "tenant",
-    tenant_type: "professional",
-    is_verified: true,
-    verification_status: "pending", // pending, verified, rejected
+    tenant_type: "searcher",
+    is_verified: false,
+    verification_status: "pending",
     documents: [
-      { type: "government_id", status: "verified", name: "Passport.jpg" },
-      { type: "proof_of_income", status: "pending", name: "Payslip_Jan.pdf" },
+      { type: "government_id", status: "not_uploaded", name: null },
+      { type: "proof_of_income", status: "not_uploaded", name: null },
       { type: "employment_cert", status: "not_uploaded", name: null },
     ],
-    profile_image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA_pgElr8j_rlRwwpwegIL6Xuu4ezz6xE_6E1sL8l_12yVtQzhizRxzdBuXKzxqzZtWedaKiW9a_rBwyN3hgVIcYMUogSkMC-PzA4tnScc8Em0e1jbPoHp1-PVUSkRNQh2qywoUUKaf2_sHhQgYC-MbdOLhdCTWIWjsxJde9pTF29mUt5EnSAWSeFt2vIEi4T6z9GP19gG0dvXkdi650EgHOBsJd6W9BhNm52Ja4gTZGd8V2d0HAJF51IQaM2kqH-OA3ubEuyskyU8",
-    occupation: "Software Engineer",
-    preferred_location: "BGC, Makati",
-    family_size: "2",
-    budget_range: "20000-30000",
-    preferred_property_type: "condo",
-    move_in_timeline: "1-3_months",
-    special_requirements: "Pet-friendly, Near MRT/LRT, Parking space",
+    profile_image: "",
+    occupation: "",
+    preferred_location: "",
+    family_size: "",
+    budget_range: "",
+    preferred_property_type: "",
+    move_in_timeline: "",
+    special_requirements: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      // Initialize from session metadata first for speed
+      const meta = user.user_metadata || {};
+      setUserProfile(prev => ({
+        ...prev,
+        full_name: meta.full_name || prev.full_name,
+        email: user.email || prev.email,
+        mobile_number: meta.mobile_number || prev.mobile_number,
+        role: meta.role || prev.role,
+        tenant_type: meta.tenant_type || prev.tenant_type,
+        occupation: meta.occupation || prev.occupation,
+      }));
+
+      // Use a function to fetch the full profile from the public table
+      const fetchPublicProfile = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (data) {
+            setUserProfile(prev => ({
+              ...prev,
+              ...data, // Spread public table data
+              // Ensure we don't overwrite with nulls if we have better local data (optional safeguard)
+              full_name: data.full_name || prev.full_name,
+            }));
+            if (data.is_verified) setVerificationLevel(2);
+          }
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchPublicProfile();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   // Verification status badge
   const verificationBadges = [
@@ -371,10 +425,10 @@ const Profile = () => {
                         </p>
                         {userProfile.documents.find((d) => d.type === doc.id)
                           ?.status === "verified" && (
-                          <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
-                            Verified
-                          </span>
-                        )}
+                            <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
+                              Verified
+                            </span>
+                          )}
                       </div>
                       <p className="text-gray-500 text-xs mt-1">
                         {doc.description}
@@ -392,12 +446,11 @@ const Profile = () => {
                   ) : (
                     <button
                       onClick={() => handleFileUpload(doc.id)}
-                      className={`text-sm font-medium px-4 py-2 rounded-lg ${
-                        userProfile.documents.find((d) => d.type === doc.id)
-                          ?.status === "verified"
-                          ? "bg-gray-100 text-gray-600"
-                          : "bg-emerald-500 text-white hover:bg-emerald-600"
-                      }`}
+                      className={`text-sm font-medium px-4 py-2 rounded-lg ${userProfile.documents.find((d) => d.type === doc.id)
+                        ?.status === "verified"
+                        ? "bg-gray-100 text-gray-600"
+                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                        }`}
                     >
                       {userProfile.documents.find((d) => d.type === doc.id)
                         ?.status === "verified"
@@ -523,7 +576,10 @@ const Profile = () => {
 
           {/* Footer Section */}
           <div className="flex flex-col items-center gap-4 px-4 py-8 border-t border-gray-200">
-            <button className="text-red-600 font-bold text-base hover:text-red-700 transition-colors">
+            <button
+              onClick={handleLogout}
+              className="text-red-600 font-bold text-base hover:text-red-700 transition-colors"
+            >
               <LogOut className="inline w-5 h-5 mr-2" />
               Log Out
             </button>
@@ -689,10 +745,10 @@ const Profile = () => {
                             {userProfile.documents.find(
                               (d) => d.type === doc.id,
                             )?.status === "verified" && (
-                              <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-xs font-bold">
-                                Verified
-                              </span>
-                            )}
+                                <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-xs font-bold">
+                                  Verified
+                                </span>
+                              )}
                           </div>
                           <p className="text-gray-600 text-sm mt-1">
                             {doc.description}
@@ -710,12 +766,11 @@ const Profile = () => {
                       ) : (
                         <button
                           onClick={() => handleFileUpload(doc.id)}
-                          className={`px-5 py-2.5 rounded-lg font-medium ${
-                            userProfile.documents.find((d) => d.type === doc.id)
-                              ?.status === "verified"
-                              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              : "bg-emerald-500 text-white hover:bg-emerald-600"
-                          }`}
+                          className={`px-5 py-2.5 rounded-lg font-medium ${userProfile.documents.find((d) => d.type === doc.id)
+                            ?.status === "verified"
+                            ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            : "bg-emerald-500 text-white hover:bg-emerald-600"
+                            }`}
                         >
                           {userProfile.documents.find((d) => d.type === doc.id)
                             ?.status === "verified"

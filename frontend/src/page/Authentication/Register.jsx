@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import {
   ArrowLeft,
   User,
@@ -23,6 +24,7 @@ import logo from "../../assets/Livora.png";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { signUp } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [activeTab, setActiveTab] = useState(1); // Start with tab 1
@@ -44,16 +46,31 @@ const Register = () => {
     special_requirements: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!agreeTerms) {
       alert("Please agree to the Terms & Conditions and Privacy Policy");
       return;
     }
-    // Handle registration logic here
-    console.log("Registration attempt:", formData);
-    // For demo purposes, navigate to home
-    navigate("/");
+
+    // Prepare metadata for the user profile (triggers on signup)
+    const metadata = {
+      full_name: formData.full_name,
+      role: formData.role,
+      tenant_type: formData.tenant_type,
+      mobile_number: formData.mobile_number,
+      occupation: formData.occupation,
+      // Add other fields as needed for the profile or extra tables
+    };
+
+    const { data, error } = await signUp(formData.email, formData.password, metadata);
+
+    if (error) {
+      alert("Registration failed: " + error.message);
+    } else {
+      alert("Registration successful! Please check your email for verification.");
+      navigate("/");
+    }
   };
 
   const handleChange = (e) => {
@@ -289,11 +306,10 @@ const Register = () => {
                   {roleOptions.map((option) => (
                     <label
                       key={option.value}
-                      className={`relative flex items-center justify-center h-12 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                        formData.role === option.value
+                      className={`relative flex items-center justify-center h-12 rounded-xl border-2 cursor-pointer transition-all duration-200 ${formData.role === option.value
                           ? "border-green-600 bg-green-50"
                           : "border-gray-200 bg-white hover:border-green-400"
-                      }`}
+                        }`}
                     >
                       <input
                         type="radio"
@@ -321,11 +337,10 @@ const Register = () => {
                     {tenantTypeOptions.map((option) => (
                       <label
                         key={option.value}
-                        className={`relative flex items-center justify-center h-12 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                          formData.tenant_type === option.value
+                        className={`relative flex items-center justify-center h-12 rounded-xl border-2 cursor-pointer transition-all duration-200 ${formData.tenant_type === option.value
                             ? "border-green-600 bg-green-50"
                             : "border-gray-200 bg-white hover:border-green-400"
-                        }`}
+                          }`}
                       >
                         <input
                           type="radio"
@@ -798,11 +813,10 @@ const Register = () => {
                     <React.Fragment key={tab.id}>
                       <button
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex flex-col items-center px-4 py-3 rounded-xl transition-all duration-300 ${
-                          activeTab === tab.id
+                        className={`flex flex-col items-center px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === tab.id
                             ? "bg-green-600 text-white shadow-lg shadow-green-600/30"
                             : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        }`}
+                          }`}
                       >
                         <tab.icon size={20} className="mb-2" />
                         <span className="text-sm font-medium">{tab.label}</span>
@@ -842,11 +856,10 @@ const Register = () => {
                       type="button"
                       onClick={prevTab}
                       disabled={activeTab === 1}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                        activeTab === 1
+                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${activeTab === 1
                           ? "text-gray-400 cursor-not-allowed"
                           : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <ChevronLeft size={20} />
                       Previous
@@ -929,11 +942,10 @@ const Register = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center px-4 py-3 min-w-0 transition-all duration-300 ${
-                activeTab === tab.id
+              className={`flex-1 flex flex-col items-center px-4 py-3 min-w-0 transition-all duration-300 ${activeTab === tab.id
                   ? "bg-green-50 text-green-600 border-b-2 border-green-600"
                   : "text-gray-500 hover:text-gray-700"
-              }`}
+                }`}
             >
               <tab.icon size={18} className="mb-1" />
               <span className="text-xs font-medium whitespace-nowrap">
@@ -976,11 +988,10 @@ const Register = () => {
                 type="button"
                 onClick={prevTab}
                 disabled={activeTab === 1}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                  activeTab === 1
+                className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 ${activeTab === 1
                     ? "text-gray-400 cursor-not-allowed"
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 <ChevronLeft size={18} />
                 <span className="text-sm">Previous</span>

@@ -1,0 +1,35 @@
+{
+  "transaction_structure": {
+    "description": "Represents a 'Proof of Payment' uploaded by a Tenant",
+    "example_data": {
+      "id": "tx-uuid-5555-6666",
+      "payer_id": "user-uuid-tenant-alice",
+      "receiver_id": "user-uuid-landlord-charlie",
+      "property_id": "prop-uuid-1234-5678",
+      "lease_id": "lease-uuid-9999-0000",
+      "amount": 18000.00,
+      "transaction_type": "rent",
+      "receipt_url": "https://bucket.supabase.co/receipts/receipt-jan-2024.jpg",
+      "reference_number": "GCASH-123456789",
+      "status": "pending_verification",
+      "submitted_at": "2024-01-05T10:00:00Z",
+      "verified_at": null,
+      "remarks": null
+    }
+  },
+  "landlord_payment_config": {
+    "description": "JSONB data stored in users.payment_details for Landlords",
+    "example_data": {
+      "gcash": {
+        "account_name": "Charlie Landlord",
+        "account_number": "09171234567",
+        "qr_code_url": "https://bucket.supabase.co/qrcodes/charlie-gcash-qr.jpg"
+      },
+      "bank_transfer": {
+        "bank_name": "BDO",
+        "account_name": "Charlie Landlord",
+        "account_number": "001234567890"
+      }
+    }
+  }
+}

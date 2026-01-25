@@ -1,0 +1,47 @@
+{
+  "maintenance_ai_structure": {
+    "description": "AI-Enhanced Maintenance Request",
+    "example_data": {
+      "id": "maint-uuid-1",
+      "title": "Water leaking from ceiling",
+      "description": "There is a steady drip in the bathroom near the light fixture.",
+      "priority": "emergency",
+      "ai_analysis": {
+        "detected_keywords": ["leaking", "ceiling", "light fixture", "water"],
+        "suggested_priority": "emergency",
+        "category": "plumbing",
+        "risk_assessment": "High - Electrical hazard potential",
+        "suggested_vendors": ["vendor-uuid-mario-plumbing"]
+      },
+      "timeline": [
+        { "status": "reported", "timestamp": "2024-02-01T08:00:00Z" },
+        { "status": "ai_triaged", "timestamp": "2024-02-01T08:00:05Z", "details": "Flagged as Emergency (Water + Electric)" },
+        { "status": "vendor_contacted", "timestamp": "2024-02-01T08:15:00Z", "details": "Auto-alert sent to Mario Plumbing" }
+      ]
+    }
+  },
+  "dashboard_alerts": {
+    "description": "Smart Alerts & Digital RSVP",
+    "examples": [
+      {
+        "type": "utility_outage",
+        "title": "Scheduled Power Interruption",
+        "content": "VECO Advisory: Power outage tomorrow 9AM-5PM for maintenance.",
+        "target": "All Tenants"
+      },
+      {
+        "type": "inspection_rsvp",
+        "title": "Quarterly Fire Safety Check",
+        "scheduled_at": "2024-02-10T14:00:00",
+        "tenant_response": "confirmed"
+      }
+    ]
+  },
+  "vendor_entry": {
+    "name": "Mario's Plumbing Services",
+    "category": "plumbing",
+    "contact": "0917-123-4567",
+    "rating": 4.8,
+    "notes": "Reliable for emergencies, charges extra for Sundays."
+  }
+}

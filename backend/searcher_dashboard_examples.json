@@ -1,0 +1,59 @@
+{
+  "searcher_dashboard_features": {
+    "compatibility_feed": {
+      "best_match_hero_card": {
+        "property_id": "prop-uuid-hero",
+        "match_score": 98,
+        "match_reasons": [
+          { "label": "Morning Sun", "icon": "sun" },
+          { "label": "Guaranteed Parking", "icon": "car" },
+          { "label": "Within Budget", "icon": "wallet" }
+        ],
+        "property_details": {
+          "location": "IT Park, Cebu City",
+          "price": 25000,
+          "image": "https://supa.storage/img/hero_condo.jpg"
+        }
+      },
+      "top_matches_sidebar": [
+        {
+          "property_id": "prop-uuid-2",
+          "match_score": 92,
+          "match_color": "green",
+          "title": "Avida Towers Riala"
+        },
+        {
+          "property_id": "prop-uuid-3",
+          "match_score": 85,
+          "match_color": "yellow",
+          "title": "Solinea Tower 1"
+        }
+      ]
+    },
+    "tenant_resume_status": {
+      "current_level": "high_intent",
+      "level_display": "High Intent Tenant",
+      "progress": 100,
+      "perks": ["Priority Replies", "Lower Deposit Potential"],
+      "missing_steps": []
+    },
+    "pipeline_tracker": [
+      {
+        "property_id": "prop-uuid-4",
+        "property_name": "One Oasis Unit 302",
+        "stage": "viewing",
+        "status": "scheduled",
+        "next_action": "Attend viewing on Feb 15, 2:00 PM",
+        "timestamp": "2024-02-10T10:00:00Z"
+      },
+      {
+        "property_id": "prop-uuid-5",
+        "property_name": "San Remo Oasis",
+        "stage": "application",
+        "status": "pending",
+        "next_action": "Wait for landlord approval",
+        "timestamp": "2024-02-12T09:30:00Z"
+      }
+    ]
+  }
+}
