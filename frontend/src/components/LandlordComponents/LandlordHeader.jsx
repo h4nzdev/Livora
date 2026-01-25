@@ -1,33 +1,36 @@
 import React, { useContext, useState } from "react";
 import {
   Bell,
-  User,
+  MessageSquare,
   Settings,
   HelpCircle,
   LogOut,
   ChevronDown,
-  CheckCircle,
+  Building,
+  Search,
 } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const TenantHeader = ({ onNavigate }) => {
+const LandlordHeader = ({ onNavigate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [notificationsCount, setNotificationsCount] = useState(3);
+  const [notificationsCount, setNotificationsCount] = useState(5);
+  const [messagesCount, setMessagesCount] = useState(12);
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const userProfile = {
-    name: "Alex Johnson",
-    email: "alex@example.com",
+    name: "Alex Sterling",
+    email: "alex@portfolio.com",
+    role: "Portfolio Manager",
     avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop",
-    matchScore: 92,
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDh2Kcv9nD9tprp1jFi9v9Hc_qFeXTSF8a4eZX2K4T7CQjYlDw83BFMXYl0q-PPN1aji_KJq0Ifbf6vxkS3BxNkiSJf1SPTKxlxzQ0HPI-Y3wouu7aJk0H8tO-HOW5MEFt0JY2QPoz8rOzXpCxVI48jTCFk89LDu0rWUfB7Zh7im5j0eO6w4Wznzr3WM-AbMUwIH2Ogzqn4h4WvbuDHCPMYnRwVWoW29UCjHcWb0ty_AdXjqutaJySXmK2nNKdTll8ld-L9s8JG4W93",
+    activeProperties: 8,
+    monthlyRevenue: "$84,200",
   };
 
-  // Navigation handler function - FIXED
   const handleNavigation = (route) => {
-    navigate(`/${route}`); // Fixed: removed extra quotes
+    navigate(`/${route}`);
     setIsProfileOpen(false);
   };
 
@@ -40,8 +43,14 @@ const TenantHeader = ({ onNavigate }) => {
     {
       id: "profile",
       label: "My Profile",
-      icon: <User className="w-5 h-5" />,
-      route: "tenant-profile",
+      icon: <Building className="w-5 h-5" />,
+      route: "landlord-profile",
+    },
+    {
+      id: "settings",
+      label: "Account Settings",
+      icon: <Settings className="w-5 h-5" />,
+      route: "landlord-settings",
     },
     {
       id: "help",
@@ -52,29 +61,54 @@ const TenantHeader = ({ onNavigate }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-200 px-6 py-4">
+    <header className="sticky top-0 z-40 bg-white border-b border-gray-200 px-8 py-4">
       <div className="flex items-center justify-between">
-        {/* Left side - Logo/Title with clickable area */}
-        <div className="flex-1">
+        {/* Left side - Title & Search */}
+        <div className="flex-1 flex items-center gap-6">
           <button
-            onClick={() => handleNavigation("dashboard")}
+            onClick={() => handleNavigation("landlord-dashboard")}
             className="text-xl font-bold text-gray-900 hover:text-emerald-600 transition-colors"
           >
-            Dashboard
+            Landlord Dashboard
           </button>
+
+          {/* Search Bar */}
+          <div className="hidden lg:block max-w-md w-full">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                className="w-full bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="Search tenants, properties, or tickets..."
+                type="text"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Right side - User Profile & Actions */}
         <div className="flex items-center gap-4">
+          {/* Messages */}
+          <button
+            onClick={() => handleNavigation("landlord-communications")}
+            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+          >
+            <MessageSquare className="w-6 h-6 text-gray-600 group-hover:text-emerald-600 transition-colors" />
+            {messagesCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {messagesCount > 9 ? "9+" : messagesCount}
+              </span>
+            )}
+          </button>
+
           {/* Notifications */}
           <button
-            onClick={() => handleNavigation("notifications")}
+            onClick={() => handleNavigation("landlord-notifications")}
             className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
           >
             <Bell className="w-6 h-6 text-gray-600 group-hover:text-emerald-600 transition-colors" />
             {notificationsCount > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                {notificationsCount}
+                {notificationsCount > 9 ? "9+" : notificationsCount}
               </span>
             )}
           </button>
@@ -91,9 +125,9 @@ const TenantHeader = ({ onNavigate }) => {
                   alt="Profile"
                   className="w-10 h-10 rounded-full border-2 border-emerald-100 group-hover:border-emerald-300 transition-colors"
                 />
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white">
                   <span className="text-[10px] font-bold text-white">
-                    {userProfile.matchScore}
+                    {userProfile.activeProperties}
                   </span>
                 </div>
               </div>
@@ -103,7 +137,7 @@ const TenantHeader = ({ onNavigate }) => {
                   <p className="text-sm font-medium text-gray-900 group-hover:text-emerald-700 transition-colors">
                     {userProfile.name}
                   </p>
-                  <p className="text-xs text-gray-500">{userProfile.email}</p>
+                  <p className="text-xs text-gray-500">{userProfile.role}</p>
                 </div>
               )}
 
@@ -123,57 +157,54 @@ const TenantHeader = ({ onNavigate }) => {
                   onClick={() => setIsProfileOpen(false)}
                 />
 
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                   {/* User Info - Clickable to go to profile */}
                   <button
-                    onClick={() => handleNavigation("tenant-profile")} // Fixed: use tenant-profile route
-                    className="w-full px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors text-left"
+                    onClick={() => handleNavigation("landlord-profile")}
+                    className="w-full px-4 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-left"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 mb-4">
                       <img
                         src={userProfile.avatar}
                         alt="Profile"
                         className="w-12 h-12 rounded-full border-2 border-emerald-100"
                       />
-                      <div>
-                        <p className="font-medium text-gray-900">
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900">
                           {userProfile.name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {userProfile.email}
+                          {userProfile.role}
                         </p>
                       </div>
                     </div>
-                    <div className="mt-3 flex items-center justify-between bg-emerald-50 rounded-lg p-3 border border-emerald-100">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                            <span className="text-emerald-600 font-bold text-lg">
-                              2
-                            </span>
-                          </div>
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
-                            <CheckCircle className="w-2.5 h-2.5 text-white" />
-                          </div>
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-emerald-50 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-emerald-700">
+                            Active Properties
+                          </span>
+                          <Building className="w-4 h-4 text-emerald-600" />
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-emerald-700">
-                            Verified
-                          </p>
-                          <p className="text-xs text-emerald-600">
-                            ID uploaded and verified
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500 mb-1">
-                          Verification
+                        <p className="text-lg font-bold text-emerald-600">
+                          {userProfile.activeProperties}
                         </p>
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                          <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                          <div className="w-2 h-2 rounded-full bg-gray-300" />
+                      </div>
+
+                      <div className="bg-blue-50 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-blue-700">
+                            Monthly Revenue
+                          </span>
+                          <span className="text-xs font-bold text-blue-600">
+                            $$$
+                          </span>
                         </div>
+                        <p className="text-lg font-bold text-blue-600">
+                          {userProfile.monthlyRevenue}
+                        </p>
                       </div>
                     </div>
                   </button>
@@ -208,8 +239,20 @@ const TenantHeader = ({ onNavigate }) => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Search Bar */}
+      <div className="lg:hidden mt-4">
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            className="w-full bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            placeholder="Search tenants, properties, or tickets..."
+            type="text"
+          />
+        </div>
+      </div>
     </header>
   );
 };
 
-export default TenantHeader;
+export default LandlordHeader;

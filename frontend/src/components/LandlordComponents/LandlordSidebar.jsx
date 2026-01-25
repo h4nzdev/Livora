@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  Home,
-  Heart,
-  MessageCircle,
-  Filter,
-  TrendingUp,
+  LayoutDashboard,
+  Building,
+  MessageSquare,
+  Wrench,
   ChevronRight,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
-const TenantSidebar = () => {
+const LandlordSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
@@ -17,23 +19,51 @@ const TenantSidebar = () => {
     {
       id: "dashboard",
       label: "Dashboard",
-      icon: <Home className="w-6 h-6" />,
+      icon: <LayoutDashboard className="w-6 h-6" />,
       badge: null,
-      path: "/tenant-dashboard",
+      path: "/landlord-dashboard",
     },
     {
-      id: "favorites",
-      label: "Favorites",
-      icon: <Heart className="w-6 h-6" />,
+      id: "properties",
+      label: "Properties",
+      icon: <Building className="w-6 h-6" />,
+      badge: "8",
+      path: "/landlord-properties",
+    },
+    {
+      id: "maintenance",
+      label: "Maintenance",
+      icon: <Wrench className="w-6 h-6" />,
       badge: "3",
-      path: "/tenant-favorites",
+      path: "/landlord-maintenance",
     },
     {
-      id: "chat",
-      label: "Chat",
-      icon: <MessageCircle className="w-6 h-6" />,
-      badge: "5",
-      path: "/tenant-chat",
+      id: "communications",
+      label: "Communications",
+      icon: <MessageSquare className="w-6 h-6" />,
+      badge: "12",
+      path: "/landlord-communications",
+    },
+  ];
+
+  const bottomMenuItems = [
+    {
+      id: "profile",
+      label: "Profile",
+      icon: <User className="w-6 h-6" />,
+      path: "/landlord-profile",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: <Settings className="w-6 h-6" />,
+      path: "/landlord-settings",
+    },
+    {
+      id: "logout",
+      label: "Logout",
+      icon: <LogOut className="w-6 h-6" />,
+      path: "/logout",
     },
   ];
 
@@ -48,14 +78,16 @@ const TenantSidebar = () => {
       <div className="p-6 border-b border-gray-100 shrink-0">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <Link to="/tenant-dashboard" className="flex items-center gap-3">
+            <Link to="/landlord-dashboard" className="flex items-center gap-3">
               <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
-                <Home className="w-7 h-7 text-white" />
+                <LayoutDashboard className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Livora</h2>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Property Pro
+                </h2>
                 <p className="text-sm text-emerald-600 font-medium">
-                  Tenant Portal
+                  Management Suite
                 </p>
               </div>
             </Link>
@@ -63,10 +95,10 @@ const TenantSidebar = () => {
 
           {isCollapsed && (
             <Link
-              to="/tenant-dashboard"
+              to="/landlord-dashboard"
               className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center mx-auto"
             >
-              <Home className="w-7 h-7 text-white" />
+              <LayoutDashboard className="w-7 h-7 text-white" />
             </Link>
           )}
 
@@ -81,9 +113,9 @@ const TenantSidebar = () => {
         </div>
       </div>
 
-      {/* Scrollable Navigation Area */}
+      {/* Main Navigation Area */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-2">
+        <div className="space-y-2 mb-8">
           {mainMenuItems.map((item) => (
             <Link
               key={item.id}
@@ -118,4 +150,4 @@ const TenantSidebar = () => {
   );
 };
 
-export default TenantSidebar;
+export default LandlordSidebar;

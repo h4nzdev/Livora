@@ -1,4 +1,38 @@
 import React, { useState } from "react";
+import {
+  User,
+  Edit,
+  Shield,
+  CheckCircle,
+  FileText,
+  Mail,
+  Phone,
+  DollarSign,
+  MapPin,
+  Home,
+  Users,
+  Lock,
+  ChevronRight,
+  LogOut,
+  Upload,
+  Info,
+  Smile,
+  CreditCard,
+  Building,
+  Calendar,
+  AlertCircle,
+  Sparkles,
+  Eye,
+  Settings,
+  RefreshCw,
+  Zap,
+  ArrowRight,
+  ShieldCheck,
+  BadgeCheck,
+  Clock,
+  HelpCircle,
+  ShieldAlert,
+} from "lucide-react";
 
 const Profile = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -38,21 +72,21 @@ const Profile = () => {
       name: "Guest",
       description: "Basic browsing only",
       color: "bg-gray-100 text-gray-600",
-      icon: "visibility",
+      icon: Eye,
     },
     {
       level: 2,
       name: "Verified",
       description: "ID uploaded and verified",
       color: "bg-blue-100 text-blue-600",
-      icon: "verified",
+      icon: Shield,
     },
     {
       level: 3,
       name: "High Intent",
       description: "Income & move-in date verified",
       color: "bg-emerald-100 text-emerald-600",
-      icon: "verified_user",
+      icon: BadgeCheck,
     },
   ];
 
@@ -64,6 +98,7 @@ const Profile = () => {
       description: "Passport, Driver's License, or UMID",
       required: true,
       examples: "JPG, PNG, PDF (max 5MB)",
+      icon: CreditCard,
     },
     {
       id: "proof_of_income",
@@ -71,6 +106,7 @@ const Profile = () => {
       description: "Latest payslip or COE with salary",
       required: true,
       examples: "Last 3 months payslips",
+      icon: DollarSign,
     },
     {
       id: "employment_cert",
@@ -78,6 +114,7 @@ const Profile = () => {
       description: "Certificate of Employment",
       required: false,
       examples: "From current employer",
+      icon: FileText,
     },
     {
       id: "bank_statement",
@@ -85,6 +122,7 @@ const Profile = () => {
       description: "3 months bank statement",
       required: false,
       examples: "PDF showing regular income",
+      icon: Building,
     },
     {
       id: "tin",
@@ -92,6 +130,7 @@ const Profile = () => {
       description: "Tax Identification Number",
       required: false,
       examples: "For official records",
+      icon: FileText,
     },
   ];
 
@@ -190,6 +229,7 @@ const Profile = () => {
 
   // Get current verification badge
   const currentBadge = verificationBadges[verificationLevel - 1];
+  const BadgeIcon = currentBadge.icon;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -199,18 +239,14 @@ const Profile = () => {
           {/* Header */}
           <header className="sticky top-0 z-50 flex items-center bg-white/80 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-100">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-2xl text-gray-900">
-                person
-              </span>
+              <User className="w-6 h-6 text-gray-900" />
               <h2 className="text-gray-900 text-lg font-bold leading-tight">
                 Profile
               </h2>
             </div>
             <div className="flex items-center gap-3">
               <button className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm">
-                <span className="material-symbols-outlined text-gray-900">
-                  edit_square
-                </span>
+                <Edit className="w-5 h-5 text-gray-900" />
               </button>
             </div>
           </header>
@@ -221,9 +257,7 @@ const Profile = () => {
               className={`flex items-center gap-3 p-4 rounded-2xl ${currentBadge.color} border border-opacity-50 ${currentBadge.color.split(" ")[0].replace("bg-", "border-")}`}
             >
               <div className="p-2 bg-white/50 rounded-xl">
-                <span className="material-symbols-outlined text-lg">
-                  {currentBadge.icon}
-                </span>
+                <BadgeIcon className="w-5 h-5" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
@@ -291,12 +325,7 @@ const Profile = () => {
                 <div className="flex justify-center gap-3 mt-4">
                   <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                     <div className="bg-emerald-500 text-white p-1 rounded-full">
-                      <span
-                        className="material-symbols-outlined text-xs font-bold"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        sentiment_satisfied
-                      </span>
+                      <Smile className="w-3 h-3" />
                     </div>
                     <span className="text-emerald-700 text-xs font-medium">
                       Active
@@ -305,9 +334,7 @@ const Profile = () => {
                   {userProfile.is_verified && (
                     <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
                       <div className="bg-emerald-600 text-white p-1 rounded-full">
-                        <span className="material-symbols-outlined text-xs font-bold">
-                          verified
-                        </span>
+                        <ShieldCheck className="w-3 h-3" />
                       </div>
                       <span className="text-blue-700 text-xs font-medium">
                         Verified
@@ -332,9 +359,7 @@ const Profile = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-gray-100 rounded-lg">
-                      <span className="material-symbols-outlined text-gray-600">
-                        description
-                      </span>
+                      <doc.icon className="w-5 h-5 text-gray-600" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -387,9 +412,7 @@ const Profile = () => {
             {/* Upload Guidelines */}
             <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-blue-600 text-lg">
-                  info
-                </span>
+                <Info className="w-5 h-5 text-blue-600" />
                 <h4 className="text-blue-800 text-sm font-bold">
                   Upload Guidelines
                 </h4>
@@ -413,9 +436,7 @@ const Profile = () => {
               <div className="flex items-center justify-between p-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-emerald-100 rounded-lg">
-                    <span className="material-symbols-outlined text-emerald-600">
-                      mail
-                    </span>
+                    <Mail className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div className="flex flex-col">
                     <p className="text-gray-900 text-sm font-bold">
@@ -433,9 +454,7 @@ const Profile = () => {
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-emerald-100 rounded-lg">
-                    <span className="material-symbols-outlined text-emerald-600">
-                      phone
-                    </span>
+                    <Phone className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div className="flex flex-col">
                     <p className="text-gray-900 text-sm font-bold">
@@ -462,9 +481,7 @@ const Profile = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <span className="material-symbols-outlined text-[16px]">
-                      payments
-                    </span>
+                    <DollarSign className="w-4 h-4" />
                     Budget
                   </div>
                   <p className="text-gray-900 text-sm font-bold">
@@ -473,9 +490,7 @@ const Profile = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <span className="material-symbols-outlined text-[16px]">
-                      location_on
-                    </span>
+                    <MapPin className="w-4 h-4" />
                     Location
                   </div>
                   <p className="text-gray-900 text-sm font-bold">
@@ -484,9 +499,7 @@ const Profile = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <span className="material-symbols-outlined text-[16px]">
-                      home
-                    </span>
+                    <Home className="w-4 h-4" />
                     Property Type
                   </div>
                   <p className="text-gray-900 text-sm font-bold">
@@ -495,9 +508,7 @@ const Profile = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <span className="material-symbols-outlined text-[16px]">
-                      groups
-                    </span>
+                    <Users className="w-4 h-4" />
                     Household Size
                   </div>
                   <p className="text-gray-900 text-sm font-bold">
@@ -513,6 +524,7 @@ const Profile = () => {
           {/* Footer Section */}
           <div className="flex flex-col items-center gap-4 px-4 py-8 border-t border-gray-200">
             <button className="text-red-600 font-bold text-base hover:text-red-700 transition-colors">
+              <LogOut className="inline w-5 h-5 mr-2" />
               Log Out
             </button>
             <p className="text-gray-400 text-[10px] font-medium tracking-widest uppercase">
@@ -529,9 +541,7 @@ const Profile = () => {
           <header className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="size-12 rounded-xl bg-emerald-500 flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-white">
-                  person
-                </span>
+                <User className="w-7 h-7 text-white" />
               </div>
               <div>
                 <h2 className="text-gray-900 text-2xl font-bold leading-tight">
@@ -547,9 +557,7 @@ const Profile = () => {
                 <div
                   className={`p-2 rounded-lg ${currentBadge.color.split(" ")[0]}`}
                 >
-                  <span className="material-symbols-outlined">
-                    {currentBadge.icon}
-                  </span>
+                  <BadgeIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="text-gray-900 font-medium">
@@ -561,9 +569,7 @@ const Profile = () => {
                 </div>
               </div>
               <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-colors">
-                <span className="material-symbols-outlined text-lg">
-                  edit_square
-                </span>
+                <Edit className="w-5 h-5" />
                 <span className="font-medium">Edit Profile</span>
               </button>
             </div>
@@ -612,12 +618,7 @@ const Profile = () => {
                       <div className="flex gap-4">
                         <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
                           <div className="bg-emerald-500 text-white p-1.5 rounded-full">
-                            <span
-                              className="material-symbols-outlined text-sm font-bold"
-                              style={{ fontVariationSettings: "'FILL' 1" }}
-                            >
-                              sentiment_satisfied
-                            </span>
+                            <Smile className="w-4 h-4" />
                           </div>
                           <div>
                             <p className="text-emerald-700 text-sm font-bold">
@@ -631,9 +632,7 @@ const Profile = () => {
                         {userProfile.is_verified && (
                           <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
                             <div className="bg-emerald-600 text-white p-1.5 rounded-full">
-                              <span className="material-symbols-outlined text-sm font-bold">
-                                verified
-                              </span>
+                              <BadgeCheck className="w-4 h-4" />
                             </div>
                             <div>
                               <p className="text-blue-700 text-sm font-bold">
@@ -664,9 +663,7 @@ const Profile = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="material-symbols-outlined text-lg">
-                      lock
-                    </span>
+                    <Lock className="w-5 h-5" />
                     Secure & Encrypted
                   </div>
                 </div>
@@ -679,9 +676,7 @@ const Profile = () => {
                     >
                       <div className="flex items-center gap-4">
                         <div className="p-3 bg-white rounded-lg border border-gray-200">
-                          <span className="material-symbols-outlined text-gray-700">
-                            description
-                          </span>
+                          <doc.icon className="w-5 h-5 text-gray-700" />
                         </div>
                         <div>
                           <div className="flex items-center gap-3">
@@ -739,9 +734,7 @@ const Profile = () => {
                   </h4>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                      <span className="material-symbols-outlined text-blue-600 mb-2">
-                        check_circle
-                      </span>
+                      <CheckCircle className="w-6 h-6 text-blue-600 mb-2" />
                       <p className="font-medium text-blue-800">
                         Faster Applications
                       </p>
@@ -750,9 +743,7 @@ const Profile = () => {
                       </p>
                     </div>
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <span className="material-symbols-outlined text-emerald-600 mb-2">
-                        verified_user
-                      </span>
+                      <BadgeCheck className="w-6 h-6 text-emerald-600 mb-2" />
                       <p className="font-medium text-emerald-800">
                         Trust Badge
                       </p>
@@ -761,9 +752,7 @@ const Profile = () => {
                       </p>
                     </div>
                     <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                      <span className="material-symbols-outlined text-purple-600 mb-2">
-                        bolt
-                      </span>
+                      <Zap className="w-6 h-6 text-purple-600 mb-2" />
                       <p className="font-medium text-purple-800">
                         Instant Viewing
                       </p>
@@ -791,9 +780,7 @@ const Profile = () => {
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <div className="p-2 bg-white/50 rounded-lg">
-                        <span className="material-symbols-outlined">
-                          {currentBadge.icon}
-                        </span>
+                        <BadgeIcon className="w-5 h-5" />
                       </div>
                       <div>
                         <h4 className="font-bold text-lg">Current Level</h4>
@@ -831,24 +818,18 @@ const Profile = () => {
                         {verificationLevel === 1 && (
                           <>
                             <li className="flex items-center gap-2 text-sm text-gray-600">
-                              <span className="material-symbols-outlined text-emerald-600 text-sm">
-                                check_circle
-                              </span>
+                              <CheckCircle className="w-4 h-4 text-emerald-600" />
                               Upload Government ID
                             </li>
                             <li className="flex items-center gap-2 text-sm text-gray-400">
-                              <span className="material-symbols-outlined text-sm">
-                                radio_button_unchecked
-                              </span>
+                              <Clock className="w-4 h-4" />
                               Verify Proof of Income
                             </li>
                           </>
                         )}
                         {verificationLevel === 2 && (
                           <li className="flex items-center gap-2 text-sm text-gray-600">
-                            <span className="material-symbols-outlined text-emerald-600 text-sm">
-                              check_circle
-                            </span>
+                            <CheckCircle className="w-4 h-4 text-emerald-600" />
                             Upload Proof of Income
                           </li>
                         )}
@@ -882,9 +863,7 @@ const Profile = () => {
                             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="material-symbols-outlined text-emerald-600">
-                                check_circle
-                              </span>
+                              <CheckCircle className="w-5 h-5 text-emerald-600" />
                               <span className="text-sm font-medium">
                                 {
                                   documentTypes.find((d) => d.id === doc.type)
@@ -933,18 +912,15 @@ const Profile = () => {
                 </h3>
                 <button className="w-full flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 transition-colors text-left mb-4">
                   <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-blue-600">
-                      lock
-                    </span>
+                    <Settings className="w-5 h-5 text-blue-600" />
                     <span className="font-medium text-gray-900">
                       Change Password
                     </span>
                   </div>
-                  <span className="material-symbols-outlined text-gray-400">
-                    chevron_right
-                  </span>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
                 </button>
-                <button className="w-full bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 px-4 py-3 rounded-xl font-medium transition-colors">
+                <button className="w-full bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 px-4 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
+                  <LogOut className="w-5 h-5" />
                   Log Out
                 </button>
               </div>
