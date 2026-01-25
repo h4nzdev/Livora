@@ -439,7 +439,10 @@ const Favorites = () => {
                         <button className="p-2 hover:bg-gray-100 rounded-lg">
                           <Share2 className="w-5 h-5 text-gray-600" />
                         </button>
-                        <button onClick={() => navigate("/property")} className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium">
+                        <button
+                          onClick={() => navigate("/property")}
+                          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium"
+                        >
                           View Details
                         </button>
                       </div>

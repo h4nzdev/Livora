@@ -23,9 +23,11 @@ import {
   Shield,
   AlertCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   // Verification state
+  const navigate = useNavigate();
   const [verificationLevel, setVerificationLevel] = useState(2);
   const verificationBadges = [
     {
@@ -867,7 +869,10 @@ const Dashboard = () => {
                   Quick Actions
                 </h3>
                 <div className="space-y-3">
-                  <button className="flex items-center justify-between w-full p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 transition-colors">
+                  <button
+                    onClick={() => navigate("/tenant-profile")}
+                    className="flex items-center justify-between w-full p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <Edit3 className="w-5 h-5 text-emerald-600" />
                       <span className="font-medium text-gray-900">
@@ -876,7 +881,10 @@ const Dashboard = () => {
                     </div>
                     <ChevronRight className="w-4 h-4 text-emerald-600" />
                   </button>
-                  <button className="flex items-center justify-between w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 transition-colors">
+                  <button
+                    onClick={() => navigate("/tenant-favorites")}
+                    className="flex items-center justify-between w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <Heart className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-900">
@@ -885,7 +893,10 @@ const Dashboard = () => {
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-600" />
                   </button>
-                  <button className="flex items-center justify-between w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 transition-colors">
+                  <button
+                    onClick={() => navigate("/tenant-chat")}
+                    className="flex items-center justify-between w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <MessageCircle className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-900">
@@ -943,7 +954,10 @@ const Dashboard = () => {
                           <span>•</span>
                           <span>{property.type}</span>
                         </div>
-                        <button className="text-emerald-600 text-xs font-medium mt-2 hover:text-emerald-700">
+                        <button
+                          onClick={() => navigate("/property")}
+                          className="text-emerald-600 text-xs font-medium mt-2 hover:text-emerald-700"
+                        >
                           View details →
                         </button>
                       </div>

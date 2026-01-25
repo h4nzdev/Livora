@@ -8,9 +8,9 @@ import LandlordRoutes from "./LandlordRoutes";
 const Role = () => {
   const { user } = useContext(AuthContext);
 
-  if (user.role === "searcher") return <MainRoutes />;
-  if (user.role === "dweller") return <DwellerRoutes />;
-  if (user.role === "landlord") return <LandlordRoutes />;
+  if (user?.role === "searcher") return <MainRoutes />;
+  if (user?.role === "dweller") return <DwellerRoutes />;
+  if (user?.role === "landlord") return <LandlordRoutes />;
 
   if (user) return <MainRoutes />;
   if (!user) return <LandingRoutes />;

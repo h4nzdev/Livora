@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // Use your existing imports
 import BudgetRange from "../../components/MatchingComponents/BudgetRange";
@@ -11,9 +12,17 @@ import LeaseAndHousehold from "../../components/MatchingComponents/LeaseAndHouse
 import logo from "../../assets/Livora.png";
 import ProfilingSplashScreen from "../../components/ProfilingSplashScreen";
 
+// Create axios instance for API calls
+const api = axios.create({
+  baseURL: "http://localhost:5000",
+  timeout: 10000,
+});
+
 const Matching = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const navigate = useNavigate();
 
   // Initialize form state with all required fields
@@ -21,32 +30,41 @@ const Matching = () => {
     // Step 1: Budget Range
     minBudget: "",
     maxBudget: "",
-    leaseDuration: "", // "short-term", "long-term", or "flexible"
+    leaseDuration: "",
 
     // Step 2: Region Selection
     region: "",
+    otherRegion: "",
 
     // Step 3: Area Preference
     areaPreferences: [],
+    destinationAddress: "",
+    destinationLocation: "",
+    primaryDestination: "",
+    transportation: "",
 
     // Step 4: Household Setup
     householdSize: "",
     hasChildren: false,
     hasPets: false,
+    hasSmokeDrink: "",
+    roommateGender: "",
 
     // Step 5: Lifestyle & Features
+    dailyRhythm: "",
     lifestyleFeatures: [],
     mustHaveFeatures: [],
     preferredAmenities: [],
+    moveInPlan: "",
   });
 
   // Validation state for each step
   const [stepValidation, setStepValidation] = useState({
-    step1: false, // Budget Range
-    step2: false, // Region Selection
-    step3: false, // Area Preference
-    step4: false, // Household Setup
-    step5: false, // Lifestyle & Features
+    step1: false,
+    step2: false,
+    step3: false,
+    step4: false,
+    step5: false,
   });
 
   // Function to update form data from child components
@@ -55,9 +73,6 @@ const Matching = () => {
       ...prev,
       ...data,
     }));
-
-    // Log the updated form data for debugging
-    console.log("Form Data Updated:", { ...formData, ...data });
   };
 
   // Function to update validation for a specific step
@@ -80,7 +95,6 @@ const Matching = () => {
   };
 
   useEffect(() => {
-    // Hide splash screen after 1.5 seconds as fallback
     const timer = setTimeout(() => {
       if (showSplash) {
         setShowSplash(false);
@@ -90,7 +104,6 @@ const Matching = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Updated steps array - pass form data, update function, and validation props
   const steps = [
     {
       title: "Lease Terms",
@@ -168,7 +181,91 @@ const Matching = () => {
     }
   };
 
-  // Submit handler - will be called on the last step
+  // API call to get recommendations
+  const getRecommendations = async (formData) => {
+    try {
+      setIsSubmitting(true);
+      setSubmitError("");
+
+      // Format the data for the backend
+      const requestData = {
+        areaPreferences: formData.areaPreferences || [],
+        dailyRhythm: formData.dailyRhythm || "",
+        destinationAddress: formData.destinationAddress || "",
+        destinationLocation: formData.destinationLocation || "",
+        hasChildren: formData.hasChildren || false,
+        hasPets: formData.hasPets || false,
+        hasSmokeDrink: formData.hasSmokeDrink || "",
+        householdSize: formData.householdSize || "solo",
+        housingType: "apartment", // Default value since it's not in your form
+        leaseDuration: formData.leaseDuration || "",
+        lifestyleFeatures: formData.lifestyleFeatures || [],
+        maxBudget: formData.maxBudget?.toString() || "30000",
+        minBudget: formData.minBudget?.toString() || "10000",
+        moveInPlan: formData.moveInPlan || "As soon as possible",
+        mustHaveFeatures: formData.mustHaveFeatures || [],
+        otherRegion: formData.otherRegion || "",
+        preferredAmenities: formData.preferredAmenities || [],
+        primaryDestination: formData.primaryDestination || "workplace",
+        region: formData.region || "cebu",
+        roommateGender: formData.roommateGender || "",
+        transportation: formData.transportation || "public",
+      };
+
+      console.log("Sending request to backend:", requestData);
+
+      const response = await api.post("/recommend", requestData);
+
+      console.log("Backend response:", response.data);
+
+      // Store results in localStorage to pass to Results page
+      localStorage.setItem(
+        "recommendationResults",
+        JSON.stringify(response.data),
+      );
+
+      // Navigate to results page
+      navigate("/results", { state: { recommendations: response.data } });
+    } catch (error) {
+      console.error("Error getting recommendations:", error);
+
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error data:", error.response.data);
+        console.error("Error status:", error.response.status);
+        setSubmitError(
+          `Error ${error.response.status}: ${error.response.data.error || "Failed to get recommendations"}`,
+        );
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received:", error.request);
+        setSubmitError(
+          "Backend server is not responding. Please make sure it's running on localhost:5000",
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error:", error.message);
+        setSubmitError(`Request error: ${error.message}`);
+      }
+
+      // Fallback: navigate anyway with empty results for demo
+      // In production, you might want to handle this differently
+      navigate("/results", {
+        state: {
+          recommendations: {
+            properties: [],
+            totalMatches: 0,
+            message: "Demo mode: No backend connection",
+          },
+        },
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Submit handler
   const handleSubmit = () => {
     // Check if all steps are valid before submitting
     const allStepsValid = Object.values(stepValidation).every(Boolean);
@@ -182,12 +279,8 @@ const Matching = () => {
     console.log("Form Data to be submitted:", formData);
     console.log("=== END FORM DATA ===");
 
-    // For now, just log the data
-    // Later you can add API call or navigation here
-    alert("Form submitted! Check console for data.");
-
-    // Navigate to results page
-    navigate("/results");
+    // Call API to get recommendations
+    getRecommendations(formData);
   };
 
   const calculateProgress = () => {
@@ -195,7 +288,9 @@ const Matching = () => {
   };
 
   const getButtonText = () => {
-    if (currentStep === totalSteps - 1) return "Find My Matches"; // Last step
+    if (currentStep === totalSteps - 1) {
+      return isSubmitting ? "Finding Matches..." : "Find My Matches";
+    }
     return "Continue";
   };
 
@@ -214,17 +309,14 @@ const Matching = () => {
     }
   };
 
-  // Prevent step navigation by clicking on step buttons if previous steps aren't valid
   const handleStepClick = (index) => {
     if (index === currentStep) return;
 
-    // Allow going back to previous steps
     if (index < currentStep) {
       setCurrentStep(index);
       return;
     }
 
-    // Check if all previous steps are valid before allowing navigation to a future step
     const allPreviousValid = Array.from(
       { length: index },
       (_, i) => stepValidation[`step${i + 1}`],
@@ -237,14 +329,37 @@ const Matching = () => {
     }
   };
 
-  // If splash screen is still showing, only render the splash screen
   if (showSplash) {
     return <ProfilingSplashScreen onFinish={handleSplashFinish} />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row overflow-hidden">
-      {/* Desktop Sidebar - Fixed position */}
+      {/* Show error message if submit failed */}
+      {submitError && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg z-50 max-w-md w-full mx-4">
+          <div className="flex items-center">
+            <div className="py-1">
+              <svg
+                className="fill-current h-6 w-6 text-red-500 mr-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm-1-9V8h2v3h-2zm0 4v2h2v-2h-2z" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-bold">Connection Error</p>
+              <p className="text-sm">{submitError}</p>
+              <p className="text-xs mt-1">
+                Make sure the backend is running: <code>python app.py</code>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:w-80 xl:w-96 bg-white border-r border-gray-200 flex-col p-6 fixed left-0 top-0 bottom-0 z-20">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-6">
@@ -262,7 +377,6 @@ const Matching = () => {
               Step {currentStep + 1} of {totalSteps}
             </p>
 
-            {/* Progress Bar - Added to sidebar */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-gray-700 font-medium">Progress</span>
@@ -280,7 +394,6 @@ const Matching = () => {
           </div>
         </div>
 
-        {/* Step List - Scrollable if needed */}
         <div className="flex-1 overflow-y-auto space-y-2 pr-2">
           {steps.map((step, index) => (
             <button
@@ -327,7 +440,6 @@ const Matching = () => {
           ))}
         </div>
 
-        {/* Desktop Footer - Fixed at bottom of sidebar */}
         <div className="pt-6 border-t border-gray-200 mt-auto">
           <p className="text-gray-500 text-sm mb-4">
             Complete all steps to get personalized property matches
@@ -347,23 +459,25 @@ const Matching = () => {
             </button>
             <button
               onClick={handleButtonClick}
+              disabled={!isCurrentStepValid() || isSubmitting}
               className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
-                !isCurrentStepValid()
+                !isCurrentStepValid() || isSubmitting
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : currentStep === totalSteps - 1
                     ? "bg-green-600 text-white hover:bg-green-700"
                     : "bg-green-600 text-white hover:bg-green-700"
               }`}
-              disabled={!isCurrentStepValid()}
             >
               {getButtonText()}
-              <ArrowRight size={20} />
+              {currentStep === totalSteps - 1 && !isSubmitting && (
+                <ArrowRight size={20} />
+              )}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area - Scrollable */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full lg:ml-80 xl:ml-96">
         {/* Mobile Progress Bar at Top */}
         <div className="lg:hidden w-full px-4 pt-4">
@@ -411,52 +525,51 @@ const Matching = () => {
 
           <button
             onClick={handleButtonClick}
+            disabled={!isCurrentStepValid() || isSubmitting}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-              !isCurrentStepValid()
+              !isCurrentStepValid() || isSubmitting
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-green-600 hover:bg-green-600/10"
             }`}
-            disabled={!isCurrentStepValid()}
           >
             <span className="font-medium">Next</span>
             <ChevronRight size={20} />
           </button>
         </div>
 
-        {/* Current Step Component - Scrollable main content */}
+        {/* Current Step Component */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8">
           <div className="max-w-[480px] mx-auto lg:max-w-none lg:w-full">
-            {/* Centered container for all steps */}
             <div className="lg:max-w-3xl xl:max-w-4xl lg:mx-auto">
               {steps[currentStep].component}
             </div>
           </div>
         </div>
 
-        {/* Mobile Footer Navigation (only for steps that need it) */}
+        {/* Mobile Footer Navigation */}
         {steps[currentStep].showFooter && (
           <div className="lg:hidden p-6 bg-gray-50 border-t border-gray-200">
             <div className="max-w-[480px] mx-auto">
               <button
                 onClick={handleButtonClick}
-                disabled={!isCurrentStepValid()}
+                disabled={!isCurrentStepValid() || isSubmitting}
                 className={`w-full flex items-center justify-center h-16 rounded-xl gap-2 text-lg font-bold leading-normal tracking-wide transition-all active:scale-[0.98] shadow-lg ${
-                  !isCurrentStepValid()
+                  !isCurrentStepValid() || isSubmitting
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-gray-300/20"
                     : "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
                 }`}
               >
                 {getButtonText()}
-                <ArrowRight
-                  size={24}
-                  className={`transition-transform ${
-                    !isCurrentStepValid() ? "" : "group-hover:translate-x-1"
-                  }`}
-                />
+                {currentStep === totalSteps - 1 && !isSubmitting && (
+                  <ArrowRight
+                    size={24}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
+                )}
               </button>
-              {!isCurrentStepValid() && (
+              {(!isCurrentStepValid() || submitError) && (
                 <p className="text-center text-red-600 text-sm mt-2">
-                  Please complete all required fields
+                  {submitError || "Please complete all required fields"}
                 </p>
               )}
               <div className="flex items-center justify-center gap-2 mt-4">
