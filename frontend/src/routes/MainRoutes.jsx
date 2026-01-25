@@ -7,6 +7,7 @@ import Chat from "../page/MainPage/Chat";
 import Listings from "../page/MainPage/Listings";
 import Transactions from "../page/MainPage/Transactions";
 import Profile from "../page/MainPage/Profile";
+import PropertyDetails from "../page/PropertyDetails/PropertyDetails";
 
 const MainRoutes = () => {
   return (
@@ -18,6 +19,14 @@ const MainRoutes = () => {
           element={
             <TenantLayout>
               <Dashboard />
+            </TenantLayout>
+          }
+        />
+        <Route
+          path="/property"
+          element={
+            <TenantLayout>
+              <PropertyDetails />
             </TenantLayout>
           }
         />

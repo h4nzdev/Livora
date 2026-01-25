@@ -249,36 +249,22 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Profile Section */}
+          {/* Profile Section - UPDATED */}
           <div className="flex flex-col items-center px-4 pt-6 pb-4">
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 w-full">
+              {/* Profile Image */}
               <div className="relative">
                 <div
-                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32 border-4 border-white shadow-lg"
+                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-32 border-4 border-white shadow-lg"
                   alt={`Professional portrait of ${userProfile.full_name}`}
                   style={{
                     backgroundImage: `url("${userProfile.profile_image}")`,
                   }}
                 />
-                <div className="absolute bottom-0 right-0 flex gap-1">
-                  <div className="bg-emerald-500 text-white p-1.5 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
-                    <span
-                      className="material-symbols-outlined text-xs font-bold"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      sentiment_satisfied
-                    </span>
-                  </div>
-                  {userProfile.is_verified && (
-                    <div className="bg-emerald-600 text-white p-1.5 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
-                      <span className="material-symbols-outlined text-xs font-bold">
-                        verified
-                      </span>
-                    </div>
-                  )}
-                </div>
               </div>
-              <div className="flex flex-col items-center justify-center">
+
+              {/* User Info */}
+              <div className="flex flex-col items-center justify-center w-full">
                 <div className="flex items-center gap-2">
                   <p className="text-gray-900 text-[22px] font-bold leading-tight tracking-tight text-center">
                     {userProfile.full_name}
@@ -294,9 +280,41 @@ const Profile = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-gray-500 mt-1 text-sm font-normal text-center">
-                  {userProfile.occupation} • Member since Jan 2024
+                <p className="text-gray-900 mt-1 text-sm font-medium text-center">
+                  {userProfile.occupation}
                 </p>
+                <p className="text-gray-500 text-xs font-normal text-center mt-1">
+                  Member since Jan 2024
+                </p>
+
+                {/* Badges Container - MOVED HERE */}
+                <div className="flex justify-center gap-3 mt-4">
+                  <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                    <div className="bg-emerald-500 text-white p-1 rounded-full">
+                      <span
+                        className="material-symbols-outlined text-xs font-bold"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        sentiment_satisfied
+                      </span>
+                    </div>
+                    <span className="text-emerald-700 text-xs font-medium">
+                      Active
+                    </span>
+                  </div>
+                  {userProfile.is_verified && (
+                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
+                      <div className="bg-emerald-600 text-white p-1 rounded-full">
+                        <span className="material-symbols-outlined text-xs font-bold">
+                          verified
+                        </span>
+                      </div>
+                      <span className="text-blue-700 text-xs font-medium">
+                        Verified
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -554,34 +572,18 @@ const Profile = () => {
           <div className="grid grid-cols-3 gap-8">
             {/* Left Column - Profile & Documents */}
             <div className="col-span-2 space-y-8">
-              {/* Profile Section */}
+              {/* Profile Section - UPDATED */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-                <div className="flex items-start gap-6">
-                  <div className="relative">
+                <div className="flex items-start gap-8">
+                  {/* Profile Image */}
+                  <div className="flex-shrink-0">
                     <div
-                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-40 w-40 border-4 border-white shadow-lg"
+                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-40 border-4 border-white shadow-lg"
                       alt={`Professional portrait of ${userProfile.full_name}`}
                       style={{
                         backgroundImage: `url("${userProfile.profile_image}")`,
                       }}
                     />
-                    <div className="absolute bottom-0 right-0 flex gap-2">
-                      <div className="bg-emerald-500 text-white p-2 rounded-full border-4 border-white flex items-center justify-center shadow-sm">
-                        <span
-                          className="material-symbols-outlined text-sm font-bold"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          sentiment_satisfied
-                        </span>
-                      </div>
-                      {userProfile.is_verified && (
-                        <div className="bg-emerald-600 text-white p-2 rounded-full border-4 border-white flex items-center justify-center shadow-sm">
-                          <span className="material-symbols-outlined text-sm font-bold">
-                            verified
-                          </span>
-                        </div>
-                      )}
-                    </div>
                   </div>
 
                   <div className="flex-1">
@@ -602,9 +604,48 @@ const Profile = () => {
                           • Member since Jan 2024
                         </span>
                       </div>
-                      <p className="text-gray-900 text-lg font-medium">
+                      <p className="text-gray-900 text-lg font-medium mb-4">
                         {userProfile.occupation}
                       </p>
+
+                      {/* Badges Container - MOVED HERE */}
+                      <div className="flex gap-4">
+                        <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
+                          <div className="bg-emerald-500 text-white p-1.5 rounded-full">
+                            <span
+                              className="material-symbols-outlined text-sm font-bold"
+                              style={{ fontVariationSettings: "'FILL' 1" }}
+                            >
+                              sentiment_satisfied
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-emerald-700 text-sm font-bold">
+                              Active User
+                            </p>
+                            <p className="text-emerald-600 text-xs">
+                              Regularly engaged
+                            </p>
+                          </div>
+                        </div>
+                        {userProfile.is_verified && (
+                          <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+                            <div className="bg-emerald-600 text-white p-1.5 rounded-full">
+                              <span className="material-symbols-outlined text-sm font-bold">
+                                verified
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-blue-700 text-sm font-bold">
+                                Verified Profile
+                              </p>
+                              <p className="text-blue-600 text-xs">
+                                ID verified
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

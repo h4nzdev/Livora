@@ -20,11 +20,13 @@ import {
   Car,
   Snowflake,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Favorites = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedProperties, setSelectedProperties] = useState([]);
   const [showCompare, setShowCompare] = useState(false);
+  const navigate = useNavigate();
 
   const favorites = [
     {
@@ -437,7 +439,7 @@ const Favorites = () => {
                         <button className="p-2 hover:bg-gray-100 rounded-lg">
                           <Share2 className="w-5 h-5 text-gray-600" />
                         </button>
-                        <button className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium">
+                        <button onClick={() => navigate("/property")} className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium">
                           View Details
                         </button>
                       </div>

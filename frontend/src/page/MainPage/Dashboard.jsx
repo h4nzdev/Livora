@@ -8,10 +8,17 @@ import {
   Heart,
   Settings,
   MessageCircle,
-  TrendingUp,
   Edit3,
   Filter,
   ChevronRight,
+  Clock,
+  FileText,
+  CheckCircle,
+  Calendar,
+  Key,
+  Truck,
+  Mail,
+  CheckCircle2,
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -57,6 +64,56 @@ const Dashboard = () => {
     { name: "Iloilo", color: "bg-gray-100 text-gray-600 border-gray-200" },
   ];
 
+  // Pipeline stages data
+  const pipelineStages = [
+    {
+      id: 1,
+      stage: "Inquiry Sent",
+      icon: Mail,
+      color: "bg-emerald-500",
+    },
+    {
+      id: 2,
+      stage: "Viewing Scheduled",
+      icon: Calendar,
+      color: "bg-blue-500",
+    },
+    {
+      id: 3,
+      stage: "Application Pending",
+      icon: FileText,
+      color: "bg-amber-500",
+    },
+    {
+      id: 4,
+      stage: "Lease Received",
+      icon: CheckCircle,
+      color: "bg-purple-500",
+    },
+    {
+      id: 5,
+      stage: "Lease Signed",
+      icon: Key,
+      color: "bg-indigo-500",
+    },
+    {
+      id: 6,
+      stage: "Moving In",
+      icon: Truck,
+      color: "bg-green-600",
+    },
+  ];
+
+  const getStatusIcon = (status, IconComponent) => {
+    if (status === "completed") {
+      return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+    }
+    if (status === "current") {
+      return <Clock className="w-4 h-4 text-blue-500 animate-pulse" />;
+    }
+    return <IconComponent className="w-4 h-4 text-gray-400" />;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile View */}
@@ -79,17 +136,113 @@ const Dashboard = () => {
             </div>
           </header>
 
-          {/* Welcome Section */}
-          <section className="px-4 pt-8 pb-4">
-            <h1 className="text-gray-900 tracking-tight text-[34px] font-extrabold leading-[1.1] text-left">
-              Welcome back,
-              <br />
-              <span className="text-emerald-600">Your Dream Home</span> awaits
-            </h1>
-            <p className="text-gray-500 mt-3 text-base font-medium">
-              We've updated your matches based on your recent preferences.
-            </p>
-          </section>
+          {/* Application Pipeline */}
+          <div className="px-4 py-4">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-gray-900 text-xl font-bold">
+                  Application Pipeline
+                </h3>
+                <span className="text-emerald-600 text-sm font-bold">
+                  2 Active
+                </span>
+              </div>
+
+              {/* Pipeline Timeline */}
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 top-8 bottom-8 w-0.5 bg-gray-200"></div>
+
+                {/* Stages */}
+                <div className="space-y-4">
+                  {pipelineStages.map((stage) => (
+                    <div key={stage.id} className="flex items-start gap-4">
+                      {/* Status dot */}
+                      <div className="relative z-10 flex-shrink-0">
+                        <div
+                          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+                            stage.status === "completed"
+                              ? "bg-emerald-500 border-emerald-500"
+                              : stage.status === "current"
+                                ? "bg-blue-500 border-blue-500 animate-pulse"
+                                : "bg-white border-gray-300"
+                          }`}
+                        >
+                          {getStatusIcon(stage.status, stage.icon)}
+                        </div>
+                      </div>
+
+                      {/* Stage content */}
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4
+                                className={`font-bold text-sm ${
+                                  stage.status === "completed"
+                                    ? "text-emerald-600"
+                                    : stage.status === "current"
+                                      ? "text-blue-600"
+                                      : "text-gray-600"
+                                }`}
+                              >
+                                {stage.stage}
+                              </h4>
+                              {stage.count && (
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                                    stage.status === "completed"
+                                      ? "bg-emerald-100 text-emerald-600"
+                                      : stage.status === "current"
+                                        ? "bg-blue-100 text-blue-600"
+                                        : "bg-gray-100 text-gray-600"
+                                  }`}
+                                >
+                                  {stage.count}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p
+                              className={`text-xs font-medium ${
+                                stage.status === "completed"
+                                  ? "text-emerald-600"
+                                  : stage.status === "current"
+                                    ? "text-blue-600"
+                                    : "text-gray-400"
+                              }`}
+                            >
+                              {stage.date}
+                            </p>
+                            {stage.time && (
+                              <p className="text-blue-600 text-xs font-bold">
+                                {stage.time}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="mt-8">
+                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                  <span>Pipeline Progress</span>
+                  <span>Stage 2 of 6</span>
+                </div>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full"
+                    style={{ width: "33%" }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Featured Property */}
           <div className="px-4 py-4">
@@ -257,39 +410,130 @@ const Dashboard = () => {
           </header>
 
           <div className="grid grid-cols-3 gap-8">
-            {/* Left Column - Welcome & Stats */}
+            {/* Left Column - Welcome & Pipeline */}
             <div className="col-span-2 space-y-8">
-              {/* Welcome Section */}
+              {/* Application Pipeline */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-                <h1 className="text-gray-900 text-3xl font-extrabold leading-[1.1]">
-                  Welcome back,
-                  <br />
-                  <span className="text-emerald-600">Your Dream Home</span>{" "}
-                  awaits
-                </h1>
-                <p className="text-gray-500 mt-4 text-lg">
-                  We've updated your matches based on your recent preferences.
-                </p>
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 className="text-gray-900 text-2xl font-bold">
+                      Application Pipeline
+                    </h3>
+                    <p className="text-gray-500 mt-2">
+                      Track your rental applications through each stage
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-emerald-600 text-sm font-bold">
+                        2 Active Applications
+                      </p>
+                      <p className="text-gray-500 text-sm">Stage 2 of 6</p>
+                    </div>
+                    <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full"
+                        style={{ width: "33%" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
 
-                {/* Quick Stats */}
-                <div className="grid grid-cols-3 gap-4 mt-8">
-                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <p className="text-emerald-600 text-sm font-bold">
-                      Properties Viewed
-                    </p>
-                    <p className="text-gray-900 text-2xl font-bold mt-1">24</p>
+                {/* Horizontal Timeline */}
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-4 right-4 top-8 h-0.5 bg-gray-200"></div>
+
+                  {/* Stages */}
+                  <div className="grid grid-cols-6 gap-0">
+                    {pipelineStages.map((stage) => (
+                      <div key={stage.id} className="relative">
+                        {/* Stage dot and line */}
+                        <div className="flex flex-col items-center">
+                          {/* Status dot */}
+                          <div
+                            className={`relative z-10 w-8 h-8 rounded-full border-4 flex items-center justify-center mb-3 ${
+                              stage.status === "completed"
+                                ? "bg-emerald-500 border-white shadow-lg"
+                                : stage.status === "current"
+                                  ? "bg-blue-500 border-white shadow-lg animate-pulse"
+                                  : "bg-white border-gray-300"
+                            }`}
+                          >
+                            {getStatusIcon(stage.status, stage.icon)}
+                          </div>
+
+                          {/* Stage info */}
+                          <div className="text-center px-2">
+                            <h4
+                              className={`font-bold text-sm mb-1 ${
+                                stage.status === "completed"
+                                  ? "text-emerald-600"
+                                  : stage.status === "current"
+                                    ? "text-blue-600"
+                                    : "text-gray-600"
+                              }`}
+                            >
+                              {stage.stage}
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <p className="text-emerald-600 text-sm font-bold">
-                      Saved Properties
-                    </p>
-                    <p className="text-gray-900 text-2xl font-bold mt-1">12</p>
+
+                  {/* Connecting lines */}
+                  <div className="absolute left-1/4 top-8 w-1/2 h-0.5 bg-gradient-to-r from-emerald-500 via-blue-500 to-amber-500"></div>
+                </div>
+
+                {/* Pipeline Summary */}
+                <div className="mt-8 grid grid-cols-3 gap-4">
+                  <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <Mail className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="text-emerald-600 text-sm font-bold">
+                          Inquiry Sent
+                        </p>
+                        <p className="text-gray-900 text-2xl font-bold mt-1">
+                          3
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <p className="text-emerald-600 text-sm font-bold">
-                      Active Messages
-                    </p>
-                    <p className="text-gray-900 text-2xl font-bold mt-1">5</p>
+
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-blue-600 text-sm font-bold">
+                          Viewing Scheduled
+                        </p>
+                        <p className="text-gray-900 text-2xl font-bold mt-1">
+                          2
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-amber-600 text-sm font-bold">
+                          Application Pending
+                        </p>
+                        <p className="text-gray-900 text-2xl font-bold mt-1">
+                          1
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

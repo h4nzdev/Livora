@@ -187,14 +187,6 @@ const Chat = () => {
                       <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500" />
                     )}
                   </button>
-                  <button
-                    onClick={() => setActiveTab("system")}
-                    className={`pb-1 text-sm font-bold transition-colors ${
-                      activeTab === "system" ? "text-gray-900" : "text-gray-400"
-                    }`}
-                  >
-                    System
-                  </button>
                 </div>
               </header>
 
@@ -421,16 +413,6 @@ const Chat = () => {
                   }`}
                 >
                   Inquiries
-                </button>
-                <button
-                  onClick={() => setActiveTab("system")}
-                  className={`px-4 py-2 rounded-lg font-medium ${
-                    activeTab === "system"
-                      ? "bg-emerald-500 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  System
                 </button>
               </div>
             </div>

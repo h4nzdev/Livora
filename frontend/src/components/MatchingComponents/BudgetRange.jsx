@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   Calendar,
   Users,
+  CalendarDays,
 } from "lucide-react";
 
 const BudgetRange = ({
@@ -19,11 +20,12 @@ const BudgetRange = ({
     minBudget: formData.minBudget || "",
     maxBudget: formData.maxBudget || "",
     leaseDuration: formData.leaseDuration || "",
+    moveInPlan: formData.moveInPlan || "",
   });
 
   // Validate the current step
   const validateStep = () => {
-    const { minBudget, maxBudget, leaseDuration } = localData;
+    const { minBudget, maxBudget, leaseDuration, moveInPlan } = localData;
 
     // Check if all required fields are filled
     const isValid =
@@ -43,6 +45,7 @@ const BudgetRange = ({
       minBudget: formData.minBudget || "",
       maxBudget: formData.maxBudget || "",
       leaseDuration: formData.leaseDuration || "",
+      moveInPlan: formData.moveInPlan || "",
     });
   }, [formData]);
 
@@ -90,6 +93,11 @@ const BudgetRange = ({
     // Remove non-numeric characters
     const numericValue = value.replace(/[^0-9]/g, "");
     handleInputChange(field, numericValue);
+  };
+
+  // Handle move-in plan text area change
+  const handleMoveInPlanChange = (value) => {
+    handleInputChange("moveInPlan", value);
   };
 
   return (
@@ -211,7 +219,7 @@ const BudgetRange = ({
           </div>
 
           {/* Lease Duration Section - Enlarged */}
-          <div>
+          <div className="mb-10">
             <div className="flex items-center gap-4 mb-6">
               <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
                 <Calendar size={28} />
@@ -233,7 +241,7 @@ const BudgetRange = ({
               </p>
             )}
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 mb-8">
               <button
                 onClick={() => handleLeaseSelect("short-term")}
                 className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:shadow-md ${
@@ -332,7 +340,7 @@ const BudgetRange = ({
             </div>
 
             {localData.leaseDuration && (
-              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+              <div className="mb-8 p-3 bg-green-50 rounded-lg">
                 <p className="text-green-700 text-center font-medium">
                   Selected:{" "}
                   {localData.leaseDuration.charAt(0).toUpperCase() +
@@ -340,6 +348,72 @@ const BudgetRange = ({
                 </p>
               </div>
             )}
+
+            {/* When do you plan to move in? - Text Area */}
+            <div className="mt-8">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="size-12 rounded-xl bg-blue-600/10 text-green-600 flex items-center justify-center">
+                  <CalendarDays size={22} />
+                </div>
+                <div>
+                  <h3 className="text-gray-900 text-xl font-bold">
+                    When do you plan to move in?
+                  </h3>
+                  <p className="text-gray-500 text-sm">
+                    Be specific - e.g., "Next week", "February 1, 2024", or "In
+                    2 months"
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative">
+                <textarea
+                  className="w-full rounded-2xl border-2 border-gray-300 bg-white h-32 px-5 py-4 text-gray-900 placeholder:text-gray-400 focus:outline-0 focus:ring-4 focus:ring-green-600/20 focus:border-green-600 hover:border-green-600/30 transition-all resize-none"
+                  placeholder="Enter your move-in timeline (e.g., 'Next week', 'February 1, 2024', 'In 2 months when my current lease ends')"
+                  value={localData.moveInPlan}
+                  onChange={(e) => handleMoveInPlanChange(e.target.value)}
+                />
+                {localData.moveInPlan && (
+                  <div className="mt-2 flex items-center gap-2 text-green-600 text-sm">
+                    <CalendarDays size={14} />
+                    <span>Move-in plan recorded</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Sample suggestions */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-gray-500">Examples:</span>
+                <button
+                  onClick={() => handleMoveInPlanChange("Next week")}
+                  className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                >
+                  Next week
+                </button>
+                <button
+                  onClick={() => handleMoveInPlanChange("February 1, 2024")}
+                  className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                >
+                  February 1
+                </button>
+                <button
+                  onClick={() =>
+                    handleMoveInPlanChange(
+                      "In 2 months when current lease ends",
+                    )
+                  }
+                  className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                >
+                  In 2 months
+                </button>
+                <button
+                  onClick={() => handleMoveInPlanChange("As soon as possible")}
+                  className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                >
+                  ASAP
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Enlarged Info Box */}
@@ -348,7 +422,7 @@ const BudgetRange = ({
               <Info size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
                 <p className="text-green-800 text-sm font-semibold">
-                  Budget & Lease Insights
+                  Budget & Move-in Insights
                 </p>
                 <p className="text-green-700 text-xs leading-relaxed">
                   • Basic studios start at ₱15K monthly
@@ -356,7 +430,9 @@ const BudgetRange = ({
                   • 1-bedroom apartments average ₱30K
                   <br />
                   • Long-term leases (12+ months) offer 10-20% savings
-                  <br />• Prices vary by location within Metro Cebu
+                  <br />
+                  • Being specific about move-in dates helps landlords prepare
+                  <br />• Flexible move-in dates can give you more options
                 </p>
               </div>
             </div>
@@ -381,6 +457,12 @@ const BudgetRange = ({
                   : "Not set"}
               </p>
               <p>Lease Duration: {localData.leaseDuration || "Not selected"}</p>
+              <p>
+                Move-in Plan:{" "}
+                {localData.moveInPlan
+                  ? `"${localData.moveInPlan}"`
+                  : "Not specified"}
+              </p>
               <p
                 className={`font-medium ${isStepValid ? "text-green-600" : "text-red-600"}`}
               >
@@ -500,7 +582,7 @@ const BudgetRange = ({
               </p>
             )}
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 mb-6">
               <button
                 onClick={() => handleLeaseSelect("short-term")}
                 className={`flex items-center gap-4 p-4 rounded-xl border-2 font-medium ${
@@ -596,12 +678,70 @@ const BudgetRange = ({
             </div>
 
             {localData.leaseDuration && (
-              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+              <div className="mb-6 p-3 bg-green-50 rounded-lg">
                 <p className="text-green-700 text-center font-medium">
                   Selected: {localData.leaseDuration}
                 </p>
               </div>
             )}
+
+            {/* When do you plan to move in? - Mobile Text Area */}
+            <div className="mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 rounded-lg bg-green-600/10 text-green-600 flex items-center justify-center">
+                  <CalendarDays size={18} />
+                </div>
+                <div>
+                  <h3 className="text-gray-900 font-bold text-base">
+                    When do you plan to move in?
+                  </h3>
+                  <p className="text-gray-500 text-xs">
+                    Be specific about your timeline
+                  </p>
+                </div>
+              </div>
+
+              <textarea
+                className="w-full rounded-xl border-2 border-gray-300 bg-white h-28 px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-0 focus:ring-2 focus:ring-green-600/20 focus:border-green-600 hover:border-blue-600/30 transition-all resize-none text-sm"
+                placeholder="e.g., 'Next week', 'February 1, 2024', 'In 2 months'"
+                value={localData.moveInPlan}
+                onChange={(e) => handleMoveInPlanChange(e.target.value)}
+              />
+
+              {/* Quick suggestions for mobile */}
+              <div className="mt-3">
+                <p className="text-xs text-gray-500 mb-2">Quick suggestions:</p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleMoveInPlanChange("Next week")}
+                    className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                  >
+                    Next week
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleMoveInPlanChange("As soon as possible")
+                    }
+                    className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                  >
+                    ASAP
+                  </button>
+                  <button
+                    onClick={() => handleMoveInPlanChange("In 1 month")}
+                    className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                  >
+                    In 1 month
+                  </button>
+                </div>
+              </div>
+
+              {localData.moveInPlan && (
+                <div className="mt-3 flex items-center gap-2 text-blue-600 text-sm">
+                  <CalendarDays size={14} />
+                  <span>Move-in recorded: "{localData.moveInPlan}"</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Info - Enlarged */}
@@ -610,10 +750,11 @@ const BudgetRange = ({
               <Info size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
               <div>
                 <h4 className="text-gray-900 font-bold text-sm mb-1">
-                  Budget Tips
+                  Budget & Move-in Tips
                 </h4>
                 <p className="text-green-700 text-xs">
-                  Basic studios start at ₱15K • Long-term leases save 10-20%
+                  • Studios start at ₱15K • Long-term saves 10-20% • Specific
+                  move-in dates help landlords prepare
                 </p>
               </div>
             </div>
@@ -634,6 +775,11 @@ const BudgetRange = ({
                 : "Max not set"}
               <br />
               Lease: {localData.leaseDuration || "Not selected"}
+              <br />
+              Move-in:{" "}
+              {localData.moveInPlan
+                ? `"${localData.moveInPlan}"`
+                : "Not specified"}
               <br />
               <span
                 className={`font-medium ${isStepValid ? "text-green-600" : "text-red-600"}`}
