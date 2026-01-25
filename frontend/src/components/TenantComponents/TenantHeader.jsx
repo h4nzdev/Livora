@@ -43,12 +43,6 @@ const TenantHeader = ({ onNavigate }) => {
       route: "tenant-profile",
     },
     {
-      id: "settings",
-      label: "Settings",
-      icon: <Settings className="w-5 h-5" />,
-      route: "settings",
-    },
-    {
       id: "help",
       label: "Help & Support",
       icon: <HelpCircle className="w-5 h-5" />,

@@ -70,10 +70,13 @@ const PrimaryDestination = ({
         lat: 10.3598,
         lng: 123.9133,
       },
-      { name: "University of Cebu", lat: 10.2947, lng: 123.8818 },
+      {
+        name: "University of Southern Philippine Foundation",
+        lat: 10.328573870602634,
+        lng: 123.90104392388733,
+      },
       { name: "Cebu Technological University", lat: 10.3595, lng: 123.914 },
       { name: "Cebu Normal University", lat: 10.3134, lng: 123.883 },
-      { name: "Southwestern University", lat: 10.2905, lng: 123.8763 },
       { name: "Cebu Institute of Technology", lat: 10.3081, lng: 123.891 },
       {
         name: "University of Southern Philippines",
