@@ -60,20 +60,6 @@ const HousingAndTransport = () => {
           </div>
         </div>
 
-        {/* Desktop Progress Bar */}
-        <div className="hidden md:block mb-8 max-w-4xl mx-auto w-full">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-700 font-medium">Step 6 & 7 of 8</span>
-            <span className="text-green-600 font-bold">80% Complete</span>
-          </div>
-          <div className="rounded-full bg-gray-200 overflow-hidden h-2">
-            <div
-              className="h-full rounded-full bg-green-600 transition-all duration-500 ease-out"
-              style={{ width: "80%" }}
-            ></div>
-          </div>
-        </div>
-
         {/* Desktop Two-Column Layout */}
         <div className="hidden md:block max-w-4xl mx-auto w-full">
           <div className="grid grid-cols-2 gap-8">

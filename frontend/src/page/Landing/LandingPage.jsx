@@ -23,6 +23,9 @@ import {
   User,
   ArrowRight,
   Zap,
+  Sofa,
+  House,
+  HouseIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/Livora.png";
@@ -85,14 +88,15 @@ const LandingPage = () => {
       icon: <Target size={28} />,
       title: "Get Smart Matches",
       description:
-        "Our AI filters thousands of listings to find your top 3 picks.",
+        "Our AI filters thousands of listings to find your top matches.",
       color: "bg-emerald-500",
       step: "02",
     },
     {
       icon: <MessageCircle size={28} />,
       title: "Chat & Move In",
-      description: "Connect directly with owners and finalize your new home.",
+      description:
+        "Connect directly and streamlined transition to your new home.",
       color: "bg-purple-500",
       step: "03",
     },
@@ -123,25 +127,25 @@ const LandingPage = () => {
 
   const whyLivora = [
     {
-      icon: <Filter size={24} />,
-      title: "Lifestyle-First Matching",
+      icon: <HouseIcon size={24} />,
+      title: "Intelligent Profiling",
       description:
-        "We prioritize commute times, pet policies, and neighborhood vibes over just price.",
+        "Go beyond filters. We use data profiling to match you with homes that truly sync with your daily lifestyle.",
       gradient: "from-blue-500 to-cyan-500",
     },
     {
-      icon: <Shield size={24} />,
-      title: "No Hidden Fees",
+      icon: <Handshake size={24} />,
+      title: "Streamlined Transitions",
       description:
-        "The service is 100% free for renters. No brokerage surcharges or hidden service costs.",
-      gradient: "from-emerald-500 to-green-500",
+        "Seamless digital agreements and transparent handovers designed to build instant confidence between you and your landlord.",
+      gradient: "from-green-500 to-cyan-500",
     },
     {
-      icon: <Handshake size={24} />,
-      title: "Direct Owner Contact",
+      icon: <Sofa size={24} />,
+      title: "Augmented Living",
       description:
-        "Skip the middleman. Chat directly with property owners and get answers instantly.",
-      gradient: "from-purple-500 to-pink-500",
+        "Your journey doesn't end at move-in. We turn your search insights into a smarter, more personalized daily living experience.",
+      gradient: "from-purple-500 to-cyan-500",
     },
   ];
 

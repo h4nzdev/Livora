@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
   Home,
@@ -8,389 +8,685 @@ import {
   Users,
 } from "lucide-react";
 
-const BudgetRange = () => {
+const BudgetRange = ({
+  formData,
+  updateFormData,
+  isStepValid,
+  setIsStepValid,
+}) => {
+  // Local state for this component
+  const [localData, setLocalData] = useState({
+    minBudget: formData.minBudget || "",
+    maxBudget: formData.maxBudget || "",
+    leaseDuration: formData.leaseDuration || "",
+  });
+
+  // Validate the current step
+  const validateStep = () => {
+    const { minBudget, maxBudget, leaseDuration } = localData;
+
+    // Check if all required fields are filled
+    const isValid =
+      minBudget.trim() !== "" &&
+      maxBudget.trim() !== "" &&
+      leaseDuration.trim() !== "" &&
+      parseInt(minBudget) > 0 &&
+      parseInt(maxBudget) > parseInt(minBudget);
+
+    setIsStepValid(isValid);
+    return isValid;
+  };
+
+  // Update local state when formData prop changes
+  useEffect(() => {
+    setLocalData({
+      minBudget: formData.minBudget || "",
+      maxBudget: formData.maxBudget || "",
+      leaseDuration: formData.leaseDuration || "",
+    });
+  }, [formData]);
+
+  // Validate whenever localData changes
+  useEffect(() => {
+    validateStep();
+  }, [localData]);
+
+  // Handle input changes
+  const handleInputChange = (field, value) => {
+    const updatedData = {
+      ...localData,
+      [field]: value,
+    };
+
+    setLocalData(updatedData);
+    updateFormData("budget", updatedData);
+
+    // Log the change
+    console.log(`BudgetRange - ${field}:`, value);
+  };
+
+  // Handle lease duration selection
+  const handleLeaseSelect = (duration) => {
+    const updatedData = {
+      ...localData,
+      leaseDuration: duration,
+    };
+
+    setLocalData(updatedData);
+    updateFormData("budget", updatedData);
+
+    // Log the selection
+    console.log("Lease Duration Selected:", duration);
+  };
+
+  // Format number with commas
+  const formatNumber = (value) => {
+    if (!value) return "";
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Handle input change with formatting
+  const handleBudgetInputChange = (field, value) => {
+    // Remove non-numeric characters
+    const numericValue = value.replace(/[^0-9]/g, "");
+    handleInputChange(field, numericValue);
+  };
+
+  // Validation messages
+  const getValidationMessage = () => {
+    const { minBudget, maxBudget, leaseDuration } = localData;
+
+    if (!minBudget) return "Minimum budget is required";
+    if (!maxBudget) return "Maximum budget is required";
+    if (!leaseDuration) return "Please select a lease duration";
+    if (parseInt(minBudget) <= 0)
+      return "Minimum budget must be greater than 0";
+    if (parseInt(maxBudget) <= parseInt(minBudget))
+      return "Maximum budget must be greater than minimum";
+
+    return null;
+  };
+
+  const validationMessage = getValidationMessage();
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-display">
-      {/* Mobile Top App Bar */}
-      <div className="lg:hidden w-full p-4 bg-gray-50 sticky top-0 z-10">
-        <div className="flex items-center justify-between h-14">
-          <button className="w-10 h-10 flex items-center justify-start text-black hover:opacity-70 transition-opacity">
-            <ArrowLeft size={28} className="mr-[-6px]" />
-          </button>
-          <div className="bg-green-600 rounded-lg p-2 shadow-sm">
-            <Home size={24} className="text-white" />
-          </div>
-          <div className="w-10"></div> {/* Spacer for symmetry */}
-        </div>
-      </div>
-
-      {/* Desktop Header */}
-      <div className="hidden lg:block p-6 lg:p-8 border-b border-gray-200">
-        <div className="max-w-3xl mx-auto w-full">
-          <div className="flex items-center gap-3 mb-2">
-            <button className="w-10 h-10 flex items-center justify-center text-green-600 hover:bg-green-600/10 rounded-full transition-colors">
-              <ChevronLeft size={24} />
-            </button>
-            <h1 className="text-gray-900 text-3xl font-bold leading-tight">
-              Budget & Lease Preferences
-            </h1>
-          </div>
-          <p className="ml-14 text-lg text-gray-600">
-            Set your budget range and lease duration preferences
-          </p>
-        </div>
-      </div>
-
-      <main className="flex-1 flex flex-col px-4 sm:px-6 lg:px-8 pt-4 lg:pt-8">
-        {/* Mobile Progress */}
-        <div className="lg:hidden flex flex-col gap-3 mb-6">
-          <div className="flex items-center justify-between">
-            <p className="text-gray-800 text-sm font-semibold tracking-wide uppercase leading-normal">
-              Step 1 of 5
+      {/* Desktop Combined Card - Optimized with larger inputs */}
+      <div className="hidden lg:block max-w-4xl mx-auto w-full mt-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          {/* Validation Status */}
+          <div
+            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
+          >
+            <p
+              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
+            >
+              {isStepValid
+                ? "✓ All required fields are filled"
+                : `⚠ ${validationMessage || "Please fill all required fields"}`}
             </p>
-            <span className="text-green-600 text-xs font-bold">20%</span>
-          </div>
-          <div className="rounded-full bg-gray-200 overflow-hidden h-1.5">
-            <div
-              className="h-full rounded-full bg-green-600 transition-all duration-500 ease-out"
-              style={{ width: "20%" }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Desktop Progress */}
-        <div className="hidden lg:block mb-8 max-w-3xl mx-auto w-full">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-700 font-medium">Step 1 of 5</span>
-            <span className="text-green-600 font-bold">20% Complete</span>
-          </div>
-          <div className="rounded-full bg-gray-200 overflow-hidden h-2">
-            <div
-              className="h-full rounded-full bg-green-600 transition-all duration-500 ease-out"
-              style={{ width: "20%" }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Mobile Headline */}
-        <div className="lg:hidden mb-10">
-          <h1 className="text-gray-900 tracking-tight text-[32px] font-bold leading-[1.15]">
-            Budget & Lease Preferences
-          </h1>
-        </div>
-
-        {/* Desktop Combined Card */}
-        <div className="hidden lg:block max-w-3xl mx-auto w-full">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            {/* Budget Range Section */}
-            <div className="mb-12">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
-                  <Home size={24} />
-                </div>
-                <div>
-                  <h2 className="text-gray-900 text-xl font-bold">
-                    Budget Range
-                  </h2>
-                  <p className="text-gray-500 text-sm">
-                    Set your minimum and maximum monthly budget
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-8">
-                {/* Minimum Budget */}
-                <div className="flex flex-col gap-4">
-                  <label className="group flex flex-col w-full">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-gray-700 text-lg font-semibold leading-normal">
-                        Minimum Budget
-                      </p>
-                      <span className="text-green-600 text-sm font-medium">
-                        PHP
-                      </span>
-                    </div>
-                    <div className="relative flex items-center">
-                      <span className="absolute left-6 text-green-600 font-bold text-xl">
-                        ₱
-                      </span>
-                      <input
-                        className="flex w-full rounded-2xl text-gray-900 focus:outline-0 focus:ring-4 focus:ring-green-600/20 border-2 border-gray-300 bg-white h-20 placeholder:text-gray-400 pl-14 pr-6 text-2xl font-bold transition-all shadow-sm hover:border-green-600/30"
-                        placeholder="15,000"
-                        type="number"
-                      />
-                    </div>
-                    <p className="mt-3 text-gray-500 text-sm">
-                      Lowest amount you're willing to spend monthly
-                    </p>
-                  </label>
-                </div>
-
-                {/* Maximum Budget */}
-                <div className="flex flex-col gap-4">
-                  <label className="group flex flex-col w-full">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-gray-700 text-lg font-semibold leading-normal">
-                        Maximum Budget
-                      </p>
-                      <span className="text-green-600 text-sm font-medium">
-                        PHP
-                      </span>
-                    </div>
-                    <div className="relative flex items-center">
-                      <span className="absolute left-6 text-green-600 font-bold text-xl">
-                        ₱
-                      </span>
-                      <input
-                        className="flex w-full rounded-2xl text-gray-900 focus:outline-0 focus:ring-4 focus:ring-green-600/20 border-2 border-gray-300 bg-white h-20 placeholder:text-gray-400 pl-14 pr-6 text-2xl font-bold transition-all shadow-sm hover:border-green-600/30"
-                        placeholder="50,000"
-                        type="number"
-                      />
-                    </div>
-                    <p className="mt-3 text-gray-500 text-sm">
-                      Highest amount you're willing to spend monthly
-                    </p>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-gray-200 mb-12"></div>
-
-            {/* Lease Duration Section */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
-                  <Calendar size={24} />
-                </div>
-                <div>
-                  <h2 className="text-gray-900 text-xl font-bold">
-                    Lease Duration
-                  </h2>
-                  <p className="text-gray-500 text-sm">
-                    How long are you planning to rent?
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <button className="flex flex-col items-center  justify-center gap-4 p-6 rounded-2xl border-2 border-green-600 bg-green-600/5 text-green-600 font-bold transition-all hover:bg-green-600/10">
-                  <div className="size-14 rounded-xl bg-green-600/10 flex items-center justify-center">
-                    <Calendar size={24} />
-                  </div>
-                  <span className="text-center">
-                    Short-term
-                    <br />
-                    <span className="text-sm font-normal text-green-600/70">
-                      (1-6 months)
-                    </span>
-                  </span>
-                </button>
-
-                <button className="flex flex-col items-center justify-center gap-4 p-6 rounded-2xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30 hover:bg-green-600/5">
-                  <div className="size-14 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <Calendar size={24} />
-                  </div>
-                  <span className="text-center">
-                    Long-term
-                    <br />
-                    <span className="text-sm font-normal text-gray-500">
-                      (1+ years)
-                    </span>
-                  </span>
-                </button>
-
-                <button className="flex flex-col items-center justify-center gap-4 p-6 rounded-2xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30 hover:bg-green-600/5">
-                  <div className="size-14 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <Users size={24} />
-                  </div>
-                  <span className="text-center">
-                    Flexible
-                    <br />
-                    <span className="text-sm font-normal text-gray-500">
-                      (open to options)
-                    </span>
-                  </span>
-                </button>
-              </div>
-            </div>
           </div>
 
-          {/* Desktop Info Box */}
-          <div className="mt-10 p-6 bg-green-50 rounded-2xl border border-green-200">
-            <div className="flex items-start gap-4">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <Info size={24} className="text-green-600" />
+          {/* Budget Range Section - Enlarged */}
+          <div className="mb-10">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+                <Home size={28} />
               </div>
               <div>
-                <h4 className="text-gray-900 text-lg font-bold mb-1">
-                  Combined Preferences
-                </h4>
-                <p className="text-gray-600 mb-4">
-                  Setting both your budget and lease duration helps us find
-                  properties that match your financial plan and timeline.
-                  Remember, longer leases often come with better rates!
+                <h2 className="text-gray-900 text-2xl font-bold">
+                  Budget Range
+                </h2>
+                <p className="text-gray-500 text-base">
+                  Set your monthly budget range{" "}
+                  <span className="text-red-500">*</span>
                 </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white p-4 rounded-xl border border-green-100">
-                    <div className="text-green-600 font-bold text-xl mb-2">
-                      Budget Tip
-                    </div>
-                    <div className="text-gray-600 text-sm">
-                      Prices in Metro Cebu range from ₱15,000 for basic studios
-                      to ₱80,000+ for luxury units.
-                    </div>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-green-100">
-                    <div className="text-green-600 font-bold text-xl mb-2">
-                      Lease Tip
-                    </div>
-                    <div className="text-gray-600 text-sm">
-                      Long-term leases (1+ years) often have 10-20% lower
-                      monthly rates than short-term rentals.
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Mobile Combined Card */}
-        <div className="lg:hidden flex flex-col gap-6 max-w-[480px] mx-auto w-full">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            {/* Budget Section Header */}
-            <div className="mb-6">
-              <h2 className="text-gray-900 text-lg font-bold mb-2">
-                Budget Range
-              </h2>
-              <p className="text-gray-500 text-sm mb-6">
-                Set your monthly budget in Philippine Peso (PHP)
-              </p>
-
-              <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-6">
+              {/* Minimum Budget */}
+              <div className="flex flex-col">
                 <label className="group flex flex-col w-full">
-                  <p className="text-gray-700 text-[15px] font-semibold leading-normal pb-2 px-1">
-                    Minimum
+                  <p className="text-gray-700 text-lg font-semibold mb-3">
+                    Minimum Budget <span className="text-red-500">*</span>
                   </p>
                   <div className="relative flex items-center">
-                    <span className="absolute left-4 text-green-600 font-medium text-lg">
+                    <span className="absolute left-4 text-green-600 font-bold text-2xl">
                       ₱
                     </span>
                     <input
-                      className="flex w-full rounded-xl text-black focus:outline-0 focus:ring-2 focus:ring-green-600/40 border border-gray-300 bg-white h-[72px] placeholder:text-gray-400 pl-10 pr-4 text-xl font-semibold transition-all shadow-sm"
+                      className={`flex w-full rounded-2xl text-gray-900 focus:outline-0 focus:ring-4 border-2 bg-white h-16 placeholder:text-gray-400 pl-12 pr-6 text-2xl font-bold transition-all ${
+                        localData.minBudget &&
+                        parseInt(localData.minBudget) <= 0
+                          ? "border-red-500 focus:ring-red-500/20 hover:border-red-500"
+                          : "border-gray-300 focus:ring-green-600/20 hover:border-green-600/30"
+                      }`}
                       placeholder="15,000"
-                      type="number"
+                      type="text"
+                      value={formatNumber(localData.minBudget)}
+                      onChange={(e) =>
+                        handleBudgetInputChange("minBudget", e.target.value)
+                      }
+                      required
                     />
                   </div>
-                </label>
-
-                <label className="group flex flex-col w-full">
-                  <p className="text-gray-700 text-[15px] font-semibold leading-normal pb-2 px-1">
-                    Maximum
+                  {localData.minBudget &&
+                    parseInt(localData.minBudget) <= 0 && (
+                      <p className="mt-1 text-red-600 text-sm font-medium">
+                        Minimum budget must be greater than 0
+                      </p>
+                    )}
+                  <p className="mt-2 text-gray-500 text-sm">
+                    Lowest amount you're willing to spend
                   </p>
-                  <div className="relative flex items-center">
-                    <span className="absolute left-4 text-green-600 font-medium text-lg">
-                      ₱
-                    </span>
-                    <input
-                      className="flex w-full rounded-xl text-black focus:outline-0 focus:ring-2 focus:ring-green-600/40 border border-gray-300 bg-white h-[72px] placeholder:text-gray-400 pl-10 pr-4 text-xl font-semibold transition-all shadow-sm"
-                      placeholder="50,000"
-                      type="number"
-                    />
-                  </div>
+                  {localData.minBudget && parseInt(localData.minBudget) > 0 && (
+                    <p className="mt-1 text-green-600 text-sm font-medium">
+                      Selected: ₱{formatNumber(localData.minBudget)}
+                    </p>
+                  )}
                 </label>
               </div>
 
-              {/* Mobile Info Text */}
-              <div className="flex items-center gap-2 px-1 mt-4">
-                <Info size={20} className="text-green-600" />
-                <p className="text-green-700 text-sm font-medium leading-normal">
-                  Prices are in Philippine Peso (PHP)
+              {/* Maximum Budget */}
+              <div className="flex flex-col">
+                <label className="group flex flex-col w-full">
+                  <p className="text-gray-700 text-lg font-semibold mb-3">
+                    Maximum Budget <span className="text-red-500">*</span>
+                  </p>
+                  <div className="relative flex items-center">
+                    <span className="absolute left-4 text-green-600 font-bold text-2xl">
+                      ₱
+                    </span>
+                    <input
+                      className={`flex w-full rounded-2xl text-gray-900 focus:outline-0 focus:ring-4 border-2 bg-white h-16 placeholder:text-gray-400 pl-12 pr-6 text-2xl font-bold transition-all ${
+                        localData.maxBudget &&
+                        localData.minBudget &&
+                        parseInt(localData.maxBudget) <=
+                          parseInt(localData.minBudget)
+                          ? "border-red-500 focus:ring-red-500/20 hover:border-red-500"
+                          : "border-gray-300 focus:ring-green-600/20 hover:border-green-600/30"
+                      }`}
+                      placeholder="50,000"
+                      type="text"
+                      value={formatNumber(localData.maxBudget)}
+                      onChange={(e) =>
+                        handleBudgetInputChange("maxBudget", e.target.value)
+                      }
+                      required
+                    />
+                  </div>
+                  {localData.maxBudget &&
+                    localData.minBudget &&
+                    parseInt(localData.maxBudget) <=
+                      parseInt(localData.minBudget) && (
+                      <p className="mt-1 text-red-600 text-sm font-medium">
+                        Maximum must be greater than minimum (₱
+                        {formatNumber(localData.minBudget)})
+                      </p>
+                    )}
+                  <p className="mt-2 text-gray-500 text-sm">
+                    Highest amount you're willing to spend
+                  </p>
+                  {localData.maxBudget &&
+                    parseInt(localData.maxBudget) >
+                      parseInt(localData.minBudget) && (
+                      <p className="mt-1 text-green-600 text-sm font-medium">
+                        Selected: ₱{formatNumber(localData.maxBudget)}
+                      </p>
+                    )}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Lease Duration Section - Enlarged */}
+          <div>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+                <Calendar size={28} />
+              </div>
+              <div>
+                <h2 className="text-gray-900 text-2xl font-bold">
+                  Lease Duration
+                </h2>
+                <p className="text-gray-500 text-base">
+                  How long are you planning to rent?{" "}
+                  <span className="text-red-500">*</span>
                 </p>
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200 my-6"></div>
-
-            {/* Lease Duration Section */}
-            <div>
-              <h2 className="text-gray-900 text-lg font-bold mb-2">
-                Lease Duration
-              </h2>
-              <p className="text-gray-500 text-sm mb-6">
-                How long are you planning to rent?
+            {!localData.leaseDuration && (
+              <p className="text-red-600 text-sm mb-4">
+                Please select a lease duration
               </p>
+            )}
 
-              <div className="flex flex-wrap gap-3">
-                <button className="flex-1 flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-green-600 bg-green-600/5 text-green-600 font-bold transition-all min-w-[140px]">
-                  <div className="size-12 rounded-xl bg-green-600/10 flex items-center justify-center">
-                    <Calendar size={20} />
-                  </div>
-                  <span className="text-center text-sm">
-                    Short-term
-                    <br />
-                    <span className="text-xs font-normal text-green-600/70">
-                      (1-6 months)
-                    </span>
+            <div className="grid grid-cols-3 gap-4">
+              <button
+                onClick={() => handleLeaseSelect("short-term")}
+                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:shadow-md ${
+                  localData.leaseDuration === "short-term"
+                    ? "border-green-600 bg-green-600/5 text-green-600"
+                    : "border-gray-200 bg-gray-50 text-gray-600 hover:border-green-600/30 hover:bg-green-600/5"
+                }`}
+              >
+                <div
+                  className={`size-14 rounded-xl flex items-center justify-center ${
+                    localData.leaseDuration === "short-term"
+                      ? "bg-green-600/10"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <Calendar size={24} />
+                </div>
+                <span className="text-center">
+                  Short-term
+                  <br />
+                  <span
+                    className={`text-sm font-normal ${
+                      localData.leaseDuration === "short-term"
+                        ? "text-green-600/70"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    (1-6 months)
                   </span>
-                </button>
+                </span>
+              </button>
 
-                <button className="flex-1 flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all min-w-[140px]">
-                  <div className="size-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <Calendar size={20} />
-                  </div>
-                  <span className="text-center text-sm">
-                    Long-term
-                    <br />
-                    <span className="text-xs font-normal text-gray-500">
-                      (1+ years)
-                    </span>
+              <button
+                onClick={() => handleLeaseSelect("long-term")}
+                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:shadow-md ${
+                  localData.leaseDuration === "long-term"
+                    ? "border-green-600 bg-green-600/5 text-green-600"
+                    : "border-gray-200 bg-gray-50 text-gray-600 hover:border-green-600/30 hover:bg-green-600/5"
+                }`}
+              >
+                <div
+                  className={`size-14 rounded-xl flex items-center justify-center ${
+                    localData.leaseDuration === "long-term"
+                      ? "bg-green-600/10"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <Calendar size={24} />
+                </div>
+                <span className="text-center">
+                  Long-term
+                  <br />
+                  <span
+                    className={`text-sm font-normal ${
+                      localData.leaseDuration === "long-term"
+                        ? "text-green-600/70"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    (1+ years)
                   </span>
-                </button>
+                </span>
+              </button>
 
-                <button className="flex-1 flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all min-w-[140px]">
-                  <div className="size-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <Users size={20} />
-                  </div>
-                  <span className="text-center text-sm">
-                    Flexible
-                    <br />
-                    <span className="text-xs font-normal text-gray-500">
-                      (open to options)
-                    </span>
+              <button
+                onClick={() => handleLeaseSelect("flexible")}
+                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:shadow-md ${
+                  localData.leaseDuration === "flexible"
+                    ? "border-green-600 bg-green-600/5 text-green-600"
+                    : "border-gray-200 bg-gray-50 text-gray-600 hover:border-green-600/30 hover:bg-green-600/5"
+                }`}
+              >
+                <div
+                  className={`size-14 rounded-xl flex items-center justify-center ${
+                    localData.leaseDuration === "flexible"
+                      ? "bg-green-600/10"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <Users size={24} />
+                </div>
+                <span className="text-center">
+                  Flexible
+                  <br />
+                  <span
+                    className={`text-sm font-normal ${
+                      localData.leaseDuration === "flexible"
+                        ? "text-green-600/70"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    (open to options)
                   </span>
-                </button>
+                </span>
+              </button>
+            </div>
+
+            {localData.leaseDuration && (
+              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                <p className="text-green-700 text-center font-medium">
+                  Selected:{" "}
+                  {localData.leaseDuration.charAt(0).toUpperCase() +
+                    localData.leaseDuration.slice(1)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Enlarged Info Box */}
+          <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+            <div className="flex items-start gap-2">
+              <Info size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="text-green-800 text-sm font-semibold">
+                  Budget & Lease Insights
+                </p>
+                <p className="text-green-700 text-xs leading-relaxed">
+                  • Basic studios start at ₱15K monthly
+                  <br />
+                  • 1-bedroom apartments average ₱30K
+                  <br />
+                  • Long-term leases (12+ months) offer 10-20% savings
+                  <br />• Prices vary by location within Metro Cebu
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Mobile Budget Tips */}
-          <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-            <h4 className="text-gray-900 font-bold mb-2">Combined Tips</h4>
-            <div className="space-y-3">
-              <div className="bg-white p-3 rounded-lg border border-green-100">
-                <div className="text-green-600 font-bold text-sm mb-1">
-                  Budget Tip
-                </div>
-                <div className="text-gray-600 text-xs">
-                  Basic studio: ₱15K • 1-Bedroom: ₱30K • Luxury: ₱50K+
-                </div>
-              </div>
-              <div className="bg-white p-3 rounded-lg border border-green-100">
-                <div className="text-green-600 font-bold text-sm mb-1">
-                  Lease Tip
-                </div>
-                <div className="text-gray-600 text-xs">
-                  Long-term leases often have 10-20% lower monthly rates.
-                </div>
-              </div>
+          {/* Debug Info (remove in production) */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-gray-700 text-sm font-medium mb-2">
+              Current Data (Console will show changes):
+            </p>
+            <div className="text-xs text-gray-600 space-y-1">
+              <p>
+                Min Budget:{" "}
+                {localData.minBudget
+                  ? `₱${formatNumber(localData.minBudget)}`
+                  : "Not set"}
+              </p>
+              <p>
+                Max Budget:{" "}
+                {localData.maxBudget
+                  ? `₱${formatNumber(localData.maxBudget)}`
+                  : "Not set"}
+              </p>
+              <p>Lease Duration: {localData.leaseDuration || "Not selected"}</p>
+              <p
+                className={`font-medium ${isStepValid ? "text-green-600" : "text-red-600"}`}
+              >
+                Step Valid: {isStepValid ? "Yes" : "No"}
+              </p>
             </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Mobile Optimized Layout - Enlarged */}
+      <div className="lg:hidden flex flex-col px-4 pt-6 max-w-[480px] mx-auto w-full">
+        {/* Mobile Combined Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          {/* Validation Status */}
+          <div
+            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
+          >
+            <p
+              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
+            >
+              {isStepValid
+                ? "✓ Ready to continue"
+                : `⚠ ${validationMessage || "Complete required fields"}`}
+            </p>
+          </div>
+
+          {/* Budget Section - Enlarged */}
+          <div className="mb-8">
+            <h2 className="text-gray-900 text-xl font-bold mb-4">
+              Budget Range <span className="text-red-500">*</span>
+            </h2>
+
+            <div className="space-y-4">
+              <label className="flex flex-col">
+                <p className="text-gray-700 text-base font-medium mb-2">
+                  Minimum <span className="text-red-500">*</span>
+                </p>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-600 font-medium text-xl">
+                    ₱
+                  </span>
+                  <input
+                    className={`w-full rounded-xl border-2 bg-white h-14 pl-12 pr-4 text-lg font-semibold ${
+                      localData.minBudget && parseInt(localData.minBudget) <= 0
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    placeholder="15,000"
+                    type="text"
+                    value={formatNumber(localData.minBudget)}
+                    onChange={(e) =>
+                      handleBudgetInputChange("minBudget", e.target.value)
+                    }
+                    required
+                  />
+                </div>
+                {localData.minBudget && parseInt(localData.minBudget) <= 0 && (
+                  <p className="mt-1 text-red-600 text-sm">
+                    Must be greater than 0
+                  </p>
+                )}
+                <p className="mt-1 text-gray-500 text-sm">
+                  Lowest monthly amount
+                </p>
+                {localData.minBudget && parseInt(localData.minBudget) > 0 && (
+                  <p className="mt-1 text-green-600 text-sm font-medium">
+                    Min: ₱{formatNumber(localData.minBudget)}
+                  </p>
+                )}
+              </label>
+
+              <label className="flex flex-col">
+                <p className="text-gray-700 text-base font-medium mb-2">
+                  Maximum <span className="text-red-500">*</span>
+                </p>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-600 font-medium text-xl">
+                    ₱
+                  </span>
+                  <input
+                    className={`w-full rounded-xl border-2 bg-white h-14 pl-12 pr-4 text-lg font-semibold ${
+                      localData.maxBudget &&
+                      localData.minBudget &&
+                      parseInt(localData.maxBudget) <=
+                        parseInt(localData.minBudget)
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    placeholder="50,000"
+                    type="text"
+                    value={formatNumber(localData.maxBudget)}
+                    onChange={(e) =>
+                      handleBudgetInputChange("maxBudget", e.target.value)
+                    }
+                    required
+                  />
+                </div>
+                {localData.maxBudget &&
+                  localData.minBudget &&
+                  parseInt(localData.maxBudget) <=
+                    parseInt(localData.minBudget) && (
+                    <p className="mt-1 text-red-600 text-sm">
+                      Must be greater than minimum
+                    </p>
+                  )}
+                <p className="mt-1 text-gray-500 text-sm">
+                  Highest monthly amount
+                </p>
+                {localData.maxBudget &&
+                  parseInt(localData.maxBudget) >
+                    parseInt(localData.minBudget) && (
+                    <p className="mt-1 text-green-600 text-sm font-medium">
+                      Max: ₱{formatNumber(localData.maxBudget)}
+                    </p>
+                  )}
+              </label>
+            </div>
+          </div>
+
+          {/* Lease Duration Section - Enlarged */}
+          <div>
+            <h2 className="text-gray-900 text-xl font-bold mb-4">
+              Lease Duration <span className="text-red-500">*</span>
+            </h2>
+
+            {!localData.leaseDuration && (
+              <p className="text-red-600 text-sm mb-4">
+                Please select an option
+              </p>
+            )}
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => handleLeaseSelect("short-term")}
+                className={`flex items-center gap-4 p-4 rounded-xl border-2 font-medium ${
+                  localData.leaseDuration === "short-term"
+                    ? "border-green-600 bg-green-600/5 text-green-600"
+                    : "border-gray-300 bg-white text-gray-700"
+                }`}
+              >
+                <div
+                  className={`size-12 rounded-lg flex items-center justify-center ${
+                    localData.leaseDuration === "short-term"
+                      ? "bg-green-600/10"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <Calendar size={20} />
+                </div>
+                <div className="text-left flex-1">
+                  <div className="font-medium text-base">Short-term</div>
+                  <div
+                    className={`text-sm ${
+                      localData.leaseDuration === "short-term"
+                        ? "text-green-600/70"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    1-6 months
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleLeaseSelect("long-term")}
+                className={`flex items-center gap-4 p-4 rounded-xl border-2 font-medium ${
+                  localData.leaseDuration === "long-term"
+                    ? "border-green-600 bg-green-600/5 text-green-600"
+                    : "border-gray-300 bg-white text-gray-700"
+                }`}
+              >
+                <div
+                  className={`size-12 rounded-lg flex items-center justify-center ${
+                    localData.leaseDuration === "long-term"
+                      ? "bg-green-600/10"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <Calendar size={20} />
+                </div>
+                <div className="text-left flex-1">
+                  <div className="font-medium text-base">Long-term</div>
+                  <div
+                    className={`text-sm ${
+                      localData.leaseDuration === "long-term"
+                        ? "text-green-600/70"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    1+ years
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleLeaseSelect("flexible")}
+                className={`flex items-center gap-4 p-4 rounded-xl border-2 font-medium ${
+                  localData.leaseDuration === "flexible"
+                    ? "border-green-600 bg-green-600/5 text-green-600"
+                    : "border-gray-300 bg-white text-gray-700"
+                }`}
+              >
+                <div
+                  className={`size-12 rounded-lg flex items-center justify-center ${
+                    localData.leaseDuration === "flexible"
+                      ? "bg-green-600/10"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <Users size={20} />
+                </div>
+                <div className="text-left flex-1">
+                  <div className="font-medium text-base">Flexible</div>
+                  <div
+                    className={`text-sm ${
+                      localData.leaseDuration === "flexible"
+                        ? "text-green-600/70"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    Open to options
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {localData.leaseDuration && (
+              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                <p className="text-green-700 text-center font-medium">
+                  Selected: {localData.leaseDuration}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Info - Enlarged */}
+          <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+            <div className="flex items-start gap-3">
+              <Info size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-gray-900 font-bold text-sm mb-1">
+                  Budget Tips
+                </h4>
+                <p className="text-green-700 text-xs">
+                  Basic studios start at ₱15K • Long-term leases save 10-20%
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Debug Info (remove in production) */}
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <p className="text-gray-600 text-xs">
+              <span className="font-medium">Current selections:</span>
+              <br />
+              Budget:{" "}
+              {localData.minBudget
+                ? `₱${formatNumber(localData.minBudget)}`
+                : "Min not set"}{" "}
+              -{" "}
+              {localData.maxBudget
+                ? `₱${formatNumber(localData.maxBudget)}`
+                : "Max not set"}
+              <br />
+              Lease: {localData.leaseDuration || "Not selected"}
+              <br />
+              <span
+                className={`font-medium ${isStepValid ? "text-green-600" : "text-red-600"}`}
+              >
+                Valid: {isStepValid ? "Yes" : "No"}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

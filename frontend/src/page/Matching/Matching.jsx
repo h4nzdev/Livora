@@ -16,6 +16,72 @@ const Matching = () => {
   const [showSplash, setShowSplash] = useState(true);
   const navigate = useNavigate();
 
+  // Initialize form state with all required fields
+  const [formData, setFormData] = useState({
+    // Step 1: Budget Range
+    minBudget: "",
+    maxBudget: "",
+    leaseDuration: "", // "short-term", "long-term", or "flexible"
+
+    // Step 2: Region Selection
+    region: "",
+
+    // Step 3: Workplace or University Location
+    workplaceLocation: "", // Will store the place ID or address
+    workplaceLat: null, // Latitude
+    workplaceLng: null, // Longitude
+    workplaceName: "", // Formatted name from Google Maps
+
+    // Step 4: Area Preference
+    areaPreferences: [],
+
+    // Step 5: Household Setup
+    householdSize: "",
+    hasChildren: false,
+    hasPets: false,
+
+    // Step 6: Lifestyle & Features
+    lifestyleFeatures: [],
+    mustHaveFeatures: [],
+    preferredAmenities: [],
+  });
+
+  // Validation state for each step
+  const [stepValidation, setStepValidation] = useState({
+    step1: false, // Budget Range
+    step2: false, // Region Selection
+    step3: false, // Workplace/University
+    step4: false, // Area Preference
+    step5: false, // Household Setup
+    step6: false, // Lifestyle & Features
+  });
+
+  // Function to update form data from child components
+  const updateFormData = (section, data) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...data,
+    }));
+
+    // Log the updated form data for debugging
+    console.log("Form Data Updated:", { ...formData, ...data });
+  };
+
+  // Function to update validation for a specific step
+  const updateStepValidation = (stepIndex, isValid) => {
+    const stepKey = `step${stepIndex + 1}`;
+    setStepValidation((prev) => ({
+      ...prev,
+      [stepKey]: isValid,
+    }));
+  };
+
+  // Check if current step is valid
+  const isCurrentStepValid = () => {
+    const stepKey = `step${currentStep + 1}`;
+    return stepValidation[stepKey];
+  };
+
   const handleSplashFinish = () => {
     setShowSplash(false);
   };
@@ -31,31 +97,66 @@ const Matching = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Updated steps array
+  // Updated steps array - pass form data, update function, and validation props
   const steps = [
     {
       title: "Lease Terms",
-      component: <BudgetRange />,
+      component: (
+        <BudgetRange
+          formData={formData}
+          updateFormData={updateFormData}
+          isStepValid={stepValidation.step1}
+          setIsStepValid={(isValid) => updateStepValidation(0, isValid)}
+        />
+      ),
       showFooter: true,
     },
     {
       title: "Region Selection",
-      component: <RegionSelection />,
+      component: (
+        <RegionSelection
+          formData={formData}
+          updateFormData={updateFormData}
+          isStepValid={stepValidation.step2}
+          setIsStepValid={(isValid) => updateStepValidation(1, isValid)}
+        />
+      ),
       showFooter: true,
     },
     {
       title: "Area Preference",
-      component: <AreaPreference />,
+      component: (
+        <AreaPreference
+          formData={formData}
+          updateFormData={updateFormData}
+          isStepValid={stepValidation.step4}
+          setIsStepValid={(isValid) => updateStepValidation(3, isValid)}
+        />
+      ),
       showFooter: true,
     },
     {
       title: "Household Setup",
-      component: <LeaseAndHousehold />,
+      component: (
+        <LeaseAndHousehold
+          formData={formData}
+          updateFormData={updateFormData}
+          isStepValid={stepValidation.step5}
+          setIsStepValid={(isValid) => updateStepValidation(4, isValid)}
+        />
+      ),
       showFooter: true,
     },
     {
       title: "Lifestyle & Features",
-      component: <LifestyleAndFeatures />,
+      component: (
+        <LifestyleAndFeatures
+          formData={formData}
+          updateFormData={updateFormData}
+          isStepValid={stepValidation.step6}
+          setIsStepValid={(isValid) => updateStepValidation(5, isValid)}
+        />
+      ),
       showFooter: true,
     },
   ];
@@ -69,22 +170,78 @@ const Matching = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < totalSteps - 1) {
+    if (currentStep < totalSteps - 1 && isCurrentStepValid()) {
       setCurrentStep(currentStep + 1);
-    } else {
-      // When on last step, navigate to Results page
-      navigate("/results");
     }
   };
 
+  // Submit handler - will be called on the last step
+  const handleSubmit = () => {
+    // Check if all steps are valid before submitting
+    const allStepsValid = Object.values(stepValidation).every(Boolean);
+
+    if (!allStepsValid) {
+      alert("Please complete all required fields before submitting.");
+      return;
+    }
+
+    console.log("=== FINAL FORM DATA ===");
+    console.log("Form Data to be submitted:", formData);
+    console.log("=== END FORM DATA ===");
+
+    // For now, just log the data
+    // Later you can add API call or navigation here
+    alert("Form submitted! Check console for data.");
+
+    // Navigate to results page
+    navigate("/results");
+  };
+
   const calculateProgress = () => {
-    // Calculate progress based on current step
     return Math.round(((currentStep + 1) / totalSteps) * 100);
   };
 
   const getButtonText = () => {
     if (currentStep === totalSteps - 1) return "Find My Matches"; // Last step
     return "Continue";
+  };
+
+  const handleButtonClick = () => {
+    if (!isCurrentStepValid()) {
+      alert(
+        "Please complete all required fields in this step before continuing.",
+      );
+      return;
+    }
+
+    if (currentStep === totalSteps - 1) {
+      handleSubmit();
+    } else {
+      handleNext();
+    }
+  };
+
+  // Prevent step navigation by clicking on step buttons if previous steps aren't valid
+  const handleStepClick = (index) => {
+    if (index === currentStep) return;
+
+    // Allow going back to previous steps
+    if (index < currentStep) {
+      setCurrentStep(index);
+      return;
+    }
+
+    // Check if all previous steps are valid before allowing navigation to a future step
+    const allPreviousValid = Array.from(
+      { length: index },
+      (_, i) => stepValidation[`step${i + 1}`],
+    ).every(Boolean);
+
+    if (allPreviousValid) {
+      setCurrentStep(index);
+    } else {
+      alert("Please complete all previous steps before skipping ahead.");
+    }
   };
 
   // If splash screen is still showing, only render the splash screen
@@ -108,9 +265,25 @@ const Matching = () => {
             <h3 className="text-gray-900 text-lg font-bold mb-2">
               Your Preferences
             </h3>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm mb-4">
               Step {currentStep + 1} of {totalSteps}
             </p>
+
+            {/* Progress Bar - Added to sidebar */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-700 font-medium">Progress</span>
+                <span className="text-green-600 font-bold">
+                  {calculateProgress()}%
+                </span>
+              </div>
+              <div className="rounded-full bg-gray-200 overflow-hidden h-2">
+                <div
+                  className="h-full rounded-full bg-green-600 transition-all duration-500 ease-out"
+                  style={{ width: `${calculateProgress()}%` }}
+                ></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -119,12 +292,17 @@ const Matching = () => {
           {steps.map((step, index) => (
             <button
               key={index}
-              onClick={() => setCurrentStep(index)}
+              onClick={() => handleStepClick(index)}
               className={`w-full text-left p-3 rounded-lg transition-all ${
                 index === currentStep
                   ? "bg-green-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  : index < currentStep
+                    ? stepValidation[`step${index + 1}`]
+                      ? "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+                      : "bg-red-50 text-red-700 hover:bg-red-100 border border-red-200"
+                    : "text-gray-700 hover:bg-gray-100"
               }`}
+              disabled={index > currentStep && !stepValidation[`step${index}`]}
             >
               <div className="flex items-center gap-3">
                 <div
@@ -132,13 +310,23 @@ const Matching = () => {
                     index === currentStep
                       ? "bg-white text-green-600"
                       : index < currentStep
-                        ? "bg-green-100 text-green-600"
+                        ? stepValidation[`step${index + 1}`]
+                          ? "bg-green-100 text-green-600"
+                          : "bg-red-100 text-red-600"
                         : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {index + 1}
                 </div>
-                <span className="font-medium">{step.title}</span>
+                <div className="flex flex-col items-start">
+                  <span className="font-medium">{step.title}</span>
+                  {index < currentStep &&
+                    !stepValidation[`step${index + 1}`] && (
+                      <span className="text-xs text-red-600 mt-1">
+                        Incomplete
+                      </span>
+                    )}
+                </div>
               </div>
             </button>
           ))}
@@ -163,12 +351,15 @@ const Matching = () => {
               Previous Step
             </button>
             <button
-              onClick={handleNext}
+              onClick={handleButtonClick}
               className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
-                currentStep === totalSteps - 1
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-green-600 text-white hover:bg-green-700"
+                !isCurrentStepValid()
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : currentStep === totalSteps - 1
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-green-600 text-white hover:bg-green-700"
               }`}
+              disabled={!isCurrentStepValid()}
             >
               {getButtonText()}
               <ArrowRight size={20} />
@@ -224,12 +415,13 @@ const Matching = () => {
           </div>
 
           <button
-            onClick={handleNext}
+            onClick={handleButtonClick}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-              currentStep === totalSteps - 1
-                ? "text-green-600 hover:bg-green-600/10"
+              !isCurrentStepValid()
+                ? "text-gray-400 cursor-not-allowed"
                 : "text-green-600 hover:bg-green-600/10"
             }`}
+            disabled={!isCurrentStepValid()}
           >
             <span className="font-medium">Next</span>
             <ChevronRight size={20} />
@@ -251,15 +443,27 @@ const Matching = () => {
           <div className="lg:hidden p-6 bg-gray-50 border-t border-gray-200">
             <div className="max-w-[480px] mx-auto">
               <button
-                onClick={handleNext}
-                className="w-full flex items-center justify-center h-16 rounded-xl bg-green-600 hover:bg-green-700 text-white gap-2 text-lg font-bold leading-normal tracking-wide transition-all active:scale-[0.98] shadow-lg shadow-green-600/20 group"
+                onClick={handleButtonClick}
+                disabled={!isCurrentStepValid()}
+                className={`w-full flex items-center justify-center h-16 rounded-xl gap-2 text-lg font-bold leading-normal tracking-wide transition-all active:scale-[0.98] shadow-lg ${
+                  !isCurrentStepValid()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-gray-300/20"
+                    : "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
+                }`}
               >
                 {getButtonText()}
                 <ArrowRight
                   size={24}
-                  className="group-hover:translate-x-1 transition-transform"
+                  className={`transition-transform ${
+                    !isCurrentStepValid() ? "" : "group-hover:translate-x-1"
+                  }`}
                 />
               </button>
+              {!isCurrentStepValid() && (
+                <p className="text-center text-red-600 text-sm mt-2">
+                  Please complete all required fields
+                </p>
+              )}
               <div className="flex items-center justify-center gap-2 mt-4">
                 <Shield size={14} className="text-gray-400" />
                 <p className="text-center text-[11px] text-gray-400 font-bold uppercase tracking-widest">
@@ -276,11 +480,15 @@ const Matching = () => {
             {steps.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentStep(index)}
+                onClick={() => handleStepClick(index)}
                 className={`w-2 h-2 rounded-full transition-all ${
                   index === currentStep
                     ? "bg-green-600 w-8"
-                    : "bg-gray-200 hover:bg-green-600/50"
+                    : index < currentStep
+                      ? stepValidation[`step${index + 1}`]
+                        ? "bg-green-600"
+                        : "bg-red-600"
+                      : "bg-gray-200 hover:bg-green-600/50"
                 }`}
                 aria-label={`Go to step ${index + 1}`}
               />

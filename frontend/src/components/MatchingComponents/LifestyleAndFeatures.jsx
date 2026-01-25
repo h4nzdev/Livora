@@ -1,486 +1,1042 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
-  ArrowLeft,
   Sun,
   Moon,
-  Laptop,
   Activity,
+  Coffee,
+  Bus,
+  Car,
+  Bike,
+  CarTaxiFront,
   Snowflake,
   Wifi,
-  Bath,
+  ShowerHead,
   Utensils,
   PawPrint,
   Dumbbell,
   Building2,
   Waves,
-  Check,
-  Coffee,
-  ShowerHead,
-  Key,
   Lock,
-  Car,
-  Home as HomeIcon,
+  HomeIcon,
+  Info,
+  Check,
+  MapPin,
+  Building,
+  School,
+  X,
+  Search,
+  ExternalLink,
 } from "lucide-react";
 
-const LifestyleAndFeatures = () => {
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-display">
-      {/* Mobile Header */}
-      <div className="md:hidden w-full p-4 bg-gray-50 sticky top-0 z-10">
-        <div className="flex items-center justify-between h-14">
-          <button className="w-10 h-10 flex items-center justify-start text-gray-900 hover:bg-gray-200 rounded-full transition-colors">
-            <ArrowLeft size={28} className="mr-[-6px]" />
-          </button>
-          <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-tight flex-1 text-center">
-            Lifestyle & Features
-          </h2>
-          <div className="flex items-center justify-end">
-            <button className="text-green-700 text-sm font-bold tracking-wide uppercase px-3 py-1 hover:opacity-70">
-              Skip
-            </button>
-          </div>
-        </div>
-      </div>
+// ==================== PRIMARY DESTINATION SECTION ====================
+const PrimaryDestination = ({
+  localData,
+  updateLocalData,
+  updateLifestyleData,
+}) => {
+  // Destination type options
+  const destinationOptions = [
+    {
+      id: "workplace",
+      name: "Workplace",
+      icon: Building,
+      description: "Office or work location",
+    },
+    {
+      id: "university",
+      name: "University",
+      icon: School,
+      description: "School or campus",
+    },
+  ];
 
-      {/* Desktop Header */}
-      <div className="hidden md:block p-6 border-b border-gray-200">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-gray-900 text-3xl font-bold leading-tight">
-            Lifestyle & Must-Have Features
-          </h1>
-          <p className="mt-2 text-lg text-gray-600">
-            Tell us about your daily routine and essential property features.
+  // Predefined location options based on destination type
+  const predefinedLocations = {
+    workplace: [
+      { name: "IT Park, Cebu City", lat: 10.3348, lng: 123.8948 },
+      { name: "Cebu Business Park", lat: 10.3181, lng: 123.9046 },
+      { name: "Ayala Center Cebu", lat: 10.317, lng: 123.9042 },
+      { name: "SM City Cebu", lat: 10.3077, lng: 123.9185 },
+      { name: "Mactan Export Processing Zone", lat: 10.3089, lng: 123.9791 },
+      { name: "Gaisano Capital", lat: 10.2988, lng: 123.8991 },
+      { name: "JCentre Mall", lat: 10.3248, lng: 123.9083 },
+      { name: "Robinsons Galleria Cebu", lat: 10.3191, lng: 123.907 },
+    ],
+    university: [
+      { name: "University of San Carlos", lat: 10.2989, lng: 123.8557 },
+      {
+        name: "University of the Philippines Cebu",
+        lat: 10.3598,
+        lng: 123.9133,
+      },
+      { name: "University of Cebu", lat: 10.2947, lng: 123.8818 },
+      { name: "Cebu Technological University", lat: 10.3595, lng: 123.914 },
+      { name: "Cebu Normal University", lat: 10.3134, lng: 123.883 },
+      { name: "Southwestern University", lat: 10.2905, lng: 123.8763 },
+      { name: "Cebu Institute of Technology", lat: 10.3081, lng: 123.891 },
+      {
+        name: "University of Southern Philippines",
+        lat: 10.3541,
+        lng: 123.9138,
+      },
+    ],
+  };
+
+  // Handle destination type selection
+  const handleDestinationTypeSelect = (type) => {
+    const updatedData = {
+      ...localData,
+      primaryDestination: type,
+      destinationLocation: "",
+      destinationAddress: "",
+      destinationCoordinates: null,
+      selectedPredefinedLocation: null,
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("Destination Type Selected:", type);
+  };
+
+  // Handle predefined location selection
+  const handlePredefinedLocationSelect = (location) => {
+    const updatedData = {
+      ...localData,
+      destinationLocation: location.name,
+      destinationAddress: location.name,
+      destinationCoordinates: { lat: location.lat, lng: location.lng },
+      selectedPredefinedLocation: location,
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("Location Selected:", location.name);
+  };
+
+  // Handle custom location input
+  const handleLocationInputChange = (e) => {
+    const value = e.target.value;
+    const updatedData = {
+      ...localData,
+      destinationLocation: value,
+      searchQuery: value,
+      selectedPredefinedLocation: null,
+    };
+
+    updateLocalData(updatedData);
+  };
+
+  // Handle custom location submission
+  const handleCustomLocationSubmit = () => {
+    if (!localData.destinationLocation.trim()) return;
+
+    const updatedData = {
+      ...localData,
+      destinationAddress: localData.destinationLocation,
+      // For custom locations, use generic Cebu coordinates
+      destinationCoordinates: { lat: 10.3157, lng: 123.8854 },
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("Custom Address Submitted:", localData.destinationLocation);
+  };
+
+  // Handle clear location
+  const handleClearLocation = () => {
+    const updatedData = {
+      ...localData,
+      destinationLocation: "",
+      destinationAddress: "",
+      destinationCoordinates: null,
+      selectedPredefinedLocation: null,
+      searchQuery: "",
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("Location cleared");
+  };
+
+  // Open Google Maps with coordinates
+  const openGoogleMaps = () => {
+    if (!localData.destinationCoordinates) return;
+
+    const { lat, lng } = localData.destinationCoordinates;
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    window.open(googleMapsUrl, "_blank");
+    console.log("Opening Google Maps:", googleMapsUrl);
+  };
+
+  return (
+    <div className="mb-10">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+          <MapPin size={28} />
+        </div>
+        <div>
+          <h2 className="text-gray-900 text-2xl font-bold">
+            Primary Daily Destination
+          </h2>
+          <p className="text-gray-500 text-base">
+            Where do you go most often? Helps us find properties with optimal
+            commute times
           </p>
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col px-4 sm:px-6 md:px-8 pt-4 md:pt-8">
-        {/* Mobile Progress Bar */}
-        <div className="md:hidden flex flex-col gap-3 mb-6">
-          <div className="rounded-full bg-gray-200 overflow-hidden h-1.5">
-            <div
-              className="h-full rounded-full bg-green-600 transition-all duration-500 ease-out"
-              style={{ width: "85%" }}
-            ></div>
-          </div>
-          <div className="flex items-center justify-center gap-2.5 py-4">
-            <div className="h-1.5 w-6 rounded-full bg-green-600/20"></div>
-            <div className="h-1.5 w-6 rounded-full bg-green-600/20"></div>
-            <div className="h-1.5 w-10 rounded-full bg-green-600"></div>
-            <div className="h-1.5 w-6 rounded-full bg-gray-300"></div>
-          </div>
+      {/* Destination Type Selection */}
+      <div className="mb-6">
+        <p className="text-sm font-bold text-gray-700 mb-3">
+          What is your primary destination?
+        </p>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {destinationOptions.map((destination) => (
+            <button
+              key={destination.id}
+              onClick={() => handleDestinationTypeSelect(destination.id)}
+              className={`flex flex-col items-center justify-center gap-2 p-5 rounded-2xl border-2 transition-all hover:shadow-md ${
+                localData.primaryDestination === destination.id
+                  ? "border-green-600 bg-green-600 text-white shadow-lg shadow-green-600/20 hover:bg-green-700"
+                  : "border-gray-200 bg-gray-50 text-gray-600 hover:border-green-600/30 hover:bg-green-600/5"
+              }`}
+            >
+              <destination.icon size={24} />
+              <span className="text-sm text-center">
+                {destination.name}
+                <br />
+                <span
+                  className={`text-xs font-normal ${
+                    localData.primaryDestination === destination.id
+                      ? "text-green-100"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {destination.description}
+                </span>
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* Desktop Progress Bar */}
-        <div className="hidden md:block mb-8 max-w-4xl mx-auto w-full">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-700 font-medium">Step 6 of 7</span>
-            <span className="text-green-600 font-bold">85% Complete</span>
-          </div>
-          <div className="rounded-full bg-gray-200 overflow-hidden h-2">
-            <div
-              className="h-full rounded-full bg-green-600 transition-all duration-500 ease-out"
-              style={{ width: "85%" }}
-            ></div>
-          </div>
-        </div>
+        {/* Location Selection */}
+        <div className="relative">
+          <p className="text-sm font-bold text-gray-700 mb-3">
+            {localData.primaryDestination === "workplace"
+              ? "Select your workplace or enter custom address"
+              : "Select your university or enter custom address"}
+          </p>
 
-        {/* Desktop Layout */}
-        <div className="hidden md:block max-w-4xl mx-auto w-full">
-          {/* Daily Rhythm Section */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
-                <Sun size={24} />
-              </div>
-              <div>
-                <h3 className="text-gray-900 text-xl font-bold">
-                  Daily Rhythm & Routine
-                </h3>
-                <p className="text-gray-500 text-sm">
-                  Select your lifestyle patterns for better community matching
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button className="flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 border-green-600 bg-green-600 text-white font-bold transition-all shadow-lg shadow-green-600/20">
-                <Sun size={24} />
-                <span className="text-sm">Early Riser</span>
-              </button>
-
-              <button className="flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30">
-                <Moon size={24} />
-                <span className="text-sm">Night Owl</span>
-              </button>
-
-              <button className="flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30">
-                <Laptop size={24} />
-                <span className="text-sm">Work from Home</span>
-              </button>
-
-              <button className="flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30">
-                <Activity size={24} />
-                <span className="text-sm">On-the-Go</span>
-              </button>
-
-              <button className="flex flex-col items-center justify-center gap-3 p-5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-bold transition-all hover:border-green-600/30">
-                <Coffee size={24} />
-                <span className="text-sm">Flexible</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Must-Have Features Section */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="size-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
-                <Key size={24} />
-              </div>
-              <div>
-                <h3 className="text-gray-900 text-xl font-bold">
-                  Must-Have Property Features
-                </h3>
-                <p className="text-gray-500 text-sm">
-                  Select all essential features for your ideal home
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Air Conditioning */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-green-600 bg-green-600/5 transition-all cursor-pointer hover:border-green-700">
-                <input defaultChecked className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Snowflake size={32} className="text-green-600 mb-3" />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Air Conditioning
-                </span>
-              </label>
-
-              {/* High-speed WiFi */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Wifi
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  High-speed WiFi
-                </span>
-              </label>
-
-              {/* Private Bathroom */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-green-600 bg-green-600/5 transition-all cursor-pointer hover:border-green-700">
-                <input defaultChecked className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <ShowerHead size={32} className="text-green-600 mb-3" />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Private Bathroom
-                </span>
-              </label>
-
-              {/* Cooking Allowed */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Utensils
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Cooking Allowed
-                </span>
-              </label>
-
-              {/* Pet Friendly */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <PawPrint
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Pet Friendly
-                </span>
-              </label>
-
-              {/* Gym Access */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Dumbbell
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Gym Access
-                </span>
-              </label>
-
-              {/* Balcony */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Building2
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Balcony
-                </span>
-              </label>
-
-              {/* Swimming Pool */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Waves
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Swimming Pool
-                </span>
-              </label>
-
-              {/* Parking */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Car
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Parking Space
-                </span>
-              </label>
-
-              {/* 24/7 Security */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Lock
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  24/7 Security
-                </span>
-              </label>
-
-              {/* Furnished */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <HomeIcon
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Furnished
-                </span>
-              </label>
-
-              {/* Natural Light */}
-              <label className="group relative flex flex-col items-center justify-center p-5 rounded-xl border-2 border-transparent hover:border-green-600/30 bg-white shadow-sm transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-3 right-3 bg-green-600 text-white rounded-full p-1 hidden group-has-[:checked]:flex">
-                  <Check size={14} className="font-bold" />
-                </div>
-                <Sun
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-sm font-bold text-gray-900 text-center">
-                  Natural Light
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Layout */}
-        <div className="md:hidden max-w-[480px] mx-auto w-full">
-          {/* Mobile Routine Section */}
-          <section className="mb-10">
-            <h3 className="text-gray-900 text-[28px] sm:text-2xl font-bold leading-tight mb-2">
-              What's your daily rhythm?
-            </h3>
-            <p className="text-gray-600 text-sm mb-5">
-              We'll match you with communities that share your vibe.
+          {/* Predefined Locations Grid */}
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-2">
+              Popular{" "}
+              {localData.primaryDestination === "workplace"
+                ? "Workplaces"
+                : "Universities"}{" "}
+              in Cebu:
             </p>
-            <div className="flex gap-3 flex-wrap">
-              <button className="flex h-12 items-center justify-center gap-x-2 rounded-xl bg-green-600 text-white px-5 shadow-lg shadow-green-600/20 font-semibold transition-all">
-                <Sun size={20} />
-                <span className="text-sm">Early Riser</span>
-              </button>
-              <button className="flex h-12 items-center justify-center gap-x-2 rounded-xl bg-white text-gray-900 px-5 border border-gray-200 font-semibold hover:border-green-600 transition-all shadow-sm">
-                <Moon size={20} />
-                <span className="text-sm">Night Owl</span>
-              </button>
-              <button className="flex h-12 items-center justify-center gap-x-2 rounded-xl bg-white text-gray-900 px-5 border border-gray-200 font-semibold hover:border-green-600 transition-all shadow-sm">
-                <Laptop size={20} />
-                <span className="text-sm">Work from Home</span>
-              </button>
-              <button className="flex h-12 items-center justify-center gap-x-2 rounded-xl bg-white text-gray-900 px-5 border border-gray-200 font-semibold hover:border-green-600 transition-all shadow-sm">
-                <Activity size={20} />
-                <span className="text-sm">Always On-the-Go</span>
-              </button>
+            <div className="grid grid-cols-2 gap-3">
+              {localData.primaryDestination &&
+                predefinedLocations[localData.primaryDestination]
+                  ?.slice(0, 4)
+                  .map((location, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePredefinedLocationSelect(location)}
+                      className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                        localData.selectedPredefinedLocation?.name ===
+                        location.name
+                          ? "border-green-600 bg-green-600/10"
+                          : "border-gray-200 bg-white hover:border-green-400"
+                      }`}
+                    >
+                      <MapPin
+                        size={16}
+                        className={
+                          localData.selectedPredefinedLocation?.name ===
+                          location.name
+                            ? "text-green-600"
+                            : "text-gray-400"
+                        }
+                      />
+                      <span className="text-sm text-gray-700 text-left">
+                        {location.name}
+                      </span>
+                    </button>
+                  ))}
             </div>
-          </section>
+          </div>
 
-          {/* Mobile Must Haves Section */}
-          <section className="mb-8">
-            <h3 className="text-gray-900 text-[28px] sm:text-2xl font-bold leading-tight mb-2">
-              What are your must-haves?
-            </h3>
-            <p className="text-gray-600 text-sm mb-5">
-              Select all the features you absolutely need.
+          {/* Custom Location Input */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-600 mb-2">
+              Or enter custom location:
             </p>
-            <div className="grid grid-cols-2 gap-4">
-              {/* Air Conditioning */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-green-600 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group has-[:checked]:bg-green-600/5">
-                <input defaultChecked className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5">
-                  <Check size={16} className="font-bold" />
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <MapPin size={20} />
                 </div>
-                <Snowflake size={32} className="text-green-600 mb-3" />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Air Conditioning
-                </span>
-              </label>
-
-              {/* WiFi */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-transparent hover:border-green-600/30 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group shadow-sm has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5 hidden group-has-[:checked]:flex">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <Wifi
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 group-hover:text-green-600 mb-3 transition-colors"
+                <input
+                  type="text"
+                  placeholder={
+                    localData.primaryDestination === "workplace"
+                      ? "e.g., Your office address"
+                      : "e.g., Your campus address"
+                  }
+                  value={localData.destinationLocation}
+                  onChange={handleLocationInputChange}
+                  className="w-full pl-12 pr-12 py-3 text-lg rounded-xl border-2 border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-600/20 focus:border-green-600 transition-all"
+                  autoComplete="off"
                 />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  High-speed WiFi
-                </span>
-              </label>
-
-              {/* Private Bathroom */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-green-600 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group has-[:checked]:bg-green-600/5">
-                <input defaultChecked className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <Bath size={32} className="text-green-600 mb-3" />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Private Bathroom
-                </span>
-              </label>
-
-              {/* Cooking Allowed */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-transparent hover:border-green-600/30 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group shadow-sm has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5 hidden group-has-[:checked]:flex">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <Utensils
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 group-hover:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Cooking Allowed
-                </span>
-              </label>
-
-              {/* Pet Friendly */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-transparent hover:border-green-600/30 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group shadow-sm has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5 hidden group-has-[:checked]:flex">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <PawPrint
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 group-hover:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Pet Friendly
-                </span>
-              </label>
-
-              {/* Gym Access */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-transparent hover:border-green-600/30 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group shadow-sm has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5 hidden group-has-[:checked]:flex">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <Dumbbell
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 group-hover:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Gym Access
-                </span>
-              </label>
-
-              {/* Balcony */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-transparent hover:border-green-600/30 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group shadow-sm has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5 hidden group-has-[:checked]:flex">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <Building2
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 group-hover:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Balcony
-                </span>
-              </label>
-
-              {/* Swimming Pool */}
-              <label className="relative aspect-square bg-white rounded-2xl border-2 border-transparent hover:border-green-600/30 flex flex-col items-center justify-center p-4 transition-all cursor-pointer group shadow-sm has-[:checked]:border-green-600 has-[:checked]:bg-green-600/5">
-                <input className="hidden" type="checkbox" />
-                <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-0.5 hidden group-has-[:checked]:flex">
-                  <Check size={16} className="font-bold" />
-                </div>
-                <Waves
-                  size={32}
-                  className="text-gray-400 group-has-[:checked]:text-green-600 group-hover:text-green-600 mb-3 transition-colors"
-                />
-                <span className="text-xs font-bold text-gray-900 text-center">
-                  Swimming Pool
-                </span>
-              </label>
+                {localData.destinationLocation && (
+                  <button
+                    onClick={handleClearLocation}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
+                    type="button"
+                  >
+                    <X size={20} />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={handleCustomLocationSubmit}
+                className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2"
+              >
+                <Search size={20} />
+                <span className="font-medium">Set</span>
+              </button>
             </div>
-          </section>
+          </div>
+
+          {/* Selected Location Display */}
+          {localData.destinationAddress && (
+            <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
+              <div className="flex items-start gap-3">
+                <Check
+                  size={20}
+                  className="text-green-600 mt-0.5 flex-shrink-0"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-green-800 font-medium text-base">
+                      Location Selected
+                    </p>
+                    {localData.destinationCoordinates && (
+                      <button
+                        onClick={openGoogleMaps}
+                        className="flex items-center gap-2 px-3 py-1 bg-white text-green-600 border border-green-300 rounded-lg hover:bg-green-50 transition-colors text-sm"
+                      >
+                        <ExternalLink size={14} />
+                        View on Google Maps
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-green-700 text-sm font-medium mb-1">
+                    {localData.destinationLocation}
+                  </p>
+                  <p className="text-green-600 text-xs">
+                    {localData.destinationAddress}
+                  </p>
+                  {localData.destinationCoordinates && (
+                    <div className="mt-2 flex items-center gap-2 text-xs">
+                      <span className="text-green-700 bg-white px-2 py-1 rounded border border-green-200">
+                        Latitude:{" "}
+                        {localData.destinationCoordinates.lat.toFixed(6)}
+                      </span>
+                      <span className="text-green-700 bg-white px-2 py-1 rounded border border-green-200">
+                        Longitude:{" "}
+                        {localData.destinationCoordinates.lng.toFixed(6)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
+    </div>
+  );
+};
+
+// ==================== DAILY RHYTHM SECTION ====================
+const DailyRhythmAndRoutine = ({
+  localData,
+  updateLocalData,
+  updateLifestyleData,
+}) => {
+  // Daily rhythm options
+  const rhythmOptions = [
+    {
+      id: "early",
+      name: "Early Riser / Standard Day",
+      description: "Active mostly 6 AM – 6 PM",
+      icon: Sun,
+    },
+    {
+      id: "night",
+      name: "Night Owl",
+      description: "Active mostly late night / Overnight",
+      icon: Moon,
+    },
+    {
+      id: "mixed",
+      name: "Mixed / Irregular",
+      description: "My schedule changes daily",
+      icon: Activity,
+    },
+    {
+      id: "flexible",
+      name: "Flexible",
+      description: "I set my own hours",
+      icon: Coffee,
+    },
+  ];
+
+  // Handle daily rhythm selection
+  const handleRhythmSelect = (rhythmId) => {
+    const updatedData = {
+      ...localData,
+      dailyRhythm: rhythmId,
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("Daily Rhythm Selected:", rhythmId);
+  };
+
+  return (
+    <div className="mb-10">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+          <Sun size={28} />
+        </div>
+        <div>
+          <h2 className="text-gray-900 text-2xl font-bold">
+            Daily Rhythm & Routine
+          </h2>
+          <p className="text-gray-500 text-base">
+            Select your lifestyle patterns for better community matching
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        {rhythmOptions.map((rhythm) => (
+          <button
+            key={rhythm.id}
+            onClick={() => handleRhythmSelect(rhythm.id)}
+            className={`flex flex-col items-center justify-center gap-2 p-5 rounded-2xl border-2 transition-all hover:shadow-md ${
+              localData.dailyRhythm === rhythm.id
+                ? "border-green-600 bg-green-600 text-white shadow-lg shadow-green-600/20 hover:bg-green-700"
+                : "border-gray-200 bg-gray-50 text-gray-600 hover:border-green-600/30 hover:bg-green-600/5"
+            }`}
+          >
+            <rhythm.icon size={24} />
+            <span className="text-sm text-center">
+              {rhythm.name.split(" / ")[0]}
+              <br />
+              <span
+                className={`text-xs font-normal ${
+                  localData.dailyRhythm === rhythm.id
+                    ? "text-green-100"
+                    : "text-gray-500"
+                }`}
+              >
+                {rhythm.description}
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ==================== DAILY TRANSPORTATION METHOD ====================
+const DailyTransportationMethod = ({
+  localData,
+  updateLocalData,
+  updateLifestyleData,
+}) => {
+  // Transportation options
+  const transportOptions = [
+    {
+      id: "public",
+      name: "Public Transit",
+      description: "Jeepney/Bus",
+      icon: Bus,
+    },
+    {
+      id: "private",
+      name: "Private Vehicle",
+      description: "Car/Motor",
+      icon: Car,
+    },
+    {
+      id: "active",
+      name: "Active Transport",
+      description: "Walk/Bike",
+      icon: Bike,
+    },
+    {
+      id: "ride",
+      name: "Ride-Hailing",
+      description: "Grab/Taxi",
+      icon: CarTaxiFront,
+    },
+  ];
+
+  // Handle transportation selection
+  const handleTransportSelect = (transportId) => {
+    const updatedData = {
+      ...localData,
+      transportation: transportId,
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("Transportation Selected:", transportId);
+  };
+
+  return (
+    <div className="mb-10">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+          <Bus size={28} />
+        </div>
+        <div>
+          <h2 className="text-gray-900 text-2xl font-bold">
+            Daily Transportation Method
+          </h2>
+          <p className="text-gray-500 text-base">
+            How do you typically get around?
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        {transportOptions.map((transport) => (
+          <button
+            key={transport.id}
+            onClick={() => handleTransportSelect(transport.id)}
+            className={`flex flex-col items-center justify-center gap-2 p-5 rounded-2xl border-2 transition-all hover:shadow-md ${
+              localData.transportation === transport.id
+                ? "border-green-600 bg-green-600 text-white shadow-lg shadow-green-600/20 hover:bg-green-700"
+                : "border-gray-200 bg-gray-50 text-gray-600 hover:border-green-600/30 hover:bg-green-600/5"
+            }`}
+          >
+            <transport.icon size={24} />
+            <span className="text-sm text-center">
+              {transport.name}
+              <br />
+              <span
+                className={`text-xs font-normal ${
+                  localData.transportation === transport.id
+                    ? "text-green-100"
+                    : "text-gray-500"
+                }`}
+              >
+                {transport.description}
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ==================== MUST-HAVE FEATURES SECTION ====================
+const MustHaveFeatures = ({
+  localData,
+  updateLocalData,
+  updateLifestyleData,
+}) => {
+  // All available features
+  const allFeatures = [
+    { id: "aircon", name: "Air Conditioning", icon: Snowflake },
+    { id: "wifi", name: "High-speed WiFi", icon: Wifi },
+    { id: "private-bathroom", name: "Private Bathroom", icon: ShowerHead },
+    { id: "cooking", name: "Cooking Allowed", icon: Utensils },
+    { id: "pet-friendly", name: "Pet Friendly", icon: PawPrint },
+    { id: "gym", name: "Gym Access", icon: Dumbbell },
+    { id: "balcony", name: "Balcony", icon: Building2 },
+    { id: "pool", name: "Swimming Pool", icon: Waves },
+    { id: "security", name: "24/7 Security", icon: Lock },
+  ];
+
+  // Get feature details by ID
+  const getFeatureDetails = (featureId) => {
+    return allFeatures.find((feature) => feature.id === featureId);
+  };
+
+  // Toggle feature selection
+  const toggleFeature = (featureId) => {
+    let newFeatures;
+
+    if (localData.mustHaveFeatures.includes(featureId)) {
+      // Remove feature if already selected
+      newFeatures = localData.mustHaveFeatures.filter((id) => id !== featureId);
+    } else {
+      // Add feature
+      newFeatures = [...localData.mustHaveFeatures, featureId];
+    }
+
+    const updatedData = {
+      ...localData,
+      mustHaveFeatures: newFeatures,
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+
+    console.log("Must-Have Features Updated:", newFeatures);
+    console.log("Total Features Selected:", newFeatures.length);
+  };
+
+  // Clear all feature selections
+  const clearAllFeatures = () => {
+    const updatedData = {
+      ...localData,
+      mustHaveFeatures: [],
+    };
+
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+    console.log("All features cleared");
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-4 mb-6">
+        <div className="size-14 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center">
+          <HomeIcon size={28} />
+        </div>
+        <div>
+          <h2 className="text-gray-900 text-2xl font-bold">
+            Must-Have Property Features
+          </h2>
+          <p className="text-gray-500 text-base">
+            Select all essential features for your ideal home
+          </p>
+        </div>
+      </div>
+
+      {/* Selected features count and actions */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="px-4 py-3 bg-green-50 rounded-xl">
+          <p className="text-green-700 text-lg">
+            <span className="font-bold">
+              {localData.mustHaveFeatures.length}
+            </span>{" "}
+            features selected
+          </p>
+        </div>
+
+        {localData.mustHaveFeatures.length > 0 && (
+          <button
+            onClick={clearAllFeatures}
+            className="px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors text-base font-medium"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
+
+      {/* Selected Features Display */}
+      {localData.mustHaveFeatures.length > 0 && (
+        <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Check size={16} className="text-green-600" />
+            <p className="text-green-800 font-medium">Selected Features:</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {localData.mustHaveFeatures.map((featureId, index) => {
+              const feature = getFeatureDetails(featureId);
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 px-3 py-2 bg-white border border-green-200 rounded-lg"
+                >
+                  {feature && (
+                    <feature.icon size={16} className="text-green-600" />
+                  )}
+                  <span className="text-green-700 font-medium text-sm">
+                    {feature ? feature.name : featureId}
+                  </span>
+                  <button
+                    onClick={() => toggleFeature(featureId)}
+                    className="ml-1 text-red-500 hover:text-red-700"
+                    aria-label={`Remove ${feature ? feature.name : featureId}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-3 gap-4">
+        {allFeatures.map((feature) => (
+          <button
+            key={feature.id}
+            onClick={() => toggleFeature(feature.id)}
+            className={`group relative flex flex-col items-center justify-center gap-2 p-5 rounded-2xl border-2 transition-all hover:shadow-md ${
+              localData.mustHaveFeatures.includes(feature.id)
+                ? "border-green-600 bg-green-600/5 hover:bg-green-600/10"
+                : "border-gray-200 bg-gray-50 hover:border-green-600/30 hover:bg-green-600/5"
+            }`}
+          >
+            {/* Circular Checkbox */}
+            <div
+              className={`size-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                localData.mustHaveFeatures.includes(feature.id)
+                  ? "border-green-600 bg-green-600"
+                  : "border-gray-300 bg-white group-hover:border-green-400"
+              }`}
+            >
+              {localData.mustHaveFeatures.includes(feature.id) && (
+                <Check size={18} className="text-white" />
+              )}
+            </div>
+
+            <feature.icon
+              size={28}
+              className={
+                localData.mustHaveFeatures.includes(feature.id)
+                  ? "text-green-600"
+                  : "text-gray-600 group-hover:text-green-500"
+              }
+            />
+            <span
+              className={`text-sm font-bold text-center ${
+                localData.mustHaveFeatures.includes(feature.id)
+                  ? "text-gray-900"
+                  : "text-gray-900"
+              }`}
+            >
+              {feature.name}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ==================== SELECTED SUMMARY ====================
+const SelectedSummary = ({ localData }) => {
+  // Helper functions for display
+  const getSelectedRhythmDisplay = () => {
+    const rhythmOptions = [
+      { id: "early", name: "Early Riser" },
+      { id: "night", name: "Night Owl" },
+      { id: "mixed", name: "Mixed Schedule" },
+      { id: "flexible", name: "Flexible" },
+    ];
+    const rhythm = rhythmOptions.find((r) => r.id === localData.dailyRhythm);
+    return rhythm ? rhythm.name : "Not selected";
+  };
+
+  const getSelectedTransportDisplay = () => {
+    const transportOptions = [
+      { id: "public", name: "Public Transit" },
+      { id: "private", name: "Private Vehicle" },
+      { id: "active", name: "Active Transport" },
+      { id: "ride", name: "Ride-Hailing" },
+    ];
+    const transport = transportOptions.find(
+      (t) => t.id === localData.transportation,
+    );
+    return transport ? transport.name : "Not selected";
+  };
+
+  const getSelectedDestinationTypeDisplay = () => {
+    const destinationOptions = [
+      { id: "workplace", name: "Workplace" },
+      { id: "university", name: "University" },
+    ];
+    const destination = destinationOptions.find(
+      (d) => d.id === localData.primaryDestination,
+    );
+    return destination ? destination.name : "Not selected";
+  };
+
+  return (
+    <div className="mt-8 p-6 bg-green-50 rounded-xl border border-green-200">
+      <h4 className="text-green-800 text-lg font-bold mb-3">
+        Your Lifestyle Preferences
+      </h4>
+      <div className="grid grid-cols-2 gap-6">
+        <div>
+          <p className="text-sm text-gray-600">Daily Rhythm</p>
+          <p className="text-green-700 font-bold">
+            {getSelectedRhythmDisplay()}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Transportation</p>
+          <p className="text-green-700 font-bold">
+            {getSelectedTransportDisplay()}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Primary Destination</p>
+          <p className="text-green-700 font-bold">
+            {getSelectedDestinationTypeDisplay()}
+          </p>
+          {localData.destinationLocation && (
+            <p className="text-green-600 text-xs truncate">
+              {localData.destinationLocation}
+            </p>
+          )}
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Features Selected</p>
+          <p className="text-green-700 font-bold">
+            {localData.mustHaveFeatures.length}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== INFO BOX ====================
+const InfoBox = () => {
+  return (
+    <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+      <div className="flex items-start gap-2">
+        <Info size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
+        <div className="space-y-1">
+          <p className="text-green-800 text-sm font-semibold">
+            Lifestyle & Features Tips
+          </p>
+          <p className="text-green-700 text-xs leading-relaxed">
+            • Early risers match well with quiet communities
+            <br />
+            • Public transit users: prioritize locations near transport hubs
+            <br />
+            • Must-have features help us filter perfect matches
+            <br />
+            • Providing your daily destination helps optimize commute times
+            <br />• Air conditioning and WiFi are most requested features
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== MOBILE LAYOUT COMPONENTS ====================
+const MobilePrimaryDestination = ({
+  localData,
+  updateLocalData,
+  updateLifestyleData,
+}) => {
+  // Similar to desktop but with mobile layout
+  const destinationOptions = [
+    { id: "workplace", name: "Workplace", icon: Building },
+    { id: "university", name: "University", icon: School },
+  ];
+
+  const handleDestinationTypeSelect = (type) => {
+    const updatedData = {
+      ...localData,
+      primaryDestination: type,
+      destinationLocation: "",
+      destinationCoordinates: null,
+    };
+    updateLocalData(updatedData);
+    updateLifestyleData(updatedData);
+  };
+
+  const handleLocationInputChange = (e) => {
+    updateLocalData({ ...localData, destinationLocation: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    if (localData.destinationLocation.trim()) {
+      const updatedData = {
+        ...localData,
+        destinationCoordinates: { lat: 10.3157, lng: 123.8854 },
+      };
+      updateLocalData(updatedData);
+      updateLifestyleData(updatedData);
+    }
+  };
+
+  return (
+    <div className="mb-8">
+      <h2 className="text-gray-900 text-xl font-bold mb-4">
+        Primary Destination
+      </h2>
+
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        {destinationOptions.map((dest) => (
+          <button
+            key={dest.id}
+            onClick={() => handleDestinationTypeSelect(dest.id)}
+            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl ${
+              localData.primaryDestination === dest.id
+                ? "bg-green-600 text-white"
+                : "bg-white border border-gray-300"
+            }`}
+          >
+            <dest.icon size={20} />
+            <span className="text-sm">{dest.name}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="relative mb-4">
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <MapPin size={18} className="text-gray-400" />
+        </div>
+        <input
+          type="text"
+          placeholder={
+            localData.primaryDestination === "workplace"
+              ? "Enter workplace"
+              : "Enter university"
+          }
+          value={localData.destinationLocation}
+          onChange={handleLocationInputChange}
+          className="w-full pl-10 pr-10 py-3 border-2 border-gray-300 rounded-xl"
+        />
+        {localData.destinationLocation && (
+          <button
+            onClick={() =>
+              updateLocalData({ ...localData, destinationLocation: "" })
+            }
+            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+          >
+            <X size={18} className="text-gray-400" />
+          </button>
+        )}
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        className="w-full bg-green-600 text-white py-3 rounded-xl font-medium"
+      >
+        Set Location
+      </button>
+    </div>
+  );
+};
+
+// ==================== MAIN COMPONENT ====================
+const LifestyleAndFeatures = ({ formData, updateFormData }) => {
+  // Local state for this component
+  const [localData, setLocalData] = useState({
+    dailyRhythm: formData.dailyRhythm || "early",
+    transportation: formData.transportation || "public",
+    mustHaveFeatures: formData.mustHaveFeatures || [
+      "aircon",
+      "private-bathroom",
+    ],
+    lifestyleFeatures: formData.lifestyleFeatures || [],
+    preferredAmenities: formData.preferredAmenities || [],
+    primaryDestination: formData.primaryDestination || "workplace",
+    destinationLocation: formData.destinationLocation || "",
+    destinationAddress: formData.destinationAddress || "",
+    destinationCoordinates: formData.destinationCoordinates || null,
+    selectedPredefinedLocation: null,
+    searchQuery: "",
+  });
+
+  // Update local state when formData prop changes
+  useEffect(() => {
+    setLocalData({
+      dailyRhythm: formData.dailyRhythm || "early",
+      transportation: formData.transportation || "public",
+      mustHaveFeatures: formData.mustHaveFeatures || [
+        "aircon",
+        "private-bathroom",
+      ],
+      lifestyleFeatures: formData.lifestyleFeatures || [],
+      preferredAmenities: formData.preferredAmenities || [],
+      primaryDestination: formData.primaryDestination || "workplace",
+      destinationLocation: formData.destinationLocation || "",
+      destinationAddress: formData.destinationAddress || "",
+      destinationCoordinates: formData.destinationCoordinates || null,
+      selectedPredefinedLocation: null,
+      searchQuery: "",
+    });
+  }, [formData]);
+
+  // Update parent form data
+  const updateLifestyleData = (data) => {
+    const lifestyleData = {
+      dailyRhythm: data.dailyRhythm,
+      transportation: data.transportation,
+      mustHaveFeatures: data.mustHaveFeatures,
+      lifestyleFeatures: data.lifestyleFeatures,
+      preferredAmenities: data.preferredAmenities,
+      primaryDestination: data.primaryDestination,
+      destinationLocation: data.destinationLocation,
+      destinationAddress: data.destinationAddress,
+      destinationCoordinates: data.destinationCoordinates,
+    };
+
+    updateFormData("lifestyle", lifestyleData);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col font-display">
+      {/* Desktop Layout */}
+      <div className="hidden lg:block max-w-4xl mx-auto w-full mt-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <PrimaryDestination
+            localData={localData}
+            updateLocalData={setLocalData}
+            updateLifestyleData={updateLifestyleData}
+          />
+
+          <DailyRhythmAndRoutine
+            localData={localData}
+            updateLocalData={setLocalData}
+            updateLifestyleData={updateLifestyleData}
+          />
+
+          <DailyTransportationMethod
+            localData={localData}
+            updateLocalData={setLocalData}
+            updateLifestyleData={updateLifestyleData}
+          />
+
+          <MustHaveFeatures
+            localData={localData}
+            updateLocalData={setLocalData}
+            updateLifestyleData={updateLifestyleData}
+          />
+
+          <SelectedSummary localData={localData} />
+          <InfoBox />
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="lg:hidden flex flex-col px-4 pt-6 max-w-[480px] mx-auto w-full">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <MobilePrimaryDestination
+            localData={localData}
+            updateLocalData={setLocalData}
+            updateLifestyleData={updateLifestyleData}
+          />
+
+          {/* Mobile versions of other components would go here */}
+          <div className="text-center py-4 text-gray-500">
+            Complete the form on desktop for full experience
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

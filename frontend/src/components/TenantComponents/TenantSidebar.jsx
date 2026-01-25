@@ -36,13 +36,6 @@ const TenantSidebar = () => {
       path: "/tenant-chat",
     },
     {
-      id: "listings",
-      label: "Listings",
-      icon: <Filter className="w-6 h-6" />,
-      badge: null,
-      path: "/tenant-listings",
-    },
-    {
       id: "transactions",
       label: "Transactions",
       icon: <TrendingUp className="w-6 h-6" />,

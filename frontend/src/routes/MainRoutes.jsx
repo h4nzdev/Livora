@@ -6,6 +6,7 @@ import Favorites from "../page/MainPage/Favorites";
 import Chat from "../page/MainPage/Chat";
 import Listings from "../page/MainPage/Listings";
 import Transactions from "../page/MainPage/Transactions";
+import Profile from "../page/MainPage/Profile";
 
 const MainRoutes = () => {
   return (
@@ -37,18 +38,18 @@ const MainRoutes = () => {
           }
         />
         <Route
-          path="/tenant-listings"
-          element={
-            <TenantLayout>
-              <Listings />
-            </TenantLayout>
-          }
-        />
-        <Route
           path="/tenant-transactions"
           element={
             <TenantLayout>
               <Transactions />
+            </TenantLayout>
+          }
+        />
+        <Route
+          path="/tenant-profile"
+          element={
+            <TenantLayout>
+              <Profile />
             </TenantLayout>
           }
         />
