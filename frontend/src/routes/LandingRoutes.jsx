@@ -6,6 +6,7 @@ import Login from "../page/Authentication/Login";
 import Register from "../page/Authentication/Register";
 import Results from "../page/Results/Results";
 import PropertyDetails from "../page/PropertyDetails/PropertyDetails";
+import LandlordDashboard from "../page/LandlordPage/LandlordDashboard";
 
 const LandingRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const LandingRoutes = () => {
         <Route path="/matching" element={<Matching />} />
         <Route path="/results" element={<Results />} />
         <Route path="/property" element={<PropertyDetails />} />
+        <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
 
         {/* Redirect any unknown paths to landing page */}
         <Route path="*" element={<LandingPage />} />
