@@ -18,6 +18,9 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// LocalStorage key for saving user preferences
+const LOCAL_STORAGE_KEY = "userPreferences";
+
 const Matching = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
@@ -90,10 +93,69 @@ const Matching = () => {
     return stepValidation[stepKey];
   };
 
-  const handleSplashFinish = () => {
-    setShowSplash(false);
+  // Function to save form data to localStorage
+  const saveToLocalStorage = () => {
+    try {
+      const dataToSave = {
+        formData,
+        currentStep,
+        stepValidation,
+        lastUpdated: new Date().toISOString(),
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+      console.log("Saved preferences to localStorage");
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+    }
   };
 
+  // Function to load form data from localStorage
+  const loadFromLocalStorage = () => {
+    try {
+      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+
+        // Check if data is not too old (optional - you can remove this if you want to keep data forever)
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const lastUpdated = new Date(parsedData.lastUpdated);
+
+        if (lastUpdated > oneWeekAgo) {
+          setFormData(parsedData.formData || formData);
+          setCurrentStep(parsedData.currentStep || 0);
+          setStepValidation(parsedData.stepValidation || stepValidation);
+          console.log("Loaded preferences from localStorage");
+          return true;
+        } else {
+          console.log("LocalStorage data is too old, clearing...");
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading from localStorage:", error);
+      // Clear corrupted data
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    }
+    return false;
+  };
+
+  // Function to clear saved preferences
+  const clearLocalStorage = () => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      console.log("Cleared preferences from localStorage");
+    } catch (error) {
+      console.error("Error clearing localStorage:", error);
+    }
+  };
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage();
+  }, [formData, currentStep, stepValidation]);
+
+  // Load saved data when component mounts
   useEffect(() => {
     const timer = setTimeout(() => {
       if (showSplash) {
@@ -101,8 +163,22 @@ const Matching = () => {
       }
     }, 1500);
 
-    return () => clearTimeout(timer);
+    // Load saved data after splash screen
+    const loadDataTimer = setTimeout(() => {
+      loadFromLocalStorage();
+    }, 1600);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(loadDataTimer);
+    };
   }, []);
+
+  const handleSplashFinish = () => {
+    setShowSplash(false);
+    // Load saved data immediately when user manually skips splash
+    loadFromLocalStorage();
+  };
 
   const steps = [
     {
@@ -223,6 +299,10 @@ const Matching = () => {
         "recommendationResults",
         JSON.stringify(response.data),
       );
+
+      // OPTIONAL: Clear the saved preferences after successful submission
+      // Uncomment the next line if you want to clear saved data after finding matches
+      // clearLocalStorage();
 
       // Navigate to results page
       navigate("/results", { state: { recommendations: response.data } });

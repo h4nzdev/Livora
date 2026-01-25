@@ -33,7 +33,8 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import SplashScreen from "../../components/SplashScreen";
-import Matching from "../Matching/Matching";
+// Remove the Matching import since we're navigating directly
+// import Matching from "../Matching/Matching";
 
 // Create axios instance
 const api = axios.create({
@@ -87,6 +88,9 @@ const Results = () => {
   // Modal states
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  // REMOVED: showMatchingModal state since we'll navigate directly
+  // const [showMatchingModal, setShowMatchingModal] = useState(false);
 
   // Sorting state
   const [sortOption, setSortOption] = useState("best_match");
@@ -500,24 +504,14 @@ const Results = () => {
     navigate(-1);
   };
 
-  // Handle opening matching modal
+  // Handle opening matching page - SIMPLIFIED VERSION
   const handleEditPreferences = () => {
-    setShowMatchingModal(true);
+    // Simply navigate to the Matching page
+    // The Matching page will load saved preferences from localStorage
+    navigate("/matching");
   };
 
-  // Handle closing matching modal and refreshing results
-  const handleMatchingComplete = (newRecommendations) => {
-    setShowMatchingModal(false);
-    if (newRecommendations) {
-      // Update localStorage and state with new recommendations
-      localStorage.setItem(
-        "recommendationResults",
-        JSON.stringify(newRecommendations),
-      );
-      // Refresh the page or update state to show new results
-      window.location.reload();
-    }
-  };
+  // REMOVED: handleMatchingComplete function since we're not using modal anymore
 
   // Count active filters
   const countActiveFilters = () => {
