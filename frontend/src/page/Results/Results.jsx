@@ -10,11 +10,8 @@ import {
   Bath,
   Dumbbell,
   Map,
-  Bookmark,
-  MessageCircle,
   User,
   Home,
-  PersonStanding,
   Wifi,
   Car,
   Waves,
@@ -26,9 +23,7 @@ import {
   Calendar,
   Star,
   ChevronDown,
-  ChevronUp,
   Check,
-  SlidersHorizontal,
   X,
   MapPin,
   Clock,
@@ -87,25 +82,13 @@ const Results = () => {
   const [error, setError] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
   const [showNotification, setShowNotification] = useState(true);
+  
+  // Modal states
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   // Sorting state
   const [sortOption, setSortOption] = useState("best_match");
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
-
-  // Filter sections expand/collapse state
-  const [expandedSections, setExpandedSections] = useState({
-    propertyType: true,
-    priceRange: false,
-    leaseDuration: false,
-    amenities: false,
-    features: false,
-  });
-
-  // Get recommendations from location state or localStorage
-  const recommendations =
-    location.state?.recommendations ||
-    JSON.parse(localStorage.getItem("recommendationResults")) ||
-    null;
 
   // Filters state
   const [selectedFilters, setSelectedFilters] = useState({
@@ -118,6 +101,12 @@ const Results = () => {
     security: false,
     leaseDuration: "all",
   });
+
+  // Get recommendations from location state or localStorage
+  const recommendations =
+    location.state?.recommendations ||
+    JSON.parse(localStorage.getItem("recommendationResults")) ||
+    null;
 
   // Hide notification after 3 seconds
   useEffect(() => {
@@ -136,19 +125,6 @@ const Results = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Toggle filter section
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
-  // Toggle sort dropdown
-  const toggleSortDropdown = () => {
-    setShowSortDropdown(!showSortDropdown);
-  };
 
   // Handle sort option change
   const handleSortChange = (optionId) => {
@@ -177,7 +153,6 @@ const Results = () => {
         return sorted.sort((a, b) => getMatchScore(b) - getMatchScore(a));
       case "best_match":
       default:
-        // For best match, sort by match score first, then rating
         return sorted.sort((a, b) => {
           const scoreA = getMatchScore(a);
           const scoreB = getMatchScore(b);
@@ -287,6 +262,12 @@ const Results = () => {
       leaseDuration: "all",
     });
     setSortOption("best_match");
+    setShowFilterModal(false);
+  };
+
+  // Apply filters and close modal
+  const applyFiltersAndClose = () => {
+    setShowFilterModal(false);
   };
 
   useEffect(() => {
@@ -302,14 +283,12 @@ const Results = () => {
           recommendations.properties &&
           recommendations.properties.length > 0
         ) {
-          // Use properties from recommendations
           console.log(
             "Using properties from recommendations:",
             recommendations.properties,
           );
           propertiesData = recommendations.properties;
         } else {
-          // Fallback: fetch properties from API
           console.log("Fetching properties from API...");
           const response = await api.get("/properties?limit=20");
           propertiesData = response.data.properties || [];
@@ -534,6 +513,243 @@ const Results = () => {
     return count;
   };
 
+  // Filter Modal Component
+  const FilterModal = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white rounded-2xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        {/* Modal Header */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Filter size={24} className="text-green-600" />
+              <h2 className="text-gray-900 text-xl font-bold">Filters</h2>
+            </div>
+            <button
+              onClick={resetFilters}
+              className="text-green-600 text-sm font-semibold hover:text-green-700"
+            >
+              Reset All
+            </button>
+          </div>
+          
+          {/* Active Filters Count */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-gray-700 font-medium">Active Filters</p>
+            <span className="text-green-600 text-sm font-bold">
+              {countActiveFilters()} applied
+            </span>
+          </div>
+          
+          {/* Quick Filter Pills */}
+          <div className="flex flex-wrap gap-2">
+            {selectedFilters.propertyType !== "all" && (
+              <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
+                <span className="text-xs font-medium">
+                  {getPropertyTypeLabel(selectedFilters.propertyType)}
+                </span>
+                <X
+                  size={14}
+                  className="ml-1 cursor-pointer"
+                  onClick={() => handleFilterChange("propertyType", "all")}
+                />
+              </div>
+            )}
+            {selectedFilters.petFriendly && (
+              <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
+                <PawPrint size={14} />
+                <span className="text-xs font-medium">Pet-friendly</span>
+                <X
+                  size={14}
+                  className="ml-1 cursor-pointer"
+                  onClick={() => handleFilterChange("petFriendly", false)}
+                />
+              </div>
+            )}
+            {selectedFilters.maxPrice < 100000 && (
+              <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
+                <span className="text-xs font-medium">
+                  ₱{selectedFilters.maxPrice.toLocaleString()} max
+                </span>
+                <X
+                  size={14}
+                  className="ml-1 cursor-pointer"
+                  onClick={() => handleFilterChange("maxPrice", 100000)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Modal Content */}
+        <div className="p-6 space-y-6">
+          {/* Property Type */}
+          <div>
+            <h3 className="text-gray-900 font-bold mb-4">Property Type</h3>
+            <div className="space-y-2">
+              {PROPERTY_TYPES.map((type) => (
+                <label
+                  key={type.id}
+                  className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all ${
+                    selectedFilters.propertyType === type.id
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }`}
+                  onClick={() => handleFilterChange("propertyType", type.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${
+                        selectedFilters.propertyType === type.id
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {getPropertyTypeIcon(type.id)}
+                    </div>
+                    <span className="font-medium">{type.label}</span>
+                  </div>
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      selectedFilters.propertyType === type.id
+                        ? "border-green-600 bg-green-600"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    {selectedFilters.propertyType === type.id && (
+                      <Check size={12} className="text-white" />
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Price Range */}
+          <div>
+            <h3 className="text-gray-900 font-bold mb-4">Monthly Budget</h3>
+            <div className="px-2 mb-2">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-green-600 font-bold text-lg">
+                  ₱{selectedFilters.maxPrice.toLocaleString()}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="5000"
+                max="100000"
+                step="5000"
+                value={selectedFilters.maxPrice}
+                onChange={(e) =>
+                  handleFilterChange("maxPrice", parseInt(e.target.value))
+                }
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-600 [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+              />
+              <div className="flex justify-between mt-3 text-sm text-gray-500">
+                <span>₱5,000</span>
+                <span>₱100,000</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Amenities */}
+          <div>
+            <h3 className="text-gray-900 font-bold mb-4">Must-Have Amenities</h3>
+            <div className="space-y-3">
+              {AMENITIES_LIST.map((amenity) => (
+                <label
+                  key={amenity.id}
+                  className="flex items-center gap-3 cursor-pointer group"
+                  onClick={() => toggleAmenityFilter(amenity.id)}
+                >
+                  <div
+                    className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center border-2 transition-all ${
+                      selectedFilters.amenities.includes(amenity.id)
+                        ? "border-green-600 bg-green-600"
+                        : "border-gray-300 group-hover:border-green-400"
+                    }`}
+                  >
+                    {selectedFilters.amenities.includes(amenity.id) && (
+                      <Check size={14} className="text-white" />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-1">
+                    {amenity.icon}
+                    <span className="text-gray-700 font-medium">
+                      {amenity.label}
+                    </span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Additional Features */}
+          <div>
+            <h3 className="text-gray-900 font-bold mb-4">Additional Features</h3>
+            <div className="space-y-3">
+              {[
+                {
+                  id: "petFriendly",
+                  label: "Pet-friendly",
+                  icon: <PawPrint size={18} />,
+                },
+                {
+                  id: "security",
+                  label: "24/7 Security",
+                  icon: <Shield size={18} />,
+                },
+                {
+                  id: "furnished",
+                  label: "Fully Furnished",
+                  icon: <Home size={18} />,
+                },
+              ].map((feature) => (
+                <label
+                  key={feature.id}
+                  className="flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-50"
+                  onClick={() =>
+                    handleFilterChange(
+                      feature.id,
+                      !selectedFilters[feature.id],
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
+                      {feature.icon}
+                    </div>
+                    <span className="font-medium text-gray-700">
+                      {feature.label}
+                    </span>
+                  </div>
+                  <div
+                    className={`w-12 h-6 rounded-full transition-all flex items-center px-1 ${
+                      selectedFilters[feature.id]
+                        ? "bg-green-600 justify-end"
+                        : "bg-gray-300 justify-start"
+                    }`}
+                  >
+                    <div className="w-4 h-4 bg-white rounded-full shadow"></div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6">
+          <button
+            onClick={applyFiltersAndClose}
+            className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/20 transition-all"
+          >
+            Apply Filters ({filteredProperties.length} properties)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   // Render splash screen if showing
   if (showSplash) {
     return <SplashScreen />;
@@ -608,6 +824,9 @@ const Results = () => {
         </div>
       )}
 
+      {/* Filter Modal */}
+      {showFilterModal && <FilterModal />}
+
       {/* Mobile Top Navigation Bar */}
       <div className="lg:hidden w-full p-4 bg-gray-50/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
         <div className="flex items-center justify-between h-14 max-w-[480px] mx-auto">
@@ -629,7 +848,10 @@ const Results = () => {
               )}
             </div>
           </div>
-          <button className="flex size-10 items-center justify-center rounded-full bg-white shadow-sm border border-gray-200">
+          <button 
+            onClick={() => setShowFilterModal(true)}
+            className="flex size-10 items-center justify-center rounded-full bg-white shadow-sm border border-gray-200"
+          >
             <Filter size={20} className="text-gray-900" />
           </button>
         </div>
@@ -637,369 +859,8 @@ const Results = () => {
 
       {/* Desktop Main Layout */}
       <div className="hidden lg:flex">
-        {/* Desktop Filters Sidebar - Fixed */}
-        <div className="fixed left-0 top-0 h-screen w-80 border-r border-gray-200 bg-white flex flex-col z-30">
-          <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
-            {/* Filters Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <SlidersHorizontal size={24} className="text-green-600" />
-                <h2 className="text-gray-900 text-xl font-bold">Filters</h2>
-              </div>
-              <button
-                onClick={resetFilters}
-                className="text-green-600 text-sm font-semibold hover:text-green-700"
-              >
-                Reset All
-              </button>
-            </div>
-
-            {/* Active Filters */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-gray-700 font-medium">Active Filters</p>
-                <span className="text-green-600 text-sm font-bold">
-                  {countActiveFilters()} applied
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {selectedFilters.propertyType !== "all" && (
-                  <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
-                    <span className="text-xs font-medium">
-                      {getPropertyTypeLabel(selectedFilters.propertyType)}
-                    </span>
-                    <X
-                      size={14}
-                      className="ml-1 cursor-pointer"
-                      onClick={() => handleFilterChange("propertyType", "all")}
-                    />
-                  </div>
-                )}
-                {selectedFilters.petFriendly && (
-                  <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
-                    <PawPrint size={14} />
-                    <span className="text-xs font-medium">Pet-friendly</span>
-                    <X
-                      size={14}
-                      className="ml-1 cursor-pointer"
-                      onClick={() => handleFilterChange("petFriendly", false)}
-                    />
-                  </div>
-                )}
-                {selectedFilters.security && (
-                  <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
-                    <Shield size={14} />
-                    <span className="text-xs font-medium">Security</span>
-                    <X
-                      size={14}
-                      className="ml-1 cursor-pointer"
-                      onClick={() => handleFilterChange("security", false)}
-                    />
-                  </div>
-                )}
-                {selectedFilters.maxPrice < 100000 && (
-                  <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
-                    <span className="text-xs font-medium">
-                      ₱{selectedFilters.maxPrice.toLocaleString()} max
-                    </span>
-                    <X
-                      size={14}
-                      className="ml-1 cursor-pointer"
-                      onClick={() => handleFilterChange("maxPrice", 100000)}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Property Type Filter */}
-            <div className="mb-6">
-              <button
-                onClick={() => toggleSection("propertyType")}
-                className="flex items-center justify-between w-full mb-4"
-              >
-                <h3 className="text-gray-900 font-bold">Property Type</h3>
-                {expandedSections.propertyType ? (
-                  <ChevronUp size={20} className="text-gray-500" />
-                ) : (
-                  <ChevronDown size={20} className="text-gray-500" />
-                )}
-              </button>
-
-              {expandedSections.propertyType && (
-                <div className="space-y-2">
-                  {PROPERTY_TYPES.map((type) => (
-                    <label
-                      key={type.id}
-                      className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all ${
-                        selectedFilters.propertyType === type.id
-                          ? "bg-green-50 border border-green-200"
-                          : "bg-gray-50 hover:bg-gray-100"
-                      }`}
-                      onClick={() =>
-                        handleFilterChange("propertyType", type.id)
-                      }
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`p-2 rounded-lg ${
-                            selectedFilters.propertyType === type.id
-                              ? "bg-green-100 text-green-600"
-                              : "bg-gray-200 text-gray-600"
-                          }`}
-                        >
-                          {getPropertyTypeIcon(type.id)}
-                        </div>
-                        <span className="font-medium">{type.label}</span>
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          selectedFilters.propertyType === type.id
-                            ? "border-green-600 bg-green-600"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        {selectedFilters.propertyType === type.id && (
-                          <Check size={12} className="text-white" />
-                        )}
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Price Range */}
-            <div className="mb-6">
-              <button
-                onClick={() => toggleSection("priceRange")}
-                className="flex items-center justify-between w-full mb-4"
-              >
-                <h3 className="text-gray-900 font-bold">Monthly Budget</h3>
-                {expandedSections.priceRange ? (
-                  <ChevronUp size={20} className="text-gray-500" />
-                ) : (
-                  <ChevronDown size={20} className="text-gray-500" />
-                )}
-              </button>
-
-              {expandedSections.priceRange && (
-                <>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-green-600 font-bold text-lg">
-                      ₱{selectedFilters.maxPrice.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="px-2">
-                    <input
-                      type="range"
-                      min="5000"
-                      max="100000"
-                      step="5000"
-                      value={selectedFilters.maxPrice}
-                      onChange={(e) =>
-                        handleFilterChange("maxPrice", parseInt(e.target.value))
-                      }
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-600 [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
-                    />
-                  </div>
-                  <div className="flex justify-between mt-3 text-sm text-gray-500">
-                    <span>₱5,000</span>
-                    <span>₱100,000</span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Lease Duration Filter */}
-            <div className="mb-6">
-              <button
-                onClick={() => toggleSection("leaseDuration")}
-                className="flex items-center justify-between w-full mb-4"
-              >
-                <h3 className="text-gray-900 font-bold">Lease Duration</h3>
-                {expandedSections.leaseDuration ? (
-                  <ChevronUp size={20} className="text-gray-500" />
-                ) : (
-                  <ChevronDown size={20} className="text-gray-500" />
-                )}
-              </button>
-
-              {expandedSections.leaseDuration && (
-                <div className="space-y-2">
-                  {["all", "short-term", "long-term", "flexible"].map(
-                    (duration) => (
-                      <label
-                        key={duration}
-                        className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all ${
-                          selectedFilters.leaseDuration === duration
-                            ? "bg-green-50 border border-green-200"
-                            : "bg-gray-50 hover:bg-gray-100"
-                        }`}
-                        onClick={() =>
-                          handleFilterChange("leaseDuration", duration)
-                        }
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`p-2 rounded-lg ${
-                              selectedFilters.leaseDuration === duration
-                                ? "bg-green-100 text-green-600"
-                                : "bg-gray-200 text-gray-600"
-                            }`}
-                          >
-                            <Calendar size={16} />
-                          </div>
-                          <span className="font-medium">
-                            {duration === "all"
-                              ? "All Durations"
-                              : duration === "short-term"
-                                ? "Short-term"
-                                : duration === "long-term"
-                                  ? "Long-term"
-                                  : "Flexible"}
-                          </span>
-                        </div>
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            selectedFilters.leaseDuration === duration
-                              ? "border-green-600 bg-green-600"
-                              : "border-gray-300"
-                          }`}
-                        >
-                          {selectedFilters.leaseDuration === duration && (
-                            <Check size={12} className="text-white" />
-                          )}
-                        </div>
-                      </label>
-                    ),
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Amenities Filter */}
-            <div className="mb-6">
-              <button
-                onClick={() => toggleSection("amenities")}
-                className="flex items-center justify-between w-full mb-4"
-              >
-                <h3 className="text-gray-900 font-bold">Must-Have Amenities</h3>
-                {expandedSections.amenities ? (
-                  <ChevronUp size={20} className="text-gray-500" />
-                ) : (
-                  <ChevronDown size={20} className="text-gray-500" />
-                )}
-              </button>
-
-              {expandedSections.amenities && (
-                <div className="space-y-3">
-                  {AMENITIES_LIST.map((amenity) => (
-                    <label
-                      key={amenity.id}
-                      className="flex items-center gap-3 cursor-pointer group"
-                      onClick={() => toggleAmenityFilter(amenity.id)}
-                    >
-                      <div
-                        className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center border-2 transition-all ${
-                          selectedFilters.amenities.includes(amenity.id)
-                            ? "border-green-600 bg-green-600"
-                            : "border-gray-300 group-hover:border-green-400"
-                        }`}
-                      >
-                        {selectedFilters.amenities.includes(amenity.id) && (
-                          <Check size={14} className="text-white" />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 flex-1">
-                        {amenity.icon}
-                        <span className="text-gray-700 font-medium">
-                          {amenity.label}
-                        </span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Additional Features */}
-            <div className="mb-6">
-              <button
-                onClick={() => toggleSection("features")}
-                className="flex items-center justify-between w-full mb-4"
-              >
-                <h3 className="text-gray-900 font-bold">Additional Features</h3>
-                {expandedSections.features ? (
-                  <ChevronUp size={20} className="text-gray-500" />
-                ) : (
-                  <ChevronDown size={20} className="text-gray-500" />
-                )}
-              </button>
-
-              {expandedSections.features && (
-                <div className="space-y-3">
-                  {[
-                    {
-                      id: "petFriendly",
-                      label: "Pet-friendly",
-                      icon: <PawPrint size={18} />,
-                    },
-                    {
-                      id: "security",
-                      label: "24/7 Security",
-                      icon: <Shield size={18} />,
-                    },
-                    {
-                      id: "furnished",
-                      label: "Fully Furnished",
-                      icon: <Home size={18} />,
-                    },
-                  ].map((feature) => (
-                    <label
-                      key={feature.id}
-                      className="flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-50"
-                      onClick={() =>
-                        handleFilterChange(
-                          feature.id,
-                          !selectedFilters[feature.id],
-                        )
-                      }
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
-                          {feature.icon}
-                        </div>
-                        <span className="font-medium text-gray-700">
-                          {feature.label}
-                        </span>
-                      </div>
-                      <div
-                        className={`w-12 h-6 rounded-full transition-all flex items-center px-1 ${
-                          selectedFilters[feature.id]
-                            ? "bg-green-600 justify-end"
-                            : "bg-gray-300 justify-start"
-                        }`}
-                      >
-                        <div className="w-4 h-4 bg-white rounded-full shadow"></div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Update Results Button - Fixed at bottom */}
-          <div className="p-6 border-t border-gray-200 bg-white">
-            <button className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/20 transition-all active:scale-[0.98]">
-              Show {filteredProperties.length} Properties
-            </button>
-          </div>
-        </div>
-
-        {/* Desktop Main Content - Scrollable */}
-        <div className="flex-1 ml-80 min-h-screen overflow-y-auto">
+        {/* Desktop Main Content */}
+        <div className="flex-1 min-h-screen overflow-y-auto">
           {/* Desktop Header */}
           <div className="p-6 sticky top-0 z-20 bg-white/80 backdrop-blur-sm border-b border-gray-100">
             <div className="max-w-5xl mx-auto">
@@ -1019,16 +880,33 @@ const Results = () => {
                     )}
                   </p>
                 </div>
+                
+                {/* Floating Filter Button - Top Right */}
                 <div className="flex items-center gap-4">
                   <button className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 transition-all shadow-sm">
                     <Map size={20} />
                     Map View
                   </button>
+                  
+                  {/* Filter Button */}
+                  <button
+                    onClick={() => setShowFilterModal(true)}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
+                  >
+                    <Filter size={20} />
+                    Filters
+                    {countActiveFilters() > 0 && (
+                      <span className="bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-full ml-1">
+                        {countActiveFilters()}
+                      </span>
+                    )}
+                  </button>
+                  
                   {/* Sort Dropdown */}
                   <div className="relative">
                     <button
-                      onClick={toggleSortDropdown}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
+                      onClick={() => setShowSortDropdown(!showSortDropdown)}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 transition-all shadow-sm"
                     >
                       <TrendingUp size={20} />
                       {getCurrentSortLabel()}
@@ -1345,7 +1223,7 @@ const Results = () => {
       {/* Mobile Layout */}
       <div className="lg:hidden flex-1 flex flex-col px-4 sm:px-6 md:px-8 pt-4 md:pt-8">
         <div className="max-w-[480px] mx-auto w-full">
-          {/* Mobile Filters Bar */}
+          {/* Mobile Quick Filter Pills */}
           <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar">
             <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full">
               <span className="text-sm font-medium">All</span>
@@ -1361,9 +1239,12 @@ const Results = () => {
                 <span className="text-sm font-medium">Pet-friendly</span>
               </button>
             )}
-            <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full">
+            <button 
+              onClick={() => setShowFilterModal(true)}
+              className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full"
+            >
+              <Filter size={14} />
               <span className="text-sm font-medium">More</span>
-              <ChevronDown size={14} />
             </button>
           </div>
 
@@ -1374,7 +1255,7 @@ const Results = () => {
                 {filteredProperties.length} properties
               </span>
               <button
-                onClick={toggleSortDropdown}
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
                 className="flex items-center gap-1 text-green-600 text-sm font-medium"
               >
                 Sort: {getCurrentSortLabel()}
@@ -1427,8 +1308,14 @@ const Results = () => {
                 {error || "Try adjusting your filters or search criteria"}
               </p>
               <button
+                onClick={() => setShowFilterModal(true)}
+                className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold mr-2"
+              >
+                Adjust Filters
+              </button>
+              <button
                 onClick={resetFilters}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold"
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold"
               >
                 Reset Filters
               </button>
