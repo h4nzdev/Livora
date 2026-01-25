@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import SplashScreen from "../../components/SplashScreen";
+import Matching from "../Matching/Matching";
 
 // Create axios instance
 const api = axios.create({
@@ -82,7 +83,7 @@ const Results = () => {
   const [error, setError] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
   const [showNotification, setShowNotification] = useState(true);
-  
+
   // Modal states
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -499,6 +500,25 @@ const Results = () => {
     navigate(-1);
   };
 
+  // Handle opening matching modal
+  const handleEditPreferences = () => {
+    setShowMatchingModal(true);
+  };
+
+  // Handle closing matching modal and refreshing results
+  const handleMatchingComplete = (newRecommendations) => {
+    setShowMatchingModal(false);
+    if (newRecommendations) {
+      // Update localStorage and state with new recommendations
+      localStorage.setItem(
+        "recommendationResults",
+        JSON.stringify(newRecommendations),
+      );
+      // Refresh the page or update state to show new results
+      window.location.reload();
+    }
+  };
+
   // Count active filters
   const countActiveFilters = () => {
     let count = 0;
@@ -531,7 +551,7 @@ const Results = () => {
               Reset All
             </button>
           </div>
-          
+
           {/* Active Filters Count */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-gray-700 font-medium">Active Filters</p>
@@ -539,7 +559,7 @@ const Results = () => {
               {countActiveFilters()} applied
             </span>
           </div>
-          
+
           {/* Quick Filter Pills */}
           <div className="flex flex-wrap gap-2">
             {selectedFilters.propertyType !== "all" && (
@@ -653,7 +673,9 @@ const Results = () => {
 
           {/* Amenities */}
           <div>
-            <h3 className="text-gray-900 font-bold mb-4">Must-Have Amenities</h3>
+            <h3 className="text-gray-900 font-bold mb-4">
+              Must-Have Amenities
+            </h3>
             <div className="space-y-3">
               {AMENITIES_LIST.map((amenity) => (
                 <label
@@ -685,7 +707,9 @@ const Results = () => {
 
           {/* Additional Features */}
           <div>
-            <h3 className="text-gray-900 font-bold mb-4">Additional Features</h3>
+            <h3 className="text-gray-900 font-bold mb-4">
+              Additional Features
+            </h3>
             <div className="space-y-3">
               {[
                 {
@@ -708,10 +732,7 @@ const Results = () => {
                   key={feature.id}
                   className="flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-50"
                   onClick={() =>
-                    handleFilterChange(
-                      feature.id,
-                      !selectedFilters[feature.id],
-                    )
+                    handleFilterChange(feature.id, !selectedFilters[feature.id])
                   }
                 >
                   <div className="flex items-center gap-3">
@@ -848,7 +869,7 @@ const Results = () => {
               )}
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setShowFilterModal(true)}
             className="flex size-10 items-center justify-center rounded-full bg-white shadow-sm border border-gray-200"
           >
@@ -861,9 +882,8 @@ const Results = () => {
       <div className="hidden lg:flex">
         {/* Desktop Main Content */}
         <div className="flex-1 min-h-screen overflow-y-auto">
-          {/* Desktop Header */}
           <div className="p-6 sticky top-0 z-20 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-gray-900 text-3xl font-bold leading-tight">
@@ -880,37 +900,64 @@ const Results = () => {
                     )}
                   </p>
                 </div>
-                
-                {/* Floating Filter Button - Top Right */}
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 transition-all shadow-sm">
-                    <Map size={20} />
-                    Map View
+
+                {/* Floating Action Buttons - Top Right */}
+                <div className="flex items-center gap-3">
+                  {/* Edit Preferences Button */}
+                  <button
+                    onClick={handleEditPreferences}
+                    className="flex items-center gap-2 px-5 py-3 h-12 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 hover:text-green-700 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    Edit Preferences
                   </button>
-                  
+
+                  {/* Map View Button */}
+                  <button className="flex items-center gap-2 px-5 py-3 h-12 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 hover:text-green-700 transition-all shadow-sm hover:shadow-md">
+                    <Map size={20} className="flex-shrink-0" />
+                    <span className="whitespace-nowrap">Map View</span>
+                  </button>
+
                   {/* Filter Button */}
                   <button
                     onClick={() => setShowFilterModal(true)}
-                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
+                    className="flex items-center gap-2 px-5 py-3 h-12 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition-all shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/30"
                   >
-                    <Filter size={20} />
-                    Filters
+                    <Filter size={20} className="flex-shrink-0" />
+                    <span className="whitespace-nowrap">Filters</span>
                     {countActiveFilters() > 0 && (
-                      <span className="bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-full ml-1">
+                      <span className="bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-full min-w-[24px] h-6 flex items-center justify-center">
                         {countActiveFilters()}
                       </span>
                     )}
                   </button>
-                  
+
                   {/* Sort Dropdown */}
                   <div className="relative">
                     <button
                       onClick={() => setShowSortDropdown(!showSortDropdown)}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 transition-all shadow-sm"
+                      className="flex items-center gap-2 px-5 py-3 h-12 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:border-green-600 hover:text-green-700 transition-all shadow-sm hover:shadow-md min-w-[180px]"
                     >
-                      <TrendingUp size={20} />
-                      {getCurrentSortLabel()}
-                      <ChevronDown size={16} />
+                      <TrendingUp size={20} className="flex-shrink-0" />
+                      <span className="flex-1 text-left truncate">
+                        {getCurrentSortLabel()}
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        className={`flex-shrink-0 transition-transform ${showSortDropdown ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {showSortDropdown && (
@@ -927,7 +974,7 @@ const Results = () => {
                               }`}
                             >
                               <div
-                                className={`w-6 h-6 flex items-center justify-center ${
+                                className={`w-6 h-6 flex items-center justify-center flex-shrink-0 ${
                                   sortOption === option.id
                                     ? "text-green-600"
                                     : "text-gray-400"
@@ -935,13 +982,13 @@ const Results = () => {
                               >
                                 {option.icon}
                               </div>
-                              <span className="font-medium">
+                              <span className="font-medium truncate">
                                 {option.label}
                               </span>
                               {sortOption === option.id && (
                                 <Check
                                   size={16}
-                                  className="ml-auto text-green-600"
+                                  className="ml-auto text-green-600 flex-shrink-0"
                                 />
                               )}
                             </button>
@@ -956,8 +1003,8 @@ const Results = () => {
           </div>
 
           {/* Desktop Content */}
-          <div className="p-6">
-            <div className="max-w-5xl mx-auto">
+          <div className="p-6 relative">
+            <div className="max-w-7xl mx-auto">
               {/* Stats Bar */}
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -1004,7 +1051,7 @@ const Results = () => {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     {filteredProperties.map((property) => {
                       const matchPercentage = getMatchScore(property);
                       const isHotProperty = property.price <= 15000;
@@ -1239,7 +1286,7 @@ const Results = () => {
                 <span className="text-sm font-medium">Pet-friendly</span>
               </button>
             )}
-            <button 
+            <button
               onClick={() => setShowFilterModal(true)}
               className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full"
             >
