@@ -92,41 +92,11 @@ const BudgetRange = ({
     handleInputChange(field, numericValue);
   };
 
-  // Validation messages
-  const getValidationMessage = () => {
-    const { minBudget, maxBudget, leaseDuration } = localData;
-
-    if (!minBudget) return "Minimum budget is required";
-    if (!maxBudget) return "Maximum budget is required";
-    if (!leaseDuration) return "Please select a lease duration";
-    if (parseInt(minBudget) <= 0)
-      return "Minimum budget must be greater than 0";
-    if (parseInt(maxBudget) <= parseInt(minBudget))
-      return "Maximum budget must be greater than minimum";
-
-    return null;
-  };
-
-  const validationMessage = getValidationMessage();
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-display">
       {/* Desktop Combined Card - Optimized with larger inputs */}
       <div className="hidden lg:block max-w-4xl mx-auto w-full mt-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Validation Status */}
-          <div
-            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
-          >
-            <p
-              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
-            >
-              {isStepValid
-                ? "✓ All required fields are filled"
-                : `⚠ ${validationMessage || "Please fill all required fields"}`}
-            </p>
-          </div>
-
           {/* Budget Range Section - Enlarged */}
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-6">
@@ -425,19 +395,6 @@ const BudgetRange = ({
       <div className="lg:hidden flex flex-col px-4 pt-6 max-w-[480px] mx-auto w-full">
         {/* Mobile Combined Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          {/* Validation Status */}
-          <div
-            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
-          >
-            <p
-              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
-            >
-              {isStepValid
-                ? "✓ Ready to continue"
-                : `⚠ ${validationMessage || "Complete required fields"}`}
-            </p>
-          </div>
-
           {/* Budget Section - Enlarged */}
           <div className="mb-8">
             <h2 className="text-gray-900 text-xl font-bold mb-4">

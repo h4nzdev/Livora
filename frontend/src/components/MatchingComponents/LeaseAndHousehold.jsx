@@ -12,28 +12,68 @@ import {
   Info,
 } from "lucide-react";
 
-const LeaseAndHousehold = ({ formData, updateFormData }) => {
+const LeaseAndHousehold = ({
+  formData,
+  updateFormData,
+  isStepValid,
+  setIsStepValid,
+}) => {
   // Local state for this component
   const [localData, setLocalData] = useState({
-    householdType: formData.householdSize || "shared",
-    roommateGender: formData.roommateGender || "any",
-    hasSmokeDrink: formData.hasSmokeDrink || "none",
-    housingType: formData.housingType || "apartment",
+    householdType: formData.householdSize || "",
+    roommateGender: formData.roommateGender || "",
+    hasSmokeDrink: formData.hasSmokeDrink || "",
+    housingType: formData.housingType || "",
     hasChildren: formData.hasChildren || false,
     hasPets: formData.hasPets || false,
   });
 
+  // Validate the current step
+  const validateStep = () => {
+    const { householdType, roommateGender, hasSmokeDrink, housingType } =
+      localData;
+
+    // Check if household type is selected
+    if (!householdType) {
+      setIsStepValid(false);
+      return false;
+    }
+
+    // If shared is selected, check roommate gender and smoke/drink preferences
+    if (householdType === "shared") {
+      if (!roommateGender || !hasSmokeDrink) {
+        setIsStepValid(false);
+        return false;
+      }
+    }
+
+    // Check if housing type is selected
+    if (!housingType) {
+      setIsStepValid(false);
+      return false;
+    }
+
+    // All validation passed
+    setIsStepValid(true);
+    return true;
+  };
+
   // Update local state when formData prop changes
   useEffect(() => {
     setLocalData({
-      householdType: formData.householdSize || "shared",
-      roommateGender: formData.roommateGender || "any",
-      hasSmokeDrink: formData.hasSmokeDrink || "none",
-      housingType: formData.housingType || "apartment",
+      householdType: formData.householdSize || "",
+      roommateGender: formData.roommateGender || "",
+      hasSmokeDrink: formData.hasSmokeDrink || "",
+      housingType: formData.housingType || "",
       hasChildren: formData.hasChildren || false,
       hasPets: formData.hasPets || false,
     });
   }, [formData]);
+
+  // Validate whenever localData changes
+  useEffect(() => {
+    validateStep();
+  }, [localData]);
 
   // Handle household type selection
   const handleHouseholdTypeSelect = (type) => {
@@ -42,7 +82,7 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
       householdType: type,
       // Reset conditional fields if not shared
       roommateGender: type === "shared" ? localData.roommateGender : "",
-      hasSmokeDrink: type === "shared" ? localData.hasSmokeDrink : "none",
+      hasSmokeDrink: type === "shared" ? localData.hasSmokeDrink : "",
     };
 
     setLocalData(updatedData);
@@ -192,10 +232,17 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                   Household Setup
                 </h2>
                 <p className="text-gray-500 text-base">
-                  Who will be living with you?
+                  Who will be living with you?{" "}
+                  <span className="text-red-500">*</span>
                 </p>
               </div>
             </div>
+
+            {!localData.householdType && (
+              <p className="text-red-600 text-sm mb-4">
+                Please select a household type
+              </p>
+            )}
 
             <div className="grid grid-cols-4 gap-4 mb-8">
               {/* Solo */}
@@ -258,8 +305,14 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                   {/* Roommate Preference */}
                   <div>
                     <p className="text-sm font-bold text-gray-700 mb-3">
-                      Roommate Preference
+                      Roommate Preference{" "}
+                      <span className="text-red-500">*</span>
                     </p>
+                    {!localData.roommateGender && (
+                      <p className="text-red-600 text-sm mb-2">
+                        Please select an option
+                      </p>
+                    )}
                     <div className="flex bg-gray-100 p-1 rounded-xl">
                       <button
                         onClick={() => handleRoommateGenderSelect("any")}
@@ -297,8 +350,14 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                   {/* Smoking/Drinking Habits */}
                   <div>
                     <p className="text-sm font-bold text-gray-700 mb-3">
-                      Do you smoke or drink?
+                      Do you smoke or drink?{" "}
+                      <span className="text-red-500">*</span>
                     </p>
+                    {!localData.hasSmokeDrink && (
+                      <p className="text-red-600 text-sm mb-2">
+                        Please select an option
+                      </p>
+                    )}
                     <div className="bg-gray-100 p-1 rounded-xl">
                       <div className="grid grid-cols-2 gap-1">
                         <button
@@ -415,10 +474,17 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                   Housing Type
                 </h2>
                 <p className="text-gray-500 text-base">
-                  Select your preferred home type
+                  Select your preferred home type{" "}
+                  <span className="text-red-500">*</span>
                 </p>
               </div>
             </div>
+
+            {!localData.housingType && (
+              <p className="text-red-600 text-sm mb-4">
+                Please select a housing type
+              </p>
+            )}
 
             <div className="grid grid-cols-3 gap-4">
               {/* Apartment Option */}
@@ -552,13 +618,17 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
               <div>
                 <p className="text-sm text-gray-600">Household Type</p>
                 <p className="text-green-700 font-bold">
-                  {getHouseholdDisplayName(localData.householdType)}
+                  {localData.householdType
+                    ? getHouseholdDisplayName(localData.householdType)
+                    : "Not selected"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Housing Type</p>
                 <p className="text-green-700 font-bold">
-                  {getHousingDisplayName(localData.housingType)}
+                  {localData.housingType
+                    ? getHousingDisplayName(localData.housingType)
+                    : "Not selected"}
                 </p>
               </div>
               {localData.householdType === "shared" && (
@@ -566,13 +636,17 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                   <div>
                     <p className="text-sm text-gray-600">Roommate Preference</p>
                     <p className="text-green-700 font-bold">
-                      {getRoommatePreferenceDisplay()}
+                      {localData.roommateGender
+                        ? getRoommatePreferenceDisplay()
+                        : "Not selected"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Smoke/Drink</p>
                     <p className="text-green-700 font-bold">
-                      {getSmokeDrinkDisplay()}
+                      {localData.hasSmokeDrink
+                        ? getSmokeDrinkDisplay()
+                        : "Not selected"}
                     </p>
                   </div>
                 </>
@@ -622,12 +696,17 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
               Current Household Data:
             </p>
             <div className="text-xs text-gray-600 space-y-1">
-              <p>Household Type: {localData.householdType}</p>
+              <p>Household Type: {localData.householdType || "Not selected"}</p>
               <p>Roommate Gender: {localData.roommateGender || "N/A"}</p>
               <p>Smoke/Drink: {localData.hasSmokeDrink || "N/A"}</p>
-              <p>Housing Type: {localData.housingType}</p>
+              <p>Housing Type: {localData.housingType || "Not selected"}</p>
               <p>Has Children: {localData.hasChildren ? "Yes" : "No"}</p>
               <p>Has Pets: {localData.hasPets ? "Yes" : "No"}</p>
+              <p
+                className={`font-medium ${isStepValid ? "text-green-600" : "text-red-600"}`}
+              >
+                Step Valid: {isStepValid ? "Yes" : "No"}
+              </p>
             </div>
           </div>
         </div>
@@ -642,8 +721,15 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
               Household Setup
             </h2>
             <p className="text-gray-600 text-sm mb-6">
-              Who will be living with you?
+              Who will be living with you?{" "}
+              <span className="text-red-500">*</span>
             </p>
+
+            {!localData.householdType && (
+              <p className="text-red-600 text-sm mb-4">
+                Please select a household type
+              </p>
+            )}
 
             <div className="grid grid-cols-2 gap-3 mb-6">
               {/* Solo */}
@@ -705,8 +791,13 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                 {/* Roommate Preference */}
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
-                    Roommate Preference
+                    Roommate Preference <span className="text-red-500">*</span>
                   </p>
+                  {!localData.roommateGender && (
+                    <p className="text-red-600 text-sm mb-2">
+                      Please select an option
+                    </p>
+                  )}
                   <div className="space-y-2">
                     <button
                       onClick={() => handleRoommateGenderSelect("any")}
@@ -744,8 +835,14 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
                 {/* Smoking/Drinking Habits */}
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
-                    Do you smoke or drink?
+                    Do you smoke or drink?{" "}
+                    <span className="text-red-500">*</span>
                   </p>
+                  {!localData.hasSmokeDrink && (
+                    <p className="text-red-600 text-sm mb-2">
+                      Please select an option
+                    </p>
+                  )}
                   <div className="space-y-2">
                     <button
                       onClick={() => handleSmokeDrinkSelect("none")}
@@ -848,8 +945,15 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
               Housing Type
             </h2>
             <p className="text-gray-600 text-sm mb-6">
-              Select your preferred home type
+              Select your preferred home type{" "}
+              <span className="text-red-500">*</span>
             </p>
+
+            {!localData.housingType && (
+              <p className="text-red-600 text-sm mb-4">
+                Please select a housing type
+              </p>
+            )}
 
             <div className="flex flex-col gap-3">
               {/* Apartment Option */}
@@ -978,13 +1082,31 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
             </h4>
             <div className="text-sm text-green-700 space-y-1">
               <p>
-                • Household: {getHouseholdDisplayName(localData.householdType)}
+                • Household:{" "}
+                {localData.householdType
+                  ? getHouseholdDisplayName(localData.householdType)
+                  : "Not selected"}
               </p>
-              <p>• Housing: {getHousingDisplayName(localData.housingType)}</p>
+              <p>
+                • Housing:{" "}
+                {localData.housingType
+                  ? getHousingDisplayName(localData.housingType)
+                  : "Not selected"}
+              </p>
               {localData.householdType === "shared" && (
                 <>
-                  <p>• Roommates: {getRoommatePreferenceDisplay()}</p>
-                  <p>• Smoke/Drink: {getSmokeDrinkDisplay()}</p>
+                  <p>
+                    • Roommates:{" "}
+                    {localData.roommateGender
+                      ? getRoommatePreferenceDisplay()
+                      : "Not selected"}
+                  </p>
+                  <p>
+                    • Smoke/Drink:{" "}
+                    {localData.hasSmokeDrink
+                      ? getSmokeDrinkDisplay()
+                      : "Not selected"}
+                  </p>
                 </>
               )}
               <p>• Children: {localData.hasChildren ? "Yes" : "No"}</p>
@@ -1013,20 +1135,26 @@ const LeaseAndHousehold = ({ formData, updateFormData }) => {
             <p className="text-gray-600 text-xs">
               <span className="font-medium">Current selections:</span>
               <br />
-              Household: {localData.householdType}
+              Household: {localData.householdType || "Not selected"}
               <br />
-              Housing: {localData.housingType}
+              Housing: {localData.housingType || "Not selected"}
               <br />
               {localData.householdType === "shared" && (
                 <>
-                  Roommate: {localData.roommateGender}
+                  Roommate: {localData.roommateGender || "Not selected"}
                   <br />
-                  Smoke/Drink: {localData.hasSmokeDrink}
+                  Smoke/Drink: {localData.hasSmokeDrink || "Not selected"}
                   <br />
                 </>
               )}
               Children: {localData.hasChildren ? "Yes" : "No"} • Pets:{" "}
               {localData.hasPets ? "Yes" : "No"}
+              <br />
+              <span
+                className={`font-medium ${isStepValid ? "text-green-600" : "text-red-600"}`}
+              >
+                Valid: {isStepValid ? "Yes" : "No"}
+              </span>
             </p>
           </div>
         </div>

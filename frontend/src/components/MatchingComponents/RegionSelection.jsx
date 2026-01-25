@@ -102,37 +102,11 @@ const RegionSelection = ({
     return regionNames[regionValue] || regionValue;
   };
 
-  // Validation messages
-  const getValidationMessage = () => {
-    const { region, otherRegion } = localData;
-
-    if (!region) return "Please select a region";
-    if (region === "others" && !otherRegion.trim())
-      return "Please specify your city or region";
-
-    return null;
-  };
-
-  const validationMessage = getValidationMessage();
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-display">
       {/* Desktop Layout - Matching BudgetRange */}
       <div className="hidden lg:block max-w-4xl mx-auto w-full mt-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Validation Status */}
-          <div
-            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
-          >
-            <p
-              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
-            >
-              {isStepValid
-                ? "All required fields are filled"
-                : `${validationMessage || "Please complete all required fields"}`}
-            </p>
-          </div>
-
           {/* Header Section - Enlarged */}
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-6">
@@ -417,19 +391,6 @@ const RegionSelection = ({
       {/* Mobile Layout - Enlarged */}
       <div className="lg:hidden flex flex-col px-4 pt-6 max-w-[480px] mx-auto w-full">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          {/* Validation Status */}
-          <div
-            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
-          >
-            <p
-              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
-            >
-              {isStepValid
-                ? "Ready to continue"
-                : `${validationMessage || "Complete required fields"}`}
-            </p>
-          </div>
-
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-gray-900 text-xl font-bold mb-4">

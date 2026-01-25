@@ -37,8 +37,12 @@ const AreaPreference = ({
 
   // Update local state when formData prop changes
   useEffect(() => {
-    setSelectedAreas(formData.areaPreferences || []);
-  }, [formData]);
+    const areas = formData.areaPreferences || [];
+    setSelectedAreas(areas);
+    // Re-validate after setting state from props
+    const isValid = areas.length >= 1 && areas.length <= 3;
+    setIsStepValid(isValid);
+  }, [formData, setIsStepValid]);
 
   // Validate whenever selectedAreas changes
   useEffect(() => {
@@ -125,6 +129,10 @@ const AreaPreference = ({
     // Log the change
     console.log("Selected Areas Updated:", newSelectedAreas);
     console.log("Total Areas Selected:", newSelectedAreas.length);
+    console.log(
+      "Step should be valid:",
+      newSelectedAreas.length >= 1 && newSelectedAreas.length <= 3,
+    );
   };
 
   // Clear all selected areas
@@ -141,37 +149,21 @@ const AreaPreference = ({
     return allAreas.find((area) => area.name === areaName);
   };
 
-  // Validation messages
-  const getValidationMessage = () => {
-    if (selectedAreas.length === 0) {
-      return "Please select at least 1 area";
-    }
-    if (selectedAreas.length > 3) {
-      return "Maximum 3 areas allowed";
-    }
-    return null;
-  };
-
-  const validationMessage = getValidationMessage();
+  // Debug: Log validation status
+  useEffect(() => {
+    console.log("AreaPreference - Validation status:", {
+      selectedAreas,
+      count: selectedAreas.length,
+      isValid: selectedAreas.length >= 1 && selectedAreas.length <= 3,
+      isStepValidProp: isStepValid,
+    });
+  }, [selectedAreas, isStepValid]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-display">
       {/* Desktop Layout - Enlarged like BudgetRange */}
       <div className="hidden lg:block max-w-4xl mx-auto w-full mt-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Validation Status */}
-          <div
-            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
-          >
-            <p
-              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
-            >
-              {isStepValid
-                ? `✓ ${selectedAreas.length} area${selectedAreas.length !== 1 ? "s" : ""} selected`
-                : `⚠ ${validationMessage || "Please select 1-3 areas"}`}
-            </p>
-          </div>
-
           {/* Header - Enlarged */}
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-6">
@@ -395,19 +387,6 @@ const AreaPreference = ({
       {/* Mobile Layout - Enlarged like BudgetRange mobile */}
       <div className="lg:hidden flex flex-col px-4 pt-6 max-w-[480px] mx-auto w-full">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          {/* Validation Status */}
-          <div
-            className={`mb-4 p-3 rounded-lg ${isStepValid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
-          >
-            <p
-              className={`text-sm font-medium ${isStepValid ? "text-green-700" : "text-red-700"}`}
-            >
-              {isStepValid
-                ? `Ready to continue`
-                : `⚠ ${validationMessage || "Select 1-3 areas"}`}
-            </p>
-          </div>
-
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-gray-900 text-xl font-bold mb-4">

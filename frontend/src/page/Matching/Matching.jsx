@@ -26,21 +26,15 @@ const Matching = () => {
     // Step 2: Region Selection
     region: "",
 
-    // Step 3: Workplace or University Location
-    workplaceLocation: "", // Will store the place ID or address
-    workplaceLat: null, // Latitude
-    workplaceLng: null, // Longitude
-    workplaceName: "", // Formatted name from Google Maps
-
-    // Step 4: Area Preference
+    // Step 3: Area Preference
     areaPreferences: [],
 
-    // Step 5: Household Setup
+    // Step 4: Household Setup
     householdSize: "",
     hasChildren: false,
     hasPets: false,
 
-    // Step 6: Lifestyle & Features
+    // Step 5: Lifestyle & Features
     lifestyleFeatures: [],
     mustHaveFeatures: [],
     preferredAmenities: [],
@@ -50,10 +44,9 @@ const Matching = () => {
   const [stepValidation, setStepValidation] = useState({
     step1: false, // Budget Range
     step2: false, // Region Selection
-    step3: false, // Workplace/University
-    step4: false, // Area Preference
-    step5: false, // Household Setup
-    step6: false, // Lifestyle & Features
+    step3: false, // Area Preference
+    step4: false, // Household Setup
+    step5: false, // Lifestyle & Features
   });
 
   // Function to update form data from child components
@@ -129,8 +122,8 @@ const Matching = () => {
         <AreaPreference
           formData={formData}
           updateFormData={updateFormData}
-          isStepValid={stepValidation.step4}
-          setIsStepValid={(isValid) => updateStepValidation(3, isValid)}
+          isStepValid={stepValidation.step3}
+          setIsStepValid={(isValid) => updateStepValidation(2, isValid)}
         />
       ),
       showFooter: true,
@@ -141,8 +134,8 @@ const Matching = () => {
         <LeaseAndHousehold
           formData={formData}
           updateFormData={updateFormData}
-          isStepValid={stepValidation.step5}
-          setIsStepValid={(isValid) => updateStepValidation(4, isValid)}
+          isStepValid={stepValidation.step4}
+          setIsStepValid={(isValid) => updateStepValidation(3, isValid)}
         />
       ),
       showFooter: true,
@@ -153,8 +146,8 @@ const Matching = () => {
         <LifestyleAndFeatures
           formData={formData}
           updateFormData={updateFormData}
-          isStepValid={stepValidation.step6}
-          setIsStepValid={(isValid) => updateStepValidation(5, isValid)}
+          isStepValid={stepValidation.step5}
+          setIsStepValid={(isValid) => updateStepValidation(4, isValid)}
         />
       ),
       showFooter: true,
@@ -302,7 +295,9 @@ const Matching = () => {
                       : "bg-red-50 text-red-700 hover:bg-red-100 border border-red-200"
                     : "text-gray-700 hover:bg-gray-100"
               }`}
-              disabled={index > currentStep && !stepValidation[`step${index}`]}
+              disabled={
+                index > currentStep && !stepValidation[`step${index + 1}`]
+              }
             >
               <div className="flex items-center gap-3">
                 <div

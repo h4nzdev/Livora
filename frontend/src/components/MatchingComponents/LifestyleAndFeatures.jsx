@@ -33,6 +33,7 @@ const PrimaryDestination = ({
   localData,
   updateLocalData,
   updateLifestyleData,
+  showValidation,
 }) => {
   // Destination type options
   const destinationOptions = [
@@ -168,6 +169,11 @@ const PrimaryDestination = ({
     console.log("Opening Google Maps:", googleMapsUrl);
   };
 
+  // Validation for this section
+  const isDestinationValid = () => {
+    return localData.primaryDestination && localData.destinationAddress;
+  };
+
   return (
     <div className="mb-10">
       <div className="flex items-center gap-4 mb-6">
@@ -180,7 +186,7 @@ const PrimaryDestination = ({
           </h2>
           <p className="text-gray-500 text-base">
             Where do you go most often? Helps us find properties with optimal
-            commute times
+            commute times <span className="text-red-500">*</span>
           </p>
         </div>
       </div>
@@ -188,8 +194,14 @@ const PrimaryDestination = ({
       {/* Destination Type Selection */}
       <div className="mb-6">
         <p className="text-sm font-bold text-gray-700 mb-3">
-          What is your primary destination?
+          What is your primary destination?{" "}
+          <span className="text-red-500">*</span>
         </p>
+        {!localData.primaryDestination && showValidation && (
+          <p className="text-red-600 text-sm mb-2">
+            Please select a destination type
+          </p>
+        )}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {destinationOptions.map((destination) => (
             <button
@@ -220,25 +232,32 @@ const PrimaryDestination = ({
         </div>
 
         {/* Location Selection */}
-        <div className="relative">
-          <p className="text-sm font-bold text-gray-700 mb-3">
-            {localData.primaryDestination === "workplace"
-              ? "Select your workplace or enter custom address"
-              : "Select your university or enter custom address"}
-          </p>
-
-          {/* Predefined Locations Grid */}
-          <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">
-              Popular{" "}
+        {localData.primaryDestination && (
+          <div className="relative">
+            <p className="text-sm font-bold text-gray-700 mb-3">
               {localData.primaryDestination === "workplace"
-                ? "Workplaces"
-                : "Universities"}{" "}
-              in Cebu:
+                ? "Select your workplace or enter custom address"
+                : "Select your university or enter custom address"}{" "}
+              <span className="text-red-500">*</span>
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              {localData.primaryDestination &&
-                predefinedLocations[localData.primaryDestination]
+
+            {!localData.destinationAddress && showValidation && (
+              <p className="text-red-600 text-sm mb-2">
+                Please select or enter a location
+              </p>
+            )}
+
+            {/* Predefined Locations Grid */}
+            <div className="mb-6">
+              <p className="text-sm text-gray-600 mb-2">
+                Popular{" "}
+                {localData.primaryDestination === "workplace"
+                  ? "Workplaces"
+                  : "Universities"}{" "}
+                in Cebu:
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {predefinedLocations[localData.primaryDestination]
                   ?.slice(0, 4)
                   .map((location, index) => (
                     <button
@@ -265,97 +284,102 @@ const PrimaryDestination = ({
                       </span>
                     </button>
                   ))}
-            </div>
-          </div>
-
-          {/* Custom Location Input */}
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-2">
-              Or enter custom location:
-            </p>
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <MapPin size={20} />
-                </div>
-                <input
-                  type="text"
-                  placeholder={
-                    localData.primaryDestination === "workplace"
-                      ? "e.g., Your office address"
-                      : "e.g., Your campus address"
-                  }
-                  value={localData.destinationLocation}
-                  onChange={handleLocationInputChange}
-                  className="w-full pl-12 pr-12 py-3 text-lg rounded-xl border-2 border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-600/20 focus:border-green-600 transition-all"
-                  autoComplete="off"
-                />
-                {localData.destinationLocation && (
-                  <button
-                    onClick={handleClearLocation}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
-                    type="button"
-                  >
-                    <X size={20} />
-                  </button>
-                )}
               </div>
-              <button
-                onClick={handleCustomLocationSubmit}
-                className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2"
-              >
-                <Search size={20} />
-                <span className="font-medium">Set</span>
-              </button>
             </div>
-          </div>
 
-          {/* Selected Location Display */}
-          {localData.destinationAddress && (
-            <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
-              <div className="flex items-start gap-3">
-                <Check
-                  size={20}
-                  className="text-green-600 mt-0.5 flex-shrink-0"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-green-800 font-medium text-base">
-                      Location Selected
-                    </p>
-                    {localData.destinationCoordinates && (
-                      <button
-                        onClick={openGoogleMaps}
-                        className="flex items-center gap-2 px-3 py-1 bg-white text-green-600 border border-green-300 rounded-lg hover:bg-green-50 transition-colors text-sm"
-                      >
-                        <ExternalLink size={14} />
-                        View on Google Maps
-                      </button>
-                    )}
+            {/* Custom Location Input */}
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                Or enter custom location:
+              </p>
+              <div className="flex gap-3">
+                <div className="flex-1 relative">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <MapPin size={20} />
                   </div>
-                  <p className="text-green-700 text-sm font-medium mb-1">
-                    {localData.destinationLocation}
-                  </p>
-                  <p className="text-green-600 text-xs">
-                    {localData.destinationAddress}
-                  </p>
-                  {localData.destinationCoordinates && (
-                    <div className="mt-2 flex items-center gap-2 text-xs">
-                      <span className="text-green-700 bg-white px-2 py-1 rounded border border-green-200">
-                        Latitude:{" "}
-                        {localData.destinationCoordinates.lat.toFixed(6)}
-                      </span>
-                      <span className="text-green-700 bg-white px-2 py-1 rounded border border-green-200">
-                        Longitude:{" "}
-                        {localData.destinationCoordinates.lng.toFixed(6)}
-                      </span>
-                    </div>
+                  <input
+                    type="text"
+                    placeholder={
+                      localData.primaryDestination === "workplace"
+                        ? "e.g., Your office address"
+                        : "e.g., Your campus address"
+                    }
+                    value={localData.destinationLocation}
+                    onChange={handleLocationInputChange}
+                    className={`w-full pl-12 pr-12 py-3 text-lg rounded-xl border-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600/20 transition-all ${
+                      !localData.destinationAddress && showValidation
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                        : "border-gray-300 focus:border-green-600"
+                    }`}
+                    autoComplete="off"
+                  />
+                  {localData.destinationLocation && (
+                    <button
+                      onClick={handleClearLocation}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
+                      type="button"
+                    >
+                      <X size={20} />
+                    </button>
                   )}
                 </div>
+                <button
+                  onClick={handleCustomLocationSubmit}
+                  className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2"
+                >
+                  <Search size={20} />
+                  <span className="font-medium">Set</span>
+                </button>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Selected Location Display */}
+            {localData.destinationAddress && (
+              <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
+                <div className="flex items-start gap-3">
+                  <Check
+                    size={20}
+                    className="text-green-600 mt-0.5 flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-green-800 font-medium text-base">
+                        Location Selected
+                      </p>
+                      {localData.destinationCoordinates && (
+                        <button
+                          onClick={openGoogleMaps}
+                          className="flex items-center gap-2 px-3 py-1 bg-white text-green-600 border border-green-300 rounded-lg hover:bg-green-50 transition-colors text-sm"
+                        >
+                          <ExternalLink size={14} />
+                          View on Google Maps
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-green-700 text-sm font-medium mb-1">
+                      {localData.destinationLocation}
+                    </p>
+                    <p className="text-green-600 text-xs">
+                      {localData.destinationAddress}
+                    </p>
+                    {localData.destinationCoordinates && (
+                      <div className="mt-2 flex items-center gap-2 text-xs">
+                        <span className="text-green-700 bg-white px-2 py-1 rounded border border-green-200">
+                          Latitude:{" "}
+                          {localData.destinationCoordinates.lat.toFixed(6)}
+                        </span>
+                        <span className="text-green-700 bg-white px-2 py-1 rounded border border-green-200">
+                          Longitude:{" "}
+                          {localData.destinationCoordinates.lng.toFixed(6)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -366,6 +390,7 @@ const DailyRhythmAndRoutine = ({
   localData,
   updateLocalData,
   updateLifestyleData,
+  showValidation,
 }) => {
   // Daily rhythm options
   const rhythmOptions = [
@@ -418,7 +443,8 @@ const DailyRhythmAndRoutine = ({
             Daily Rhythm & Routine
           </h2>
           <p className="text-gray-500 text-base">
-            Select your lifestyle patterns for better community matching
+            Select your lifestyle patterns for better community matching{" "}
+            <span className="text-red-500">*</span>
           </p>
         </div>
       </div>
@@ -460,6 +486,7 @@ const DailyTransportationMethod = ({
   localData,
   updateLocalData,
   updateLifestyleData,
+  showValidation,
 }) => {
   // Transportation options
   const transportOptions = [
@@ -512,7 +539,8 @@ const DailyTransportationMethod = ({
             Daily Transportation Method
           </h2>
           <p className="text-gray-500 text-base">
-            How do you typically get around?
+            How do you typically get around?{" "}
+            <span className="text-red-500">*</span>
           </p>
         </div>
       </div>
@@ -554,6 +582,7 @@ const MustHaveFeatures = ({
   localData,
   updateLocalData,
   updateLifestyleData,
+  showValidation,
 }) => {
   // All available features
   const allFeatures = [
@@ -620,22 +649,14 @@ const MustHaveFeatures = ({
             Must-Have Property Features
           </h2>
           <p className="text-gray-500 text-base">
-            Select all essential features for your ideal home
+            Select all essential features for your ideal home (minimum 2
+            required) <span className="text-red-500">*</span>
           </p>
         </div>
       </div>
 
       {/* Selected features count and actions */}
       <div className="flex items-center justify-between mb-6">
-        <div className="px-4 py-3 bg-green-50 rounded-xl">
-          <p className="text-green-700 text-lg">
-            <span className="font-bold">
-              {localData.mustHaveFeatures.length}
-            </span>{" "}
-            features selected
-          </p>
-        </div>
-
         {localData.mustHaveFeatures.length > 0 && (
           <button
             onClick={clearAllFeatures}
@@ -730,7 +751,7 @@ const MustHaveFeatures = ({
 };
 
 // ==================== SELECTED SUMMARY ====================
-const SelectedSummary = ({ localData }) => {
+const SelectedSummary = ({ localData, isStepValid }) => {
   // Helper functions for display
   const getSelectedRhythmDisplay = () => {
     const rhythmOptions = [
@@ -768,26 +789,50 @@ const SelectedSummary = ({ localData }) => {
   };
 
   return (
-    <div className="mt-8 p-6 bg-green-50 rounded-xl border border-green-200">
-      <h4 className="text-green-800 text-lg font-bold mb-3">
-        Your Lifestyle Preferences
+    <div
+      className={`mt-8 p-6 rounded-xl border ${
+        isStepValid
+          ? "bg-green-50 border-green-200"
+          : "bg-red-50 border-red-200"
+      }`}
+    >
+      <h4
+        className={`text-lg font-bold mb-3 ${
+          isStepValid ? "text-green-800" : "text-red-800"
+        }`}
+      >
+        {isStepValid
+          ? "Your Lifestyle Preferences"
+          : "Missing Required Information"}
       </h4>
       <div className="grid grid-cols-2 gap-6">
         <div>
           <p className="text-sm text-gray-600">Daily Rhythm</p>
-          <p className="text-green-700 font-bold">
+          <p
+            className={`font-bold ${
+              localData.dailyRhythm ? "text-green-700" : "text-red-700"
+            }`}
+          >
             {getSelectedRhythmDisplay()}
           </p>
         </div>
         <div>
           <p className="text-sm text-gray-600">Transportation</p>
-          <p className="text-green-700 font-bold">
+          <p
+            className={`font-bold ${
+              localData.transportation ? "text-green-700" : "text-red-700"
+            }`}
+          >
             {getSelectedTransportDisplay()}
           </p>
         </div>
         <div>
           <p className="text-sm text-gray-600">Primary Destination</p>
-          <p className="text-green-700 font-bold">
+          <p
+            className={`font-bold ${
+              localData.primaryDestination ? "text-green-700" : "text-red-700"
+            }`}
+          >
             {getSelectedDestinationTypeDisplay()}
           </p>
           {localData.destinationLocation && (
@@ -798,8 +843,14 @@ const SelectedSummary = ({ localData }) => {
         </div>
         <div>
           <p className="text-sm text-gray-600">Features Selected</p>
-          <p className="text-green-700 font-bold">
-            {localData.mustHaveFeatures.length}
+          <p
+            className={`font-bold ${
+              localData.mustHaveFeatures.length >= 2
+                ? "text-green-700"
+                : "text-red-700"
+            }`}
+          >
+            {localData.mustHaveFeatures.length} of 2
           </p>
         </div>
       </div>
@@ -822,7 +873,8 @@ const InfoBox = () => {
             <br />
             • Public transit users: prioritize locations near transport hubs
             <br />
-            • Must-have features help us filter perfect matches
+            • Must-have features help us filter perfect matches (minimum 2
+            required)
             <br />
             • Providing your daily destination helps optimize commute times
             <br />• Air conditioning and WiFi are most requested features
@@ -932,18 +984,20 @@ const MobilePrimaryDestination = ({
 };
 
 // ==================== MAIN COMPONENT ====================
-const LifestyleAndFeatures = ({ formData, updateFormData }) => {
+const LifestyleAndFeatures = ({
+  formData,
+  updateFormData,
+  isStepValid,
+  setIsStepValid,
+}) => {
   // Local state for this component
   const [localData, setLocalData] = useState({
-    dailyRhythm: formData.dailyRhythm || "early",
-    transportation: formData.transportation || "public",
-    mustHaveFeatures: formData.mustHaveFeatures || [
-      "aircon",
-      "private-bathroom",
-    ],
+    dailyRhythm: formData.dailyRhythm || "",
+    transportation: formData.transportation || "",
+    mustHaveFeatures: formData.mustHaveFeatures || [],
     lifestyleFeatures: formData.lifestyleFeatures || [],
     preferredAmenities: formData.preferredAmenities || [],
-    primaryDestination: formData.primaryDestination || "workplace",
+    primaryDestination: formData.primaryDestination || "",
     destinationLocation: formData.destinationLocation || "",
     destinationAddress: formData.destinationAddress || "",
     destinationCoordinates: formData.destinationCoordinates || null,
@@ -951,18 +1005,37 @@ const LifestyleAndFeatures = ({ formData, updateFormData }) => {
     searchQuery: "",
   });
 
+  // Validate the current step
+  const validateStep = () => {
+    const {
+      dailyRhythm,
+      transportation,
+      mustHaveFeatures,
+      primaryDestination,
+      destinationAddress,
+    } = localData;
+
+    // Check all required fields
+    const isValid =
+      dailyRhythm &&
+      transportation &&
+      mustHaveFeatures.length >= 2 &&
+      primaryDestination &&
+      destinationAddress;
+
+    setIsStepValid(isValid);
+    return isValid;
+  };
+
   // Update local state when formData prop changes
   useEffect(() => {
     setLocalData({
-      dailyRhythm: formData.dailyRhythm || "early",
-      transportation: formData.transportation || "public",
-      mustHaveFeatures: formData.mustHaveFeatures || [
-        "aircon",
-        "private-bathroom",
-      ],
+      dailyRhythm: formData.dailyRhythm || "",
+      transportation: formData.transportation || "",
+      mustHaveFeatures: formData.mustHaveFeatures || [],
       lifestyleFeatures: formData.lifestyleFeatures || [],
       preferredAmenities: formData.preferredAmenities || [],
-      primaryDestination: formData.primaryDestination || "workplace",
+      primaryDestination: formData.primaryDestination || "",
       destinationLocation: formData.destinationLocation || "",
       destinationAddress: formData.destinationAddress || "",
       destinationCoordinates: formData.destinationCoordinates || null,
@@ -970,6 +1043,11 @@ const LifestyleAndFeatures = ({ formData, updateFormData }) => {
       searchQuery: "",
     });
   }, [formData]);
+
+  // Validate whenever localData changes
+  useEffect(() => {
+    validateStep();
+  }, [localData]);
 
   // Update parent form data
   const updateLifestyleData = (data) => {
@@ -997,27 +1075,31 @@ const LifestyleAndFeatures = ({ formData, updateFormData }) => {
             localData={localData}
             updateLocalData={setLocalData}
             updateLifestyleData={updateLifestyleData}
+            showValidation={!isStepValid}
           />
 
           <DailyRhythmAndRoutine
             localData={localData}
             updateLocalData={setLocalData}
             updateLifestyleData={updateLifestyleData}
+            showValidation={!isStepValid}
           />
 
           <DailyTransportationMethod
             localData={localData}
             updateLocalData={setLocalData}
             updateLifestyleData={updateLifestyleData}
+            showValidation={!isStepValid}
           />
 
           <MustHaveFeatures
             localData={localData}
             updateLocalData={setLocalData}
             updateLifestyleData={updateLifestyleData}
+            showValidation={!isStepValid}
           />
 
-          <SelectedSummary localData={localData} />
+          <SelectedSummary localData={localData} isStepValid={isStepValid} />
           <InfoBox />
         </div>
       </div>
@@ -1031,9 +1113,20 @@ const LifestyleAndFeatures = ({ formData, updateFormData }) => {
             updateLifestyleData={updateLifestyleData}
           />
 
-          {/* Mobile versions of other components would go here */}
-          <div className="text-center py-4 text-gray-500">
-            Complete the form on desktop for full experience
+          {/* Mobile Info */}
+          <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+            <div className="flex items-start gap-3">
+              <Info size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-gray-900 font-bold text-sm mb-1">
+                  Complete on Desktop
+                </h4>
+                <p className="text-green-700 text-xs">
+                  For the best experience, please complete this step on a
+                  desktop computer to access all features and validation.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
