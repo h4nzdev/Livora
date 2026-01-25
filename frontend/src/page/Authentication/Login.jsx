@@ -41,16 +41,16 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Desktop Layout */}
-      <div className="hidden lg:flex min-h-screen">
+      <div className="hidden lg:flex min-h-screen ">
         {/* Left Column - Livora Showcase (Desktop Only) - REVERSED */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+        <div className="hidden fixed lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
           <div className="absolute inset-0 bg-gradient-to-br from-green-600/10 via-emerald-500/10 to-teal-500/10"></div>
 
           {/* Decorative Elements */}
           <div className="absolute top-1/4 -left-16 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 -right-16 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
 
-          <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center">
+          <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center fixed">
             <div className="mb-8">
               {/* Updated Logo - Using your imported logo */}
               <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-400 rounded-3xl flex items-center justify-center mb-6 shadow-2xl">
@@ -127,8 +127,8 @@ const Login = () => {
         </div>
 
         {/* Right Column - Login Form - REVERSED */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8 xl:p-16">
-          <div className="w-full max-w-md 2xl:max-w-lg">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 xl:p-16 ">
+          <div className="w-full pl-214">
             {/* Back Button */}
             <button
               onClick={() => navigate(-1)}
