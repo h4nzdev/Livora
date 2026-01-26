@@ -1,4 +1,4 @@
-properties = [
+[
     {
         "id": 1,
         "name": "Lahug Modern Apartment",
@@ -15,7 +15,8 @@ properties = [
         "area_sqm": 45,
         "floor": 3,
         "distance_to_it_park_km": 0.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"
     },
     {
         "id": 2,
@@ -33,7 +34,8 @@ properties = [
         "area_sqm": 35,
         "floor": 12,
         "distance_to_it_park_km": 1.5,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688"
     },
     {
         "id": 3,
@@ -51,7 +53,8 @@ properties = [
         "area_sqm": 120,
         "floor": 1,
         "distance_to_it_park_km": 3.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994"
     },
     {
         "id": 4,
@@ -69,7 +72,8 @@ properties = [
         "area_sqm": 25,
         "floor": 8,
         "distance_to_it_park_km": 0.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
     },
     {
         "id": 5,
@@ -87,7 +91,8 @@ properties = [
         "area_sqm": 30,
         "floor": 15,
         "distance_to_it_park_km": 0.5,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511"
     },
     {
         "id": 6,
@@ -105,7 +110,8 @@ properties = [
         "area_sqm": 110,
         "floor": 1,
         "distance_to_it_park_km": 4.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1518780664697-55e3ad937233"
     },
     {
         "id": 7,
@@ -123,7 +129,8 @@ properties = [
         "area_sqm": 28,
         "floor": 2,
         "distance_to_it_park_km": 1.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1554995207-c18c203602cb"
     },
     {
         "id": 8,
@@ -141,7 +148,8 @@ properties = [
         "area_sqm": 32,
         "floor": 3,
         "distance_to_it_park_km": 0.3,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1598928506311-c55ded91a20c"
     },
     {
         "id": 9,
@@ -159,7 +167,8 @@ properties = [
         "area_sqm": 26,
         "floor": 4,
         "distance_to_it_park_km": 0.9,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
     },
     {
         "id": 10,
@@ -177,7 +186,8 @@ properties = [
         "area_sqm": 20,
         "floor": 2,
         "distance_to_it_park_km": 4.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3"
     },
     {
         "id": 11,
@@ -195,7 +205,8 @@ properties = [
         "area_sqm": 65,
         "floor": 18,
         "distance_to_it_park_km": 0.7,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd"
     },
     {
         "id": 12,
@@ -213,7 +224,8 @@ properties = [
         "area_sqm": 70,
         "floor": 10,
         "distance_to_it_park_km": 12.5,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1513584684374-8bab748fbf90"
     },
     {
         "id": 13,
@@ -231,7 +243,8 @@ properties = [
         "area_sqm": 180,
         "floor": 2,
         "distance_to_it_park_km": 2.8,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1613977257363-707ba9348227"
     },
     {
         "id": 14,
@@ -249,7 +262,8 @@ properties = [
         "area_sqm": 50,
         "floor": 1,
         "distance_to_it_park_km": 1.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1567496898669-ee935f003f30"
     },
     {
         "id": 15,
@@ -267,7 +281,8 @@ properties = [
         "area_sqm": 55,
         "floor": 2,
         "distance_to_it_park_km": 3.0,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1484101403633-562f891dc89a"
     },
     {
         "id": 16,
@@ -285,7 +300,8 @@ properties = [
         "area_sqm": 22,
         "floor": 5,
         "distance_to_it_park_km": 0.1,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3"
     },
     {
         "id": 17,
@@ -303,7 +319,8 @@ properties = [
         "area_sqm": 68,
         "floor": 22,
         "distance_to_it_park_km": 1.3,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"
     },
     {
         "id": 18,
@@ -321,7 +338,8 @@ properties = [
         "area_sqm": 25,
         "floor": 3,
         "distance_to_it_park_km": 2.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
     },
     {
         "id": 19,
@@ -339,7 +357,8 @@ properties = [
         "area_sqm": 110,
         "floor": 1,
         "distance_to_it_park_km": 8.5,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1565538810643-b5bdb714032a"
     },
     {
         "id": 20,
@@ -357,7 +376,8 @@ properties = [
         "area_sqm": 24,
         "floor": 4,
         "distance_to_it_park_km": 2.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1554995207-c18c203602cb"
     },
     {
         "id": 21,
@@ -375,7 +395,8 @@ properties = [
         "area_sqm": 150,
         "floor": 1,
         "distance_to_it_park_km": 5.2,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1613490493576-7fde63acd811"
     },
     {
         "id": 22,
@@ -393,7 +414,8 @@ properties = [
         "area_sqm": 22,
         "floor": 2,
         "distance_to_it_park_km": 3.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3"
     },
     {
         "id": 23,
@@ -411,7 +433,8 @@ properties = [
         "area_sqm": 200,
         "floor": 1,
         "distance_to_it_park_km": 13.0,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1613977257363-707ba9348227"
     },
     {
         "id": 24,
@@ -429,7 +452,8 @@ properties = [
         "area_sqm": 130,
         "floor": 1,
         "distance_to_it_park_km": 1.5,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1565538810643-b5bdb714032a"
     },
     {
         "id": 25,
@@ -447,7 +471,8 @@ properties = [
         "area_sqm": 35,
         "floor": 2,
         "distance_to_it_park_km": 2.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
     },
     {
         "id": 26,
@@ -465,7 +490,8 @@ properties = [
         "area_sqm": 50,
         "floor": 5,
         "distance_to_it_park_km": 0.4,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1484101403633-562f891dc89a"
     },
     {
         "id": 27,
@@ -483,7 +509,8 @@ properties = [
         "area_sqm": 70,
         "floor": 1,
         "distance_to_it_park_km": 3.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1518780664697-55e3ad937233"
     },
     {
         "id": 28,
@@ -501,7 +528,8 @@ properties = [
         "area_sqm": 60,
         "floor": 30,
         "distance_to_it_park_km": 1.0,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"
     },
     {
         "id": 29,
@@ -519,7 +547,8 @@ properties = [
         "area_sqm": 23,
         "floor": 2,
         "distance_to_it_park_km": 6.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
     },
     {
         "id": 30,
@@ -537,7 +566,8 @@ properties = [
         "area_sqm": 80,
         "floor": 1,
         "distance_to_it_park_km": 2.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1497366754035-f200968a6e72"
     },
     {
         "id": 31,
@@ -555,7 +585,8 @@ properties = [
         "area_sqm": 55,
         "floor": 1,
         "distance_to_it_park_km": 0.9,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1567496898669-ee935f003f30"
     },
     {
         "id": 32,
@@ -573,7 +604,8 @@ properties = [
         "area_sqm": 75,
         "floor": 14,
         "distance_to_it_park_km": 3.2,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd"
     },
     {
         "id": 33,
@@ -591,7 +623,8 @@ properties = [
         "area_sqm": 22,
         "floor": 7,
         "distance_to_it_park_km": 0.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
     },
     {
         "id": 34,
@@ -609,7 +642,8 @@ properties = [
         "area_sqm": 115,
         "floor": 1,
         "distance_to_it_park_km": 9.5,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1565538810643-b5bdb714032a"
     },
     {
         "id": 35,
@@ -627,7 +661,8 @@ properties = [
         "area_sqm": 38,
         "floor": 20,
         "distance_to_it_park_km": 0.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"
     },
     {
         "id": 36,
@@ -645,7 +680,8 @@ properties = [
         "area_sqm": 18,
         "floor": 2,
         "distance_to_it_park_km": 1.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3"
     },
     {
         "id": 37,
@@ -663,7 +699,8 @@ properties = [
         "area_sqm": 140,
         "floor": 1,
         "distance_to_it_park_km": 16.3,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1513584684374-8bab748fbf90"
     },
     {
         "id": 38,
@@ -681,7 +718,8 @@ properties = [
         "area_sqm": 15,
         "floor": 4,
         "distance_to_it_park_km": 2.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
     },
     {
         "id": 39,
@@ -699,7 +737,8 @@ properties = [
         "area_sqm": 75,
         "floor": 1,
         "distance_to_it_park_km": 7.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1518780664697-55e3ad937233"
     },
     {
         "id": 40,
@@ -717,7 +756,8 @@ properties = [
         "area_sqm": 80,
         "floor": 12,
         "distance_to_it_park_km": 0.1,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd"
     },
     {
         "id": 41,
@@ -735,7 +775,8 @@ properties = [
         "area_sqm": 65,
         "floor": 6,
         "distance_to_it_park_km": 12.8,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1513584684374-8bab748fbf90"
     },
     {
         "id": 42,
@@ -753,7 +794,8 @@ properties = [
         "area_sqm": 100,
         "floor": 1,
         "distance_to_it_park_km": 4.8,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994"
     },
     {
         "id": 43,
@@ -771,7 +813,8 @@ properties = [
         "area_sqm": 18,
         "floor": 3,
         "distance_to_it_park_km": 1.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
     },
     {
         "id": 44,
@@ -789,7 +832,8 @@ properties = [
         "area_sqm": 40,
         "floor": 8,
         "distance_to_it_park_km": 1.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688"
     },
     {
         "id": 45,
@@ -807,7 +851,8 @@ properties = [
         "area_sqm": 55,
         "floor": 1,
         "distance_to_it_park_km": 2.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1484101403633-562f891dc89a"
     },
     {
         "id": 46,
@@ -825,7 +870,8 @@ properties = [
         "area_sqm": 200,
         "floor": 2,
         "distance_to_it_park_km": 15.2,
-        "available_date": "Next month"
+        "available_date": "Next month",
+        "image_url": "https://images.unsplash.com/photo-1613490493576-7fde63acd811"
     },
     {
         "id": 47,
@@ -843,7 +889,8 @@ properties = [
         "area_sqm": 20,
         "floor": 3,
         "distance_to_it_park_km": 2.5,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
     },
     {
         "id": 48,
@@ -861,7 +908,8 @@ properties = [
         "area_sqm": 45,
         "floor": 3,
         "distance_to_it_park_km": 2.2,
-        "available_date": "Immediate"
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"
     },
     {
         "id": 49,
@@ -879,9 +927,10 @@ properties = [
         "area_sqm": 65,
         "floor": 12,
         "distance_to_it_park_km": 11.8,
-        "available_date": "Next week"
+        "available_date": "Next week",
+        "image_url": "https://images.unsplash.com/photo-1513584684374-8bab748fbf90"
     },
- {
+    {
         "id": 50,
         "name": "Talamban Student Dorm",
         "type": "Shared",
@@ -893,5 +942,11 @@ properties = [
         "pet_friendly": False,
         "lease_duration": "short-term",
         "rating": 3.8,
+        "furnished": True,
+        "area_sqm": 20,
+        "floor": 2,
+        "distance_to_it_park_km": 4.2,
+        "available_date": "Immediate",
+        "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3"
     }
 ]

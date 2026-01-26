@@ -4,6 +4,7 @@ import DwellerDashboard from "../page/DwellerPage/DwellerDashboard";
 import DwellerLayout from "../layout/DwellerLayout";
 import DwellerMaintenance from "../page/DwellerPage/DwellerMaintenance";
 import DwellerCommunityHub from "../page/DwellerPage/DwellerCommunityHub";
+import DwellerProfile from "../page/DwellerPage/DwellerProfile";
 
 const DwellerRoutes = () => {
   return (
@@ -30,6 +31,14 @@ const DwellerRoutes = () => {
           element={
             <DwellerLayout>
               <DwellerCommunityHub />
+            </DwellerLayout>
+          }
+        />
+        <Route
+          path="/dweller-profile"
+          element={
+            <DwellerLayout>
+              <DwellerProfile />
             </DwellerLayout>
           }
         />

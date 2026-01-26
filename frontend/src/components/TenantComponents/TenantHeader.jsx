@@ -14,8 +14,10 @@ import { useNavigate } from "react-router-dom";
 const TenantHeader = ({ onNavigate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notificationsCount, setNotificationsCount] = useState(3);
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  console.log(user);
 
   const userProfile = {
     name: "Alex Johnson",
@@ -101,9 +103,9 @@ const TenantHeader = ({ onNavigate }) => {
               {!isProfileOpen && (
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-medium text-gray-900 group-hover:text-emerald-700 transition-colors">
-                    {userProfile.name}
+                    {user?.full_name}
                   </p>
-                  <p className="text-xs text-gray-500">{userProfile.email}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
               )}
 
@@ -137,11 +139,9 @@ const TenantHeader = ({ onNavigate }) => {
                       />
                       <div>
                         <p className="font-medium text-gray-900">
-                          {userProfile.name}
+                          {user?.full_name}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {userProfile.email}
-                        </p>
+                        <p className="text-sm text-gray-500">{user?.email}</p>
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between bg-emerald-50 rounded-lg p-3 border border-emerald-100">

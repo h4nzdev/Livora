@@ -12,10 +12,29 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(true);
+    setError("");
+    setLoading(true);
+
+    try {
+      const result = await login(formData.email, formData.password);
+
+      if (result.success) {
+        // Redirect to dashboard or home page
+        navigate("/dashboard");
+      } else {
+        setError(result.error || "Login failed. Please try again.");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -23,6 +42,8 @@ const Login = () => {
       ...formData,
       [e.target.id]: e.target.value,
     });
+    // Clear error when user starts typing
+    if (error) setError("");
   };
 
   const handleGoogleLogin = () => {
@@ -152,6 +173,13 @@ const Login = () => {
               </p>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
             {/* Login Form */}
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-2">
@@ -170,6 +198,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  disabled={loading}
                 />
               </div>
 
@@ -190,11 +219,13 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                   <button
                     type="button"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 disabled:opacity-50"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -206,7 +237,8 @@ const Login = () => {
                   <input
                     type="checkbox"
                     id="remember"
-                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-600"
+                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-600 disabled:opacity-50"
+                    disabled={loading}
                   />
                   <label
                     htmlFor="remember"
@@ -217,17 +249,44 @@ const Login = () => {
                 </div>
                 <a
                   href="#"
-                  className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors"
+                  className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors disabled:opacity-50"
                 >
                   Forgot Password?
                 </a>
               </div>
 
               <button
-                className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 mt-2 active:scale-[0.98]"
+                className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 mt-2 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 type="submit"
+                disabled={loading}
               >
-                Sign In
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-3 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Signing in...
+                  </div>
+                ) : (
+                  "Sign In"
+                )}
               </button>
             </form>
 
@@ -246,7 +305,8 @@ const Login = () => {
             {/* Google Login Button */}
             <button
               onClick={handleGoogleLogin}
-              className="w-full h-14 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 text-base hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] shadow-sm"
+              className="w-full h-14 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 text-base hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] shadow-sm disabled:opacity-50"
+              disabled={loading}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -347,6 +407,13 @@ const Login = () => {
             </p>
           </div>
 
+          {/* Error Message (Mobile) */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-xs font-medium">{error}</p>
+            </div>
+          )}
+
           {/* Login Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1">
@@ -358,13 +425,14 @@ const Login = () => {
                 Email Address
               </label>
               <input
-                className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-1 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none"
+                className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-1 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none disabled:opacity-50"
                 id="email"
                 type="email"
                 placeholder="name@example.com"
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
             </div>
 
@@ -378,18 +446,20 @@ const Login = () => {
               </label>
               <div className="relative">
                 <input
-                  className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-1 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none pr-12"
+                  className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-green-600 focus:ring-1 focus:ring-green-600/20 transition-all duration-200 text-gray-900 font-medium text-sm outline-none pr-12 disabled:opacity-50"
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 disabled:opacity-50"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -401,7 +471,8 @@ const Login = () => {
                 <input
                   type="checkbox"
                   id="remember-mobile"
-                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-600"
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-600 disabled:opacity-50"
+                  disabled={loading}
                 />
                 <label
                   htmlFor="remember-mobile"
@@ -412,17 +483,44 @@ const Login = () => {
               </div>
               <a
                 href="#"
-                className="text-xs font-semibold text-green-600 hover:text-green-700 transition-colors"
+                className="text-xs font-semibold text-green-600 hover:text-green-700 transition-colors disabled:opacity-50"
               >
                 Forgot Password?
               </a>
             </div>
 
             <button
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm shadow-md active:scale-[0.98] transition-all duration-300 mt-2"
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm shadow-md active:scale-[0.98] transition-all duration-300 mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
               type="submit"
+              disabled={loading}
             >
-              Sign In
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-4 w-4 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Signing in...
+                </div>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
@@ -441,7 +539,8 @@ const Login = () => {
           {/* Google Login Button */}
           <button
             onClick={handleGoogleLogin}
-            className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 text-sm hover:bg-gray-50 transition-all duration-300 active:scale-[0.98]"
+            className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 text-sm hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
+            disabled={loading}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path

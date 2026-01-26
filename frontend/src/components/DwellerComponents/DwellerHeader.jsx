@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Bell,
   MessageSquare,
@@ -14,17 +14,19 @@ import {
   Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 const DwellerHeader = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notificationsCount, setNotificationsCount] = useState(3);
   const [messagesCount, setMessagesCount] = useState(8);
   const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
 
   const userProfile = {
-    name: "Alex Sterling",
-    email: "alex@dweller.com",
-    role: "Apartment 402",
+    name: user?.full_name,
+    email: user?.email,
+    role: user?.role,
     avatar:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBy_5zdsBRceWhf1gIQWfrCh3M3iinoJUywkylt9vicHjR7nmVPwFOH9kQYIE8RCv4pZUwpTnjouFv3Hc-UEx36pGCx5G6V7FfPnBEtzKSLeNw9NL6ZD416EKDgIFaC99Q48P7a3eLe0NVFG2zlACjkPTc5XhIPAgJgd2mdHVo8kQx-m3G3XycsCjGm7pxQh-c92JLANVlocw8FOeh8U3v8hv3kW7zRMUAL1NHURx_TC5hq1Pcv83VdDVBHV4z9k7yS4DrK2IGidhux",
     currentBalance: "$2,450.00",
@@ -38,8 +40,7 @@ const DwellerHeader = () => {
   };
 
   const handleLogout = () => {
-    console.log("Logging out...");
-    // Handle logout logic here
+    logout();
     navigate("/login");
   };
 
@@ -100,32 +101,6 @@ const DwellerHeader = () => {
 
         {/* Right side - User Profile & Actions */}
         <div className="flex items-center gap-4">
-          {/* Messages */}
-          <button
-            onClick={() => handleNavigation("dweller-messages")}
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
-          >
-            <MessageSquare className="w-5 h-5 text-gray-600 group-hover:text-emerald-600 transition-colors" />
-            {messagesCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {messagesCount > 9 ? "9+" : messagesCount}
-              </span>
-            )}
-          </button>
-
-          {/* Notifications */}
-          <button
-            onClick={() => handleNavigation("dweller-notifications")}
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
-          >
-            <Bell className="w-5 h-5 text-gray-600 group-hover:text-emerald-600 transition-colors" />
-            {notificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {notificationsCount > 9 ? "9+" : notificationsCount}
-              </span>
-            )}
-          </button>
-
           {/* User Profile Dropdown */}
           <div className="relative">
             <button

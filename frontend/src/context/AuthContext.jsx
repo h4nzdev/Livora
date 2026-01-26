@@ -1,42 +1,71 @@
-import { createContext, useState } from "react";
+// context/AuthContext.js
+import { createContext, useState, useEffect } from "react";
+import { authService } from "../services/authService";
 
 // 1. Create the context
 export const AuthContext = createContext();
-const sampleUser = {
-  id: 1,
-  uuid: "550e8400-e29b-41d4-a716-446655440000",
-  full_name: "Juan Dela Cruz",
-  email: "juan@example.com",
-  mobile_number: "09123456789",
-  role: "admin",
-  tenant_type: "owner",
-  profile_image: "https://via.placeholder.com/150",
-  is_verified: true,
-  created_at: "2026-01-25T10:30:00Z",
-};
 
 // 2. Create the provider
 export const AuthProvider = ({ children }) => {
-  // Initialize state from sessionStorage if it exists
-  const [user, setUser] = useState(() => {
-    const storedUser = sessionStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // simple login function
-  const login = (userData) => {
-    setUser(userData);
-    sessionStorage.setItem("user", JSON.stringify(userData));
+  // Check if user is already logged in on app start
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedUser = sessionStorage.getItem("user");
+
+      if (storedUser) {
+        // Use stored user if available
+        setUser(JSON.parse(storedUser));
+      } else {
+        // Check Supabase session
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          sessionStorage.setItem("user", JSON.stringify(currentUser));
+        }
+      }
+
+      setLoading(false);
+    };
+
+    initAuth();
+  }, []);
+
+  // Login function - calls the service
+  const login = async (email, password) => {
+    const result = await authService.login(email, password);
+
+    if (result.success && result.user) {
+      setUser(result.user);
+      sessionStorage.setItem("user", JSON.stringify(result.user));
+    }
+
+    return result;
   };
 
-  // simple logout function
-  const logout = () => {
-    setUser(null);
-    sessionStorage.removeItem("user");
+  // Logout function - calls the service
+  const logout = async () => {
+    const result = await authService.logout();
+
+    if (result.success) {
+      setUser(null);
+      sessionStorage.removeItem("user");
+    }
+
+    return result;
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

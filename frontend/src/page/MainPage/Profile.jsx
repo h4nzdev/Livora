@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   User,
   Edit,
@@ -33,62 +33,14 @@ import {
   HelpCircle,
   ShieldAlert,
 } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
 
 const Profile = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [verificationLevel, setVerificationLevel] = useState(1); // 1=Guest, 2=Verified, 3=High Intent
   const [uploading, setUploading] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState("");
-
-  // User profile data matching the register component format
-  const [userProfile, setUserProfile] = useState({
-    full_name: "Juan Dela Cruz",
-    email: "juan.delacruz@example.com",
-    mobile_number: "+63 917 123 4567",
-    role: "tenant",
-    tenant_type: "professional",
-    is_verified: true,
-    verification_status: "pending", // pending, verified, rejected
-    documents: [
-      { type: "government_id", status: "verified", name: "Passport.jpg" },
-      { type: "proof_of_income", status: "pending", name: "Payslip_Jan.pdf" },
-      { type: "employment_cert", status: "not_uploaded", name: null },
-    ],
-    profile_image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA_pgElr8j_rlRwwpwegIL6Xuu4ezz6xE_6E1sL8l_12yVtQzhizRxzdBuXKzxqzZtWedaKiW9a_rBwyN3hgVIcYMUogSkMC-PzA4tnScc8Em0e1jbPoHp1-PVUSkRNQh2qywoUUKaf2_sHhQgYC-MbdOLhdCTWIWjsxJde9pTF29mUt5EnSAWSeFt2vIEi4T6z9GP19gG0dvXkdi650EgHOBsJd6W9BhNm52Ja4gTZGd8V2d0HAJF51IQaM2kqH-OA3ubEuyskyU8",
-    occupation: "Software Engineer",
-    preferred_location: "BGC, Makati",
-    family_size: "2",
-    budget_range: "20000-30000",
-    preferred_property_type: "condo",
-    move_in_timeline: "1-3_months",
-    special_requirements: "Pet-friendly, Near MRT/LRT, Parking space",
-  });
-
-  // Verification status badge
-  const verificationBadges = [
-    {
-      level: 1,
-      name: "Guest",
-      description: "Basic browsing only",
-      color: "bg-gray-100 text-gray-600",
-      icon: Eye,
-    },
-    {
-      level: 2,
-      name: "Verified",
-      description: "ID uploaded and verified",
-      color: "bg-blue-100 text-blue-600",
-      icon: Shield,
-    },
-    {
-      level: 3,
-      name: "High Intent",
-      description: "Income & move-in date verified",
-      color: "bg-emerald-100 text-emerald-600",
-      icon: BadgeCheck,
-    },
-  ];
+  const { user, logout } = useContext(AuthContext);
 
   // Document types for upload
   const documentTypes = [
@@ -136,6 +88,7 @@ const Profile = () => {
 
   // Format budget range for display
   const formatBudget = (range) => {
+    if (!range) return "Not specified";
     switch (range) {
       case "5000-10000":
         return "₱5,000 - ₱10,000";
@@ -146,12 +99,13 @@ const Profile = () => {
       case "30000+":
         return "₱30,000+";
       default:
-        return "Not specified";
+        return range;
     }
   };
 
   // Format tenant type for display
   const formatTenantType = (type) => {
+    if (!type) return "Not specified";
     switch (type) {
       case "searcher":
         return "Searcher";
@@ -168,6 +122,7 @@ const Profile = () => {
 
   // Format move-in timeline for display
   const formatTimeline = (timeline) => {
+    if (!timeline) return "Not specified";
     switch (timeline) {
       case "immediate":
         return "Immediate (within 1 month)";
@@ -178,12 +133,13 @@ const Profile = () => {
       case "6+_months":
         return "6+ months";
       default:
-        return "Not specified";
+        return timeline;
     }
   };
 
   // Format property type for display
   const formatPropertyType = (type) => {
+    if (!type) return "Not specified";
     switch (type) {
       case "apartment":
         return "Apartment";
@@ -204,9 +160,22 @@ const Profile = () => {
 
   // Role display mapping
   const roleDisplay = {
+    admin: "Admin",
     tenant: "Tenant",
-    landlord: "Landlord",
+    owner: "Owner",
     agent: "Agent",
+    user: "User",
+    searcher: "Searcher", // Your custom role
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
   };
 
   // Handle file upload
@@ -227,9 +196,54 @@ const Profile = () => {
     }, 1500);
   };
 
+  // Verification status badge
+  const verificationBadges = [
+    {
+      level: 1,
+      name: "Guest",
+      description: "Basic browsing only",
+      color: "bg-gray-100 text-gray-600",
+      icon: Eye,
+    },
+    {
+      level: 2,
+      name: "Verified",
+      description: "ID uploaded and verified",
+      color: "bg-blue-100 text-blue-600",
+      icon: Shield,
+    },
+    {
+      level: 3,
+      name: "High Intent",
+      description: "Income & move-in date verified",
+      color: "bg-emerald-100 text-emerald-600",
+      icon: BadgeCheck,
+    },
+  ];
+
   // Get current verification badge
   const currentBadge = verificationBadges[verificationLevel - 1];
   const BadgeIcon = currentBadge.icon;
+
+  // Handle logout
+  const handleLogout = async () => {
+    if (logout) {
+      await logout();
+      window.location.href = "/login";
+    }
+  };
+
+  // If no user, show loading or redirect
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -283,16 +297,18 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Profile Section - UPDATED */}
+          {/* Profile Section - UPDATED WITH REAL DATA */}
           <div className="flex flex-col items-center px-4 pt-6 pb-4">
             <div className="flex flex-col items-center gap-4 w-full">
               {/* Profile Image */}
               <div className="relative">
                 <div
                   className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-32 border-4 border-white shadow-lg"
-                  alt={`Professional portrait of ${userProfile.full_name}`}
+                  alt={`Profile of ${user.full_name || user.email}`}
                   style={{
-                    backgroundImage: `url("${userProfile.profile_image}")`,
+                    backgroundImage: user.profile_image
+                      ? `url("${user.profile_image}")`
+                      : `url("https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.email)}&background=10b981&color=fff&size=128")`,
                   }}
                 />
               </div>
@@ -301,27 +317,24 @@ const Profile = () => {
               <div className="flex flex-col items-center justify-center w-full">
                 <div className="flex items-center gap-2">
                   <p className="text-gray-900 text-[22px] font-bold leading-tight tracking-tight text-center">
-                    {userProfile.full_name}
+                    {user.full_name || user.email.split("@")[0]}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-emerald-600 text-sm font-semibold">
-                    {roleDisplay[userProfile.role]}
+                    {roleDisplay[user.role] || roleDisplay.user}
                   </span>
-                  {userProfile.role === "tenant" && (
+                  {user.role === "tenant" && user.tenant_type && (
                     <span className="text-sm text-gray-500">
-                      • {formatTenantType(userProfile.tenant_type)}
+                      • {formatTenantType(user.tenant_type)}
                     </span>
                   )}
                 </div>
-                <p className="text-gray-900 mt-1 text-sm font-medium text-center">
-                  {userProfile.occupation}
-                </p>
                 <p className="text-gray-500 text-xs font-normal text-center mt-1">
-                  Member since Jan 2024
+                  Member since {formatDate(user.created_at)}
                 </p>
 
-                {/* Badges Container - MOVED HERE */}
+                {/* Badges Container */}
                 <div className="flex justify-center gap-3 mt-4">
                   <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                     <div className="bg-emerald-500 text-white p-1 rounded-full">
@@ -331,7 +344,7 @@ const Profile = () => {
                       Active
                     </span>
                   </div>
-                  {userProfile.is_verified && (
+                  {user.is_verified && (
                     <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
                       <div className="bg-emerald-600 text-white p-1 rounded-full">
                         <ShieldCheck className="w-3 h-3" />
@@ -369,12 +382,6 @@ const Profile = () => {
                             <span className="text-red-500 ml-1">*</span>
                           )}
                         </p>
-                        {userProfile.documents.find((d) => d.type === doc.id)
-                          ?.status === "verified" && (
-                          <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
-                            Verified
-                          </span>
-                        )}
                       </div>
                       <p className="text-gray-500 text-xs mt-1">
                         {doc.description}
@@ -392,17 +399,9 @@ const Profile = () => {
                   ) : (
                     <button
                       onClick={() => handleFileUpload(doc.id)}
-                      className={`text-sm font-medium px-4 py-2 rounded-lg ${
-                        userProfile.documents.find((d) => d.type === doc.id)
-                          ?.status === "verified"
-                          ? "bg-gray-100 text-gray-600"
-                          : "bg-emerald-500 text-white hover:bg-emerald-600"
-                      }`}
+                      className="text-sm font-medium px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600"
                     >
-                      {userProfile.documents.find((d) => d.type === doc.id)
-                        ?.status === "verified"
-                        ? "Re-upload"
-                        : "Upload"}
+                      Upload
                     </button>
                   )}
                 </div>
@@ -443,7 +442,7 @@ const Profile = () => {
                       Email Address
                     </p>
                     <p className="text-gray-500 text-xs font-medium">
-                      {userProfile.email}
+                      {user.email}
                     </p>
                   </div>
                 </div>
@@ -461,7 +460,7 @@ const Profile = () => {
                       Mobile Number
                     </p>
                     <p className="text-gray-500 text-xs font-medium">
-                      {userProfile.mobile_number}
+                      {user.mobile_number || "Not provided"}
                     </p>
                   </div>
                 </div>
@@ -472,58 +471,12 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Housing Preferences Section */}
-          <div className="px-4 py-4">
-            <h3 className="text-gray-900 text-sm font-bold mb-3">
-              Housing Preferences
-            </h3>
-            <div className="flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm border border-gray-100">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <DollarSign className="w-4 h-4" />
-                    Budget
-                  </div>
-                  <p className="text-gray-900 text-sm font-bold">
-                    {formatBudget(userProfile.budget_range)}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <MapPin className="w-4 h-4" />
-                    Location
-                  </div>
-                  <p className="text-gray-900 text-sm font-bold">
-                    {userProfile.preferred_location || "Not specified"}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Home className="w-4 h-4" />
-                    Property Type
-                  </div>
-                  <p className="text-gray-900 text-sm font-bold">
-                    {formatPropertyType(userProfile.preferred_property_type)}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Users className="w-4 h-4" />
-                    Household Size
-                  </div>
-                  <p className="text-gray-900 text-sm font-bold">
-                    {userProfile.family_size === "5+"
-                      ? "5+ people"
-                      : `${userProfile.family_size} person${userProfile.family_size === "1" ? "" : "s"}`}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Footer Section */}
           <div className="flex flex-col items-center gap-4 px-4 py-8 border-t border-gray-200">
-            <button className="text-red-600 font-bold text-base hover:text-red-700 transition-colors">
+            <button
+              onClick={handleLogout}
+              className="text-red-600 font-bold text-base hover:text-red-700 transition-colors"
+            >
               <LogOut className="inline w-5 h-5 mr-2" />
               Log Out
             </button>
@@ -578,16 +531,18 @@ const Profile = () => {
           <div className="grid grid-cols-3 gap-8">
             {/* Left Column - Profile & Documents */}
             <div className="col-span-2 space-y-8">
-              {/* Profile Section - UPDATED */}
+              {/* Profile Section - UPDATED WITH REAL DATA */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <div className="flex items-start gap-8">
                   {/* Profile Image */}
                   <div className="flex-shrink-0">
                     <div
                       className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-40 border-4 border-white shadow-lg"
-                      alt={`Professional portrait of ${userProfile.full_name}`}
+                      alt={`Profile of ${user.full_name || user.email}`}
                       style={{
-                        backgroundImage: `url("${userProfile.profile_image}")`,
+                        backgroundImage: user.profile_image
+                          ? `url("${user.profile_image}")`
+                          : `url("https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.email)}&background=10b981&color=fff&size=160")`,
                       }}
                     />
                   </div>
@@ -595,27 +550,24 @@ const Profile = () => {
                   <div className="flex-1">
                     <div className="mb-6">
                       <h3 className="text-gray-900 text-2xl font-bold mb-2">
-                        {userProfile.full_name}
+                        {user.full_name || user.email.split("@")[0]}
                       </h3>
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-emerald-600 font-semibold">
-                          {roleDisplay[userProfile.role]}
+                          {roleDisplay[user.role] || roleDisplay.user}
                         </span>
-                        {userProfile.role === "tenant" && (
+                        {user.role === "tenant" && user.tenant_type && (
                           <span className="text-gray-600">
-                            • {formatTenantType(userProfile.tenant_type)}
+                            • {formatTenantType(user.tenant_type)}
                           </span>
                         )}
                         <span className="text-gray-500 text-sm">
-                          • Member since Jan 2024
+                          • Member since {formatDate(user.created_at)}
                         </span>
                       </div>
-                      <p className="text-gray-900 text-lg font-medium mb-4">
-                        {userProfile.occupation}
-                      </p>
 
-                      {/* Badges Container - MOVED HERE */}
-                      <div className="flex gap-4">
+                      {/* Badges Container */}
+                      <div className="flex gap-4 mt-4">
                         <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
                           <div className="bg-emerald-500 text-white p-1.5 rounded-full">
                             <Smile className="w-4 h-4" />
@@ -629,7 +581,7 @@ const Profile = () => {
                             </p>
                           </div>
                         </div>
-                        {userProfile.is_verified && (
+                        {user.is_verified && (
                           <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
                             <div className="bg-emerald-600 text-white p-1.5 rounded-full">
                               <BadgeCheck className="w-4 h-4" />
@@ -686,13 +638,6 @@ const Profile = () => {
                                 <span className="text-red-500 ml-1">*</span>
                               )}
                             </h4>
-                            {userProfile.documents.find(
-                              (d) => d.type === doc.id,
-                            )?.status === "verified" && (
-                              <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-xs font-bold">
-                                Verified
-                              </span>
-                            )}
                           </div>
                           <p className="text-gray-600 text-sm mt-1">
                             {doc.description}
@@ -710,17 +655,9 @@ const Profile = () => {
                       ) : (
                         <button
                           onClick={() => handleFileUpload(doc.id)}
-                          className={`px-5 py-2.5 rounded-lg font-medium ${
-                            userProfile.documents.find((d) => d.type === doc.id)
-                              ?.status === "verified"
-                              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              : "bg-emerald-500 text-white hover:bg-emerald-600"
-                          }`}
+                          className="px-5 py-2.5 rounded-lg font-medium bg-emerald-500 text-white hover:bg-emerald-600"
                         >
-                          {userProfile.documents.find((d) => d.type === doc.id)
-                            ?.status === "verified"
-                            ? "Update"
-                            : "Upload Document"}
+                          Upload Document
                         </button>
                       )}
                     </div>
@@ -848,36 +785,6 @@ const Profile = () => {
                       </button>
                     </div>
                   )}
-
-                  {/* Verified Documents */}
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-3">
-                      Verified Documents
-                    </h4>
-                    <div className="space-y-3">
-                      {userProfile.documents
-                        .filter((doc) => doc.status === "verified")
-                        .map((doc, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="flex items-center gap-3">
-                              <CheckCircle className="w-5 h-5 text-emerald-600" />
-                              <span className="text-sm font-medium">
-                                {
-                                  documentTypes.find((d) => d.id === doc.type)
-                                    ?.name
-                                }
-                              </span>
-                            </div>
-                            <span className="text-xs text-gray-500">
-                              Verified
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -889,14 +796,12 @@ const Profile = () => {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <p className="text-gray-500 text-sm">Email Address</p>
-                    <p className="text-gray-900 font-medium">
-                      {userProfile.email}
-                    </p>
+                    <p className="text-gray-900 font-medium">{user.email}</p>
                   </div>
                   <div className="space-y-2">
                     <p className="text-gray-500 text-sm">Mobile Number</p>
                     <p className="text-gray-900 font-medium">
-                      {userProfile.mobile_number}
+                      {user.mobile_number || "Not provided"}
                     </p>
                   </div>
                   <button className="w-full mt-4 text-emerald-600 font-medium hover:text-emerald-700 text-sm">
@@ -919,7 +824,10 @@ const Profile = () => {
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
                 </button>
-                <button className="w-full bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 px-4 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
+                <button
+                  onClick={handleLogout}
+                  className="w-full bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 px-4 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                >
                   <LogOut className="w-5 h-5" />
                   Log Out
                 </button>

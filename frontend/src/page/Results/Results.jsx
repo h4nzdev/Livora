@@ -29,18 +29,9 @@ import {
   Clock,
   TrendingUp,
   AlertCircle,
-  ChevronRight,
 } from "lucide-react";
-import axios from "axios";
+import { propertyService, formatUserData } from "../../services/api";
 import SplashScreen from "../../components/SplashScreen";
-// Remove the Matching import since we're navigating directly
-// import Matching from "../Matching/Matching";
-
-// Create axios instance
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-  timeout: 10000,
-});
 
 // Sorting options
 const SORT_OPTIONS = [
@@ -88,9 +79,6 @@ const Results = () => {
   // Modal states
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-
-  // REMOVED: showMatchingModal state since we'll navigate directly
-  // const [showMatchingModal, setShowMatchingModal] = useState(false);
 
   // Sorting state
   const [sortOption, setSortOption] = useState("best_match");
@@ -275,6 +263,7 @@ const Results = () => {
     setShowFilterModal(false);
   };
 
+  // Fetch properties using service
   useEffect(() => {
     const fetchProperties = async () => {
       setLoading(true);
@@ -294,9 +283,9 @@ const Results = () => {
           );
           propertiesData = recommendations.properties;
         } else {
-          console.log("Fetching properties from API...");
-          const response = await api.get("/properties?limit=20");
-          propertiesData = response.data.properties || [];
+          console.log("Fetching properties from API service...");
+          const response = await propertyService.getAllProperties(20);
+          propertiesData = response.properties || [];
 
           // Add match scores for demo if not present
           propertiesData = propertiesData.map((prop) => ({
@@ -326,6 +315,8 @@ const Results = () => {
             rating: 4.5,
             match_score: 85,
             furnished: true,
+            image_url:
+              "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop",
           },
           {
             id: 2,
@@ -341,6 +332,8 @@ const Results = () => {
             rating: 4.3,
             match_score: 78,
             furnished: true,
+            image_url:
+              "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w-800&auto=format&fit=crop",
           },
           {
             id: 3,
@@ -356,6 +349,8 @@ const Results = () => {
             rating: 4.8,
             match_score: 92,
             furnished: true,
+            image_url:
+              "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop",
           },
           {
             id: 4,
@@ -371,6 +366,8 @@ const Results = () => {
             rating: 4.7,
             match_score: 88,
             furnished: false,
+            image_url:
+              "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop",
           },
         ];
         setProperties(demoProperties);
@@ -388,9 +385,9 @@ const Results = () => {
   const calculateMatchPercentage = (property) => {
     let score = 70;
     if (property.pet_friendly) score += 10;
-    if (property.amenities.includes("gym")) score += 8;
-    if (property.amenities.includes("pool")) score += 7;
-    if (property.amenities.includes("wifi")) score += 5;
+    if (property.amenities?.includes("gym")) score += 8;
+    if (property.amenities?.includes("pool")) score += 7;
+    if (property.amenities?.includes("wifi")) score += 5;
     if (property.price <= 20000) score += 5;
     return Math.min(score, 99);
   };
@@ -496,22 +493,26 @@ const Results = () => {
     );
   };
 
-  const handleViewDetails = (propertyId) => {
-    navigate("/property", { state: { propertyId } });
+  const handleViewDetails = async (propertyId) => {
+    try {
+      // Fetch property details using service
+      const property = await propertyService.getPropertyById(propertyId);
+      navigate("/property", { state: { property } });
+    } catch (err) {
+      console.error("Error fetching property details:", err);
+      // Navigate with just the ID if service fails
+      navigate("/property", { state: { propertyId } });
+    }
   };
 
   const handleGoBack = () => {
     navigate(-1);
   };
 
-  // Handle opening matching page - SIMPLIFIED VERSION
+  // Handle opening matching page
   const handleEditPreferences = () => {
-    // Simply navigate to the Matching page
-    // The Matching page will load saved preferences from localStorage
     navigate("/matching");
   };
-
-  // REMOVED: handleMatchingComplete function since we're not using modal anymore
 
   // Count active filters
   const countActiveFilters = () => {
@@ -1057,7 +1058,27 @@ const Results = () => {
                           className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all hover:border-green-600/30 group"
                         >
                           {/* Image Section */}
-                          <div className="relative h-48 w-full bg-gradient-to-br from-green-50 to-green-100">
+                          <div className="relative h-48 w-full">
+                            {property.image_url ? (
+                              <img
+                                src={property.image_url}
+                                alt={property.name}
+                                className="absolute inset-0 w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                  // Show fallback gradient
+                                  e.target.parentElement.classList.add(
+                                    "bg-gradient-to-br",
+                                    "from-green-50",
+                                    "to-green-100",
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100"></div>
+                            )}
+
+                            {/* Badges */}
                             <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-sm">
                               <p className="text-green-600 font-bold text-xs tracking-wide">
                                 {matchPercentage}% MATCH
@@ -1246,7 +1267,7 @@ const Results = () => {
                     })}
                   </div>
 
-                  {/* Load More (only show if we have more properties) */}
+                  {/* Load More */}
                   {filteredProperties.length > 0 && (
                     <div className="mt-10 text-center">
                       <button className="px-8 py-3 border-2 border-green-600 text-green-600 hover:bg-green-50 rounded-xl font-bold transition-colors">

@@ -23,14 +23,6 @@ const LandingRoutes = () => {
         {/* Matching Flow */}
         <Route path="/matching" element={<Matching />} />
         <Route path="/results" element={<Results />} />
-        <Route
-          path="/dweller-dashboard"
-          element={
-            <DwellerLayout>
-              <DwellerDashboard />
-            </DwellerLayout>
-          }
-        />
         <Route path="/property" element={<PropertyDetails />} />
         {/* Redirect any unknown paths to landing page */}
         <Route path="*" element={<LandingPage />} />

@@ -16,13 +16,13 @@ const LandlordHeader = ({ onNavigate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notificationsCount, setNotificationsCount] = useState(5);
   const [messagesCount, setMessagesCount] = useState(12);
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const userProfile = {
-    name: "Alex Sterling",
-    email: "alex@portfolio.com",
-    role: "Portfolio Manager",
+    name: user?.full_name,
+    email: user?.email,
+    role: user?.role,
     avatar:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDh2Kcv9nD9tprp1jFi9v9Hc_qFeXTSF8a4eZX2K4T7CQjYlDw83BFMXYl0q-PPN1aji_KJq0Ifbf6vxkS3BxNkiSJf1SPTKxlxzQ0HPI-Y3wouu7aJk0H8tO-HOW5MEFt0JY2QPoz8rOzXpCxVI48jTCFk89LDu0rWUfB7Zh7im5j0eO6w4Wznzr3WM-AbMUwIH2Ogzqn4h4WvbuDHCPMYnRwVWoW29UCjHcWb0ty_AdXjqutaJySXmK2nNKdTll8ld-L9s8JG4W93",
     activeProperties: 8,

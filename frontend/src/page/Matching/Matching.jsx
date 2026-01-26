@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
+// USE THE PROPERTY SERVICE INSTEAD OF DIRECT AXIOS
+import {
+  propertyService,
+  formatUserData,
+} from "../../services/propertyService";
 
 // Use your existing imports
 import BudgetRange from "../../components/MatchingComponents/BudgetRange";
@@ -12,11 +17,11 @@ import LeaseAndHousehold from "../../components/MatchingComponents/LeaseAndHouse
 import logo from "../../assets/Livora.png";
 import ProfilingSplashScreen from "../../components/ProfilingSplashScreen";
 
-// Create axios instance for API calls
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-  timeout: 10000,
-});
+// REMOVE THIS - using service instead
+// const api = axios.create({
+//   baseURL: "http://localhost:5000",
+//   timeout: 10000,
+// });
 
 // LocalStorage key for saving user preferences
 const LOCAL_STORAGE_KEY = "userPreferences";
@@ -263,86 +268,71 @@ const Matching = () => {
     }
   };
 
-  // API call to get recommendations
+  // API call to get recommendations - USING THE SERVICE
   const getRecommendations = async (formData) => {
     try {
       setIsSubmitting(true);
       setSubmitError("");
 
-      // Format the data for the backend
-      const requestData = {
-        areaPreferences: formData.areaPreferences || [],
-        dailyRhythm: formData.dailyRhythm || "",
-        destinationAddress: formData.destinationAddress || "",
-        destinationLocation: formData.destinationLocation || "",
-        hasChildren: formData.hasChildren || false,
-        hasPets: formData.hasPets || false,
-        hasSmokeDrink: formData.hasSmokeDrink || "",
-        householdSize: formData.householdSize || "solo",
-        housingType: "apartment", // Default value since it's not in your form
-        leaseDuration: formData.leaseDuration || "",
-        lifestyleFeatures: formData.lifestyleFeatures || [],
-        maxBudget: formData.maxBudget?.toString() || "30000",
-        minBudget: formData.minBudget?.toString() || "10000",
-        moveInPlan: formData.moveInPlan || "As soon as possible",
-        mustHaveFeatures: formData.mustHaveFeatures || [],
-        otherRegion: formData.otherRegion || "",
-        preferredAmenities: formData.preferredAmenities || [],
-        primaryDestination: formData.primaryDestination || "workplace",
-        region: formData.region || "cebu",
-        roommateGender: formData.roommateGender || "",
-        transportation: formData.transportation || "public",
-      };
+      console.log("=== FORM DATA TO SEND ===");
+      console.log("Raw form data:", formData);
 
-      console.log("Sending request to backend:", requestData);
+      // USE THE FORMATTER FROM SERVICE
+      const requestData = formatUserData(formData);
 
-      const response = await api.post("/recommend", requestData);
+      console.log("Formatted data for backend:", requestData);
 
-      console.log("Backend response:", response.data);
+      // USE THE SERVICE FUNCTION
+      const response = await propertyService.getRecommendations(requestData);
+
+      console.log("Backend response:", response);
 
       // Store results in localStorage to pass to Results page
-      localStorage.setItem(
-        "recommendationResults",
-        JSON.stringify(response.data),
-      );
+      localStorage.setItem("recommendationResults", JSON.stringify(response));
 
-      // OPTIONAL: Clear the saved preferences after successful submission
-      // Uncomment the next line if you want to clear saved data after finding matches
-      // clearLocalStorage();
+      console.log("✅ Recommendations saved to localStorage");
 
       // Navigate to results page
-      navigate("/results", { state: { recommendations: response.data } });
+      navigate("/results", { state: { recommendations: response } });
     } catch (error) {
-      console.error("Error getting recommendations:", error);
+      console.error("❌ Error getting recommendations:", error);
 
+      // Better error handling
       if (error.response) {
         // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         console.error("Error data:", error.response.data);
         console.error("Error status:", error.response.status);
-        setSubmitError(
-          `Error ${error.response.status}: ${error.response.data.error || "Failed to get recommendations"}`,
-        );
+
+        let errorMessage = `Error ${error.response.status}: `;
+        if (error.response.data && error.response.data.error) {
+          errorMessage += error.response.data.error;
+        } else if (error.response.data && error.response.data.message) {
+          errorMessage += error.response.data.message;
+        } else {
+          errorMessage += "Failed to get recommendations";
+        }
+
+        setSubmitError(errorMessage);
       } else if (error.request) {
         // The request was made but no response was received
-        console.error("No response received:", error.request);
+        console.error("No response received. Is backend running?");
         setSubmitError(
           "Backend server is not responding. Please make sure it's running on localhost:5000",
         );
       } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error("Error:", error.message);
+        // Something happened in setting up the request
+        console.error("Request setup error:", error.message);
         setSubmitError(`Request error: ${error.message}`);
       }
 
-      // Fallback: navigate anyway with empty results for demo
-      // In production, you might want to handle this differently
+      // Optional: Still navigate but with error state
       navigate("/results", {
         state: {
           recommendations: {
             properties: [],
             totalMatches: 0,
-            message: "Demo mode: No backend connection",
+            message: "Error: Could not get recommendations",
+            error: submitError,
           },
         },
       });

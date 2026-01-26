@@ -7,7 +7,6 @@ import os
 import sys
 import math
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics.pairwise import cosine_similarity
 import re
 from datetime import datetime
 
@@ -41,7 +40,7 @@ def format_response_keys(response_data):
     else:
         return response_data
 
-# Enhanced properties data with additional fields for mathematical framework
+# Enhanced properties data with images and all required fields
 try:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(current_dir, 'data')
@@ -49,7 +48,7 @@ try:
     from properties import properties
     print(f"✓ Imported {len(properties)} properties")
 except ImportError:
-    # Enhanced properties with all required fields for mathematical framework
+    # Enhanced properties with all required fields and images
     properties = [
         {
             "id": 1,
@@ -64,22 +63,22 @@ except ImportError:
             "lease_duration": "short-term",
             "rating": 3.9,
             "furnished": True,
-            "parking_available": False,
+            "area_sqm": 12,
+            "floor": 3,
             "distance_to_it_park_km": 0.3,
-            "noise_level": "medium",
-            "kitchen_type": "shared",
-            "commute_type": "walking",
-            "fiber_available": True,
+            "available_date": "Immediate",
+            "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3?auto=format&fit=crop&w=800",
             # New fields for mathematical framework
             "latitude": 10.3190,
             "longitude": 123.9020,
-            "view_type": "city_view",  # interior, exterior, city_view, garden_view
-            "gender_preference": "co-ed",  # co-ed, female_only, male_only
-            "connectivity_score": 4.8,  # 1-5 scale for internet/signal
-            "share_type": "shared",  # private, shared, semi-private
-            "anchor_point_distance": 0.3,  # km to IT Park (anchor point)
+            "view_type": "city_view",
+            "gender_preference": "co-ed",
+            "connectivity_score": 4.8,
+            "share_type": "shared",
+            "anchor_point_distance": 0.3,
             "commute_minutes": 5,
-            "value_ratio": 1.14  # amenities per 1000 pesos
+            "value_ratio": 1.14,
+            "description": "Shared dormitory in the heart of IT Park, perfect for students and young professionals. Walking distance to offices and restaurants."
         },
         {
             "id": 2,
@@ -94,12 +93,11 @@ except ImportError:
             "lease_duration": "short-term",
             "rating": 3.5,
             "furnished": True,
-            "parking_available": False,
+            "area_sqm": 15,
+            "floor": 2,
             "distance_to_it_park_km": 1.5,
-            "noise_level": "low",
-            "kitchen_type": "shared",
-            "commute_type": "jeepney",
-            "fiber_available": False,
+            "available_date": "Immediate",
+            "image_url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3350,
             "longitude": 123.9150,
@@ -109,7 +107,8 @@ except ImportError:
             "share_type": "shared",
             "anchor_point_distance": 1.5,
             "commute_minutes": 12,
-            "value_ratio": 1.43
+            "value_ratio": 1.43,
+            "description": "Budget-friendly student room in Lahug with study desk and shared kitchen. Short jeepney ride to IT Park."
         },
         {
             "id": 3,
@@ -124,12 +123,11 @@ except ImportError:
             "lease_duration": "short-term",
             "rating": 4.0,
             "furnished": False,
-            "parking_available": False,
+            "area_sqm": 25,
+            "floor": 1,
             "distance_to_it_park_km": 4.0,
-            "noise_level": "low",
-            "kitchen_type": "induction",
-            "commute_type": "jeepney",
-            "fiber_available": True,
+            "available_date": "Immediate",
+            "image_url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3500,
             "longitude": 123.9200,
@@ -139,7 +137,8 @@ except ImportError:
             "share_type": "private",
             "anchor_point_distance": 4.0,
             "commute_minutes": 25,
-            "value_ratio": 0.89
+            "value_ratio": 0.89,
+            "description": "Simple apartment with private bathroom and kitchenette. Quiet neighborhood in Talamban."
         },
         {
             "id": 4,
@@ -154,12 +153,11 @@ except ImportError:
             "lease_duration": "short-term",
             "rating": 4.2,
             "furnished": True,
-            "parking_available": False,
+            "area_sqm": 22,
+            "floor": 4,
             "distance_to_it_park_km": 2.5,
-            "noise_level": "medium",
-            "kitchen_type": "induction",
-            "commute_type": "jeepney",
-            "fiber_available": True,
+            "available_date": "Immediate",
+            "image_url": "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3250,
             "longitude": 123.9100,
@@ -169,7 +167,8 @@ except ImportError:
             "share_type": "private",
             "anchor_point_distance": 2.5,
             "commute_minutes": 15,
-            "value_ratio": 1.0
+            "value_ratio": 1.0,
+            "description": "Modern studio apartment in Mabolo with gym access and 24/7 security. Convenient location."
         },
         {
             "id": 5,
@@ -184,12 +183,11 @@ except ImportError:
             "lease_duration": "short-term",
             "rating": 3.7,
             "furnished": True,
-            "parking_available": False,
+            "area_sqm": 10,
+            "floor": 1,
             "distance_to_it_park_km": 3.0,
-            "noise_level": "high",
-            "kitchen_type": "shared",
-            "commute_type": "jeepney",
-            "fiber_available": False,
+            "available_date": "Immediate",
+            "image_url": "https://images.unsplash.com/photo-1555854876-bf365c7c5de3?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3000,
             "longitude": 123.9000,
@@ -199,7 +197,8 @@ except ImportError:
             "share_type": "shared",
             "anchor_point_distance": 3.0,
             "commute_minutes": 20,
-            "value_ratio": 2.0
+            "value_ratio": 2.0,
+            "description": "Budget dormitory in Cebu City proper with laundry facilities and common area. Great for tight budgets."
         },
         {
             "id": 6,
@@ -214,12 +213,11 @@ except ImportError:
             "lease_duration": "short-term",
             "rating": 4.5,
             "furnished": True,
-            "parking_available": True,
+            "area_sqm": 30,
+            "floor": 8,
             "distance_to_it_park_km": 0.2,
-            "noise_level": "medium",
-            "kitchen_type": "induction",
-            "commute_type": "walking",
-            "fiber_available": True,
+            "available_date": "Immediate",
+            "image_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3195,
             "longitude": 123.9015,
@@ -229,7 +227,8 @@ except ImportError:
             "share_type": "private",
             "anchor_point_distance": 0.2,
             "commute_minutes": 3,
-            "value_ratio": 0.88
+            "value_ratio": 0.88,
+            "description": "Premium studio in IT Park with pool, gym, and parking. Perfect for professionals who want luxury amenities."
         },
         {
             "id": 7,
@@ -244,12 +243,11 @@ except ImportError:
             "lease_duration": "long-term",
             "rating": 4.3,
             "furnished": True,
-            "parking_available": True,
+            "area_sqm": 28,
+            "floor": 12,
             "distance_to_it_park_km": 3.5,
-            "noise_level": "low",
-            "kitchen_type": "induction",
-            "commute_type": "car",
-            "fiber_available": True,
+            "available_date": "Next week",
+            "image_url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3400,
             "longitude": 123.9180,
@@ -259,7 +257,8 @@ except ImportError:
             "share_type": "private",
             "anchor_point_distance": 3.5,
             "commute_minutes": 18,
-            "value_ratio": 0.92
+            "value_ratio": 0.92,
+            "description": "Modern condo in Banilad with pool, gym, and balcony. Pet-friendly unit with great amenities."
         },
         {
             "id": 8,
@@ -274,12 +273,11 @@ except ImportError:
             "lease_duration": "long-term",
             "rating": 4.1,
             "furnished": False,
-            "parking_available": True,
+            "area_sqm": 50,
+            "floor": 1,
             "distance_to_it_park_km": 5.5,
-            "noise_level": "low",
-            "kitchen_type": "full",
-            "commute_type": "car",
-            "fiber_available": True,
+            "available_date": "Next month",
+            "image_url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800",
             # New fields
             "latitude": 10.3600,
             "longitude": 123.9300,
@@ -289,7 +287,8 @@ except ImportError:
             "share_type": "private",
             "anchor_point_distance": 5.5,
             "commute_minutes": 30,
-            "value_ratio": 0.83
+            "value_ratio": 0.83,
+            "description": "Spacious house in Mandaue with garden and parking. Perfect for small families or roommates."
         }
     ]
     print("✓ Using enhanced properties dataset with mathematical framework fields")
@@ -339,61 +338,98 @@ class EnhancedProfiler:
     
     def calculate_s_finance(self, property_price, min_budget, max_budget):
         """Financial score - how close rent is to target (0-1 scale)"""
-        if min_budget <= property_price <= max_budget:
-            return 1.0  # Perfect match
-        elif property_price < min_budget:
-            # Bonus for being under budget (up to 10% bonus)
-            bonus = (min_budget - property_price) / min_budget * 0.1
-            return min(1.1, 1.0 + bonus)
-        else:
-            # Penalty for being over budget
-            over_percentage = (property_price - max_budget) / max_budget
-            penalty = over_percentage * 2  # Harsh penalty for being over
-            return max(0, 1.0 - penalty)
+        try:
+            # Ensure all values are numbers
+            property_price = float(property_price) if property_price else 0
+            min_budget = float(min_budget) if min_budget else 0
+            max_budget = float(max_budget) if max_budget else 999999
+            
+            if property_price <= 0:
+                return 0.0
+                
+            if min_budget <= property_price <= max_budget:
+                return 1.0  # Perfect match
+            elif property_price < min_budget:
+                # Bonus for being under budget (up to 20% bonus)
+                bonus = (min_budget - property_price) / min_budget * 0.2
+                return min(1.2, 1.0 + bonus)
+            else:
+                # Penalty for being over budget
+                over_percentage = (property_price - max_budget) / max_budget
+                penalty = min(0.5, over_percentage * 1.5)  # Cap penalty at 50%
+                return max(0.5, 1.0 - penalty)  # Minimum score of 0.5
+        except Exception as e:
+            print(f"   Finance score calculation error: {e}")
+            return 0.5  # Return neutral score on error
     
     def calculate_s_commute(self, distance_km):
         """Geo-spatial score based on distance (0-1 scale)"""
-        if distance_km < 1:
+        if distance_km <= 1:
             return 1.0
-        elif distance_km > 5:
-            return 0.0
+        elif distance_km >= 5:
+            return 0.2  # Minimum score instead of 0
         else:
-            # Linear interpolation between 1-5km
-            return 1.0 - ((distance_km - 1) / 4)
+            # Exponential decay for longer distances
+            return 1.0 - ((distance_km - 1) / 4) ** 1.5
     
     def calculate_s_lifestyle(self, property_data, user_prefs):
-        """Feature match with sensory check and cosine similarity (0-1 scale)"""
+        """Feature match with sensory check and amenity matching (0-1 scale)"""
         score = 0.0
+        max_score = 0.0
         
-        # 1. Sensory Check (Night Owl + Interior View)
+        # 1. Basic amenity matching (50% weight)
+        must_haves = set(user_prefs.get('must_have_features', []))
+        if must_haves:
+            property_amenities = set(property_data.get('amenities', []))
+            matched = len(must_haves.intersection(property_amenities))
+            amenity_score = matched / len(must_haves) if must_haves else 0.5
+            score += amenity_score * 0.5
+            max_score += 0.5
+        
+        # 2. Additional preferred amenities (20% weight)
+        preferred_amenities = set(user_prefs.get('preferred_amenities', []))
+        if preferred_amenities:
+            property_amenities = set(property_data.get('amenities', []))
+            matched = len(preferred_amenities.intersection(property_amenities))
+            preferred_score = matched / len(preferred_amenities) if preferred_amenities else 0.3
+            score += preferred_score * 0.2
+            max_score += 0.2
+        
+        # 3. Sensory compatibility (15% weight)
         daily_rhythm = user_prefs.get('daily_rhythm', '').lower()
         view_type = property_data.get('view_type', '').lower()
+        noise_level = property_data.get('noise_level', 'medium').lower()
         
-        if daily_rhythm == 'night owl' and view_type == 'interior':
-            score += 0.15  # Bonus points for sensory compatibility
-            print(f"  🦉 Sensory match: Night Owl + Interior View (+15%)")
+        sensory_score = 0.0
+        if daily_rhythm == 'night owl':
+            if view_type == 'interior' or noise_level == 'low':
+                sensory_score = 1.0
+            elif noise_level == 'medium':
+                sensory_score = 0.5
+        elif daily_rhythm == 'early bird':
+            if view_type in ['exterior', 'garden_view', 'city_view']:
+                sensory_score = 1.0
         
-        # 2. Amenities Cosine Similarity
-        # Get all possible amenities across all properties
-        all_amenities = set()
-        for prop in properties:
-            all_amenities.update(prop.get('amenities', []))
+        score += sensory_score * 0.15
+        max_score += 0.15
         
-        # Create binary vectors
-        prop_amenities = set(property_data.get('amenities', []))
-        user_wants = set(user_prefs.get('must_have_features', []))
+        # 4. Connectivity for remote work (15% weight)
+        work_type = user_prefs.get('work_type', '').lower()
+        connectivity_score = property_data.get('connectivity_score', 3.0)
         
-        prop_vector = [1 if amenity in prop_amenities else 0 for amenity in all_amenities]
-        user_vector = [1 if amenity in user_wants else 0 for amenity in all_amenities]
+        if work_type == 'remote':
+            connectivity_normalized = max(0, min(1, (connectivity_score - 3) / 2))
+            score += connectivity_normalized * 0.15
+        else:
+            score += 0.15  # Full points if not remote work
         
-        # Calculate Jaccard Index (simpler than cosine for binary vectors)
-        if len(user_wants) > 0:
-            intersection = len(prop_amenities.intersection(user_wants))
-            union = len(prop_amenities.union(user_wants))
-            jaccard_score = intersection / union if union > 0 else 0
-            score += jaccard_score * 0.85  # Remaining weight
+        max_score += 0.15
         
-        return min(1.0, score)  # Cap at 1.0
+        # Normalize by max possible score
+        if max_score > 0:
+            score = score / max_score
+        
+        return min(1.0, max(0.1, score))  # Cap between 0.1 and 1.0
     
     def analyze_preferences(self, user_prefs):
         """Analyze user preferences for insights"""
@@ -409,6 +445,8 @@ class EnhancedProfiler:
                 insights.append("💰 Your budget is below average. We'll show best value options.")
             elif max_budget > avg_price * 1.5:
                 insights.append("💎 Your budget allows for premium options with extra amenities.")
+            else:
+                insights.append("✅ Your budget aligns well with market prices.")
         except:
             pass
         
@@ -421,7 +459,7 @@ class EnhancedProfiler:
         
         # Destination analysis
         destination = user_prefs.get('destination_location', '')
-        if 'IT Park' in destination:
+        if 'IT Park' in destination or 'Cebu Business Park' in destination:
             insights.append("🏢 Using IT Park as anchor point for distance calculations")
         
         # Lifestyle analysis
@@ -430,6 +468,11 @@ class EnhancedProfiler:
             insights.append("🦉 Considering interior-view properties for better daytime sleep")
         elif daily_rhythm == 'early bird':
             insights.append("🌅 Prioritizing properties with good natural light")
+        
+        # Remote work analysis
+        work_type = user_prefs.get('work_type', '').lower()
+        if work_type == 'remote':
+            insights.append("💻 Prioritizing properties with high-speed internet connectivity")
         
         return insights
     
@@ -482,51 +525,71 @@ class BucketingAlgorithm:
         # Get user preferences
         preferred_areas = user_prefs.get('area_preferences', [])
         max_budget = int(user_prefs.get('max_budget', 999999))
+        min_budget = int(user_prefs.get('min_budget', 0))
         
         for prop in properties_list:
             total_score = prop.get('match_score', 0)
-            normalized_score = total_score / 100  # Convert to 0-1 scale
             
             # Check if property passes hard filters
             passes_hard_filters = self.check_hard_filters(prop, user_prefs)
             
-            # 1. Safe Bet: Score > 85% and passes all hard filters
-            if normalized_score > 0.85 and passes_hard_filters:
+            # 1. Safe Bet: Score > 75% and passes all hard filters AND within budget
+            if total_score >= 75 and passes_hard_filters and prop['price'] <= max_budget:
                 prop['category'] = "Safe Bet"
-                prop['category_description'] = "High compliance across all vectors"
-                prop['match_type'] = "exact"
+                prop['categoryDescription'] = "High compliance across all vectors, within budget"
+                prop['matchType'] = "exact"
                 categorized['safe_bet'].append(prop)
             
-            # 2. Stretch: Constraint relaxation logic
-            elif self.is_stretch_candidate(prop, user_prefs, normalized_score, passes_hard_filters):
-                prop['category'] = "Stretch"
-                prop['category_description'] = self.generate_stretch_description(prop, user_prefs)
-                prop['match_type'] = "relaxed"
-                categorized['stretch'].append(prop)
+            # 2. Stretch: Excellent match but slightly over budget OR minor constraint issue
+            elif total_score >= 65 and passes_hard_filters:
+                if prop['price'] > max_budget:
+                    over_amount = prop['price'] - max_budget
+                    if over_amount <= max_budget * 0.3:  # Up to 30% over budget
+                        prop['category'] = "Stretch"
+                        prop['categoryDescription'] = f"Excellent match but ₱{over_amount:,} over budget"
+                        prop['matchType'] = "relaxed"
+                        categorized['stretch'].append(prop)
             
-            # 3. Wildcard: Discovery radius logic
-            elif self.is_wildcard_candidate(prop, user_prefs, preferred_areas):
-                prop['category'] = "Wildcard"
-                prop['category_description'] = self.generate_wildcard_description(prop, user_prefs)
-                prop['match_type'] = "discovery"
-                categorized['wildcard'].append(prop)
+            # 3. Wildcard: Good value, decent score, not necessarily in preferred areas
+            elif total_score >= 50:
+                # Check if it's a good value proposition
+                value_ratio = prop.get('value_ratio', 0)
+                commute_minutes = prop.get('commute_minutes', 60)
+                
+                if (value_ratio >= 1.0 or commute_minutes <= 15) and passes_hard_filters:
+                    prop['category'] = "Wildcard"
+                    
+                    # Generate description
+                    price_diff = prop['price'] - max_budget
+                    if price_diff < 0:
+                        price_text = f"₱{abs(price_diff):,} under budget"
+                    elif price_diff > 0:
+                        price_text = f"₱{price_diff:,} over budget"
+                    else:
+                        price_text = "within budget"
+                    
+                    # Check if in preferred areas
+                    prop_location = prop['location'].lower()
+                    in_preferred = any(area.lower() in prop_location for area in preferred_areas)
+                    
+                    if in_preferred:
+                        prop['categoryDescription'] = f"Located in {prop['location']} (your preferred area), {price_text}"
+                        prop['matchType'] = "preferred_area"
+                    else:
+                        prop['categoryDescription'] = f"Located in {prop['location']} (discovery area), {price_text} with great value"
+                        prop['matchType'] = "discovery"
+                    
+                    categorized['wildcard'].append(prop)
         
         return categorized
     
     def check_hard_filters(self, prop, user_prefs):
         """Apply hard filters (binary exclusion)"""
         # Gender preference filter
-        user_gender = user_prefs.get('gender', '').lower()
+        user_gender = user_prefs.get('roommate_gender', '').lower()
         property_gender = prop.get('gender_preference', 'co-ed').lower()
         
         if property_gender != 'co-ed' and user_gender and property_gender != user_gender:
-            return False
-        
-        # Remote work connectivity filter
-        work_type = user_prefs.get('work_type', '').lower()
-        connectivity_score = prop.get('connectivity_score', 0)
-        
-        if work_type == 'remote' and connectivity_score < 3.0:
             return False
         
         # Pet filter
@@ -536,126 +599,31 @@ class BucketingAlgorithm:
         if has_pets and not pet_friendly:
             return False
         
+        # Smoking/drinking filter
+        has_smoke_drink = user_prefs.get('has_smoke_drink', '').lower()
+        if has_smoke_drink == 'no' and 'no_smoking' not in [a.lower() for a in prop.get('amenities', [])]:
+            # Not a hard filter, but could be considered
+            pass
+        
         return True
     
-    def is_stretch_candidate(self, prop, user_prefs, normalized_score, passes_hard_filters):
-        """Identify stretch candidates using constraint relaxation"""
+    def generate_hard_filter_suggestions(self, user_prefs):
+        """Generate suggestions when no properties pass hard filters"""
+        suggestions = []
         
-        # Case 1: Failed hard filter but otherwise excellent
-        if not passes_hard_filters:
-            # Recalculate score ignoring failed filter
-            stretch_score = self.calculate_stretch_score(prop, user_prefs)
-            if stretch_score > 0.9:
-                return True
+        has_pets = user_prefs.get('has_pets', False)
+        user_gender = user_prefs.get('roommate_gender', '')
         
-        # Case 2: Over budget but high amenity score
-        price = prop.get('price', 0)
-        max_budget = int(user_prefs.get('max_budget', 999999))
+        if has_pets:
+            suggestions.append("Consider expanding your search to include pet-friendly properties")
         
-        if price > max_budget:
-            # Calculate amenity match score
-            amenities = set(prop.get('amenities', []))
-            must_haves = set(user_prefs.get('must_have_features', []))
-            
-            if must_haves:
-                amenity_match = len(amenities.intersection(must_haves)) / len(must_haves)
-                
-                # If amenity score > 0.9, qualify as stretch
-                if amenity_match > 0.9:
-                    stretch_score = normalized_score + 0.4  # Add back budget penalty
-                    if stretch_score > 0.9:
-                        return True
+        if user_gender and user_gender != 'any':
+            suggestions.append(f"Try searching for '{user_gender}' only properties or co-ed options")
         
-        return False
-    
-    def is_wildcard_candidate(self, prop, user_prefs, preferred_areas):
-        """Identify wildcard candidates in discovery radius"""
-        prop_location = prop.get('location', '').lower()
+        if not suggestions:
+            suggestions.append("Try adjusting your budget or preferred locations")
         
-        # 1. Not in preferred areas
-        in_preferred = False
-        for area in preferred_areas:
-            if area.lower() in prop_location:
-                in_preferred = True
-                break
-        
-        if in_preferred:
-            return False
-        
-        # 2. Check commute time (< 15 mins)
-        commute_minutes = prop.get('commute_minutes', 60)
-        if commute_minutes > 15:
-            return False
-        
-        # 3. Calculate value ratio (amenities per 1000 pesos)
-        price = prop.get('price', 1)
-        amenities_count = len(prop.get('amenities', []))
-        value_ratio = amenities_count / price * 1000
-        
-        # Threshold: at least 0.8 amenities per 1000 pesos
-        if value_ratio > 0.8:
-            return True
-        
-        return False
-    
-    def calculate_stretch_score(self, prop, user_prefs):
-        """Calculate score ignoring specific failed constraints"""
-        # Create a copy of property data
-        prop_copy = prop.copy()
-        
-        # Remove penalties for specific constraints
-        # For example, if it failed pet filter, assume it's pet friendly
-        prop_copy['pet_friendly'] = True
-        
-        # Recalculate using enhanced profiler
-        profiler = EnhancedProfiler()
-        min_budget = int(user_prefs.get('min_budget', 0))
-        max_budget = int(user_prefs.get('max_budget', 999999))
-        
-        # Calculate scores without specific constraints
-        s_finance = profiler.calculate_s_finance(prop['price'], min_budget, max_budget)
-        s_commute = profiler.calculate_s_commute(prop.get('anchor_point_distance', 10))
-        s_lifestyle = profiler.calculate_s_lifestyle(prop_copy, user_prefs)
-        
-        # Weighted sum
-        total_score = (
-            profiler.weights['finance'] * s_finance +
-            profiler.weights['commute'] * s_commute +
-            profiler.weights['lifestyle'] * s_lifestyle
-        )
-        
-        return total_score
-    
-    def generate_stretch_description(self, prop, user_prefs):
-        """Generate description for stretch candidates"""
-        price = prop.get('price', 0)
-        max_budget = int(user_prefs.get('max_budget', 999999))
-        
-        if price > max_budget:
-            over_amount = price - max_budget
-            return f"Matches {prop.get('match_score', 0)}% of your needs, but ₱{over_amount:,} over budget"
-        
-        # Check for other constraints
-        if not prop.get('pet_friendly', False) and user_prefs.get('has_pets', False):
-            return f"Excellent match but not pet-friendly"
-        
-        return "Great match with minor trade-offs"
-    
-    def generate_wildcard_description(self, prop, user_prefs):
-        """Generate description for wildcard candidates"""
-        location = prop.get('location', '')
-        price = prop.get('price', 0)
-        max_budget = int(user_prefs.get('max_budget', 999999))
-        
-        price_diff = price - max_budget
-        if price_diff < 0:
-            price_text = f"₱{abs(price_diff):,} under budget"
-        elif price_diff > 0:
-            price_text = f"₱{price_diff:,} over budget"
-        else:
-            price_text = "within budget"
-        
-        return f"Located in {location} (discovery area), {price_text} with great value"
+        return suggestions
 
 def extract_key_features(prop, user_prefs):
     """Extract key features for display with mathematical insights"""
@@ -663,11 +631,13 @@ def extract_key_features(prop, user_prefs):
     
     # Budget indicator
     price = prop.get('price', 0)
-    if price <= 3000:
-        features.append("💰 Budget-friendly")
-    elif price <= 5000:
-        features.append("💰 Good value")
-    elif price <= 8000:
+    max_budget = user_prefs.get('max_budget', 999999)
+    
+    if price <= max_budget * 0.7:
+        features.append("💰 Great value")
+    elif price <= max_budget:
+        features.append("💰 Within budget")
+    else:
         features.append("💰 Premium option")
     
     # Location features with mathematical insights
@@ -677,22 +647,39 @@ def extract_key_features(prop, user_prefs):
     elif anchor_distance <= 3:
         features.append("📍 Short commute to IT Park")
     
-    # Amenity highlights
+    # Amenity highlights - prioritize user's must-haves
     amenities = prop.get('amenities', [])
-    if any('aircon' in str(a).lower() for a in amenities):
-        features.append("❄️ Air conditioned")
-    if any('private' in str(a).lower() and 'bathroom' in str(a).lower() for a in amenities):
-        features.append("🚿 Private bathroom")
-    if any('wifi' in str(a).lower() for a in amenities):
-        features.append("📶 High-speed WiFi")
-    if any('gym' in str(a).lower() for a in amenities):
-        features.append("💪 Gym access")
+    must_haves = user_prefs.get('must_have_features', [])
+    
+    # Show which must-haves are present
+    for must_have in must_haves:
+        if any(must_have in str(a).lower() for a in amenities):
+            if 'aircon' in must_have.lower():
+                features.append("❄️ Air conditioned")
+            elif 'wifi' in must_have.lower():
+                features.append("📶 High-speed WiFi")
+            elif 'private' in must_have.lower() and 'bathroom' in must_have.lower():
+                features.append("🚿 Private bathroom")
+            elif 'gym' in must_have.lower():
+                features.append("💪 Gym access")
+            elif 'pool' in must_have.lower():
+                features.append("🏊 Pool access")
+    
+    # Add unique selling points
+    if 'security' in [a.lower() for a in amenities]:
+        features.append("🛡️ 24/7 Security")
+    if 'parking' in [a.lower() for a in amenities]:
+        features.append("🅿️ Parking available")
+    if prop.get('furnished', False):
+        features.append("🛋️ Fully furnished")
     
     # Sensory match indicator
     daily_rhythm = user_prefs.get('daily_rhythm', '').lower()
     view_type = prop.get('view_type', '').lower()
     if daily_rhythm == 'night owl' and view_type == 'interior':
-        features.append("🦉 Ideal for night owls")
+        features.append("🦉 Quiet for night owls")
+    elif daily_rhythm == 'early bird' and view_type != 'interior':
+        features.append("🌅 Good natural light")
     
     return features[:5]  # Limit to 5 features
 
@@ -706,9 +693,9 @@ def recommend():
         if not raw_user_prefs:
             return jsonify(format_response_keys({
                 "error": "No preferences provided",
-                "recommended_ids": [],
+                "recommendedIds": [],
                 "properties": [],
-                "total_matches": 0
+                "totalMatches": 0
             })), 400
         
         print(f"\n📝 Received user preferences:")
@@ -719,6 +706,41 @@ def recommend():
         
         # Normalize to snake_case for processing
         user_prefs = normalize_user_prefs(raw_user_prefs)
+        
+        # CRITICAL FIX: Convert budget values to integers
+        try:
+            min_budget_str = user_prefs.get('min_budget', '0')
+            max_budget_str = user_prefs.get('max_budget', '30000')  # Default to 30k if not provided
+            
+            # Handle if they're already numbers
+            if isinstance(min_budget_str, (int, float)):
+                min_budget = int(min_budget_str)
+            else:
+                # Remove currency symbols and commas, convert to int
+                min_budget_str = str(min_budget_str).replace('₱', '').replace(',', '').strip()
+                min_budget = int(float(min_budget_str)) if min_budget_str else 0
+            
+            if isinstance(max_budget_str, (int, float)):
+                max_budget = int(max_budget_str)
+            else:
+                max_budget_str = str(max_budget_str).replace('₱', '').replace(',', '').strip()
+                max_budget = int(float(max_budget_str)) if max_budget_str else 30000
+                
+            # Ensure max is not less than min
+            if max_budget < min_budget:
+                max_budget = min_budget + 5000  # Add 5k buffer
+                
+            user_prefs['min_budget'] = min_budget
+            user_prefs['max_budget'] = max_budget
+            
+            print(f"   Converted budget: ₱{min_budget:,} - ₱{max_budget:,}")
+            
+        except Exception as budget_error:
+            print(f"   Budget conversion error: {budget_error}")
+            # Set safe defaults
+            user_prefs['min_budget'] = 5000
+            user_prefs['max_budget'] = 20000
+            print(f"   Using default budget: ₱5,000 - ₱20,000")
         
         # Initialize enhanced profiler
         profiler = EnhancedProfiler()
@@ -737,14 +759,14 @@ def recommend():
         
         if len(filtered_properties) == 0:
             # Return suggestions for failed hard filters
-            suggestions = self.generate_hard_filter_suggestions(user_prefs)
+            suggestions = bucketing.generate_hard_filter_suggestions(user_prefs)
             return jsonify(format_response_keys({
-                "recommended_ids": [],
+                "recommendedIds": [],
                 "properties": [],
-                "total_matches": 0,
+                "totalMatches": 0,
                 "message": "No properties match your hard constraints",
                 "suggestions": suggestions,
-                "match_insights": profiler.analyze_preferences(user_prefs)
+                "matchInsights": profiler.analyze_preferences(user_prefs)
             }))
         
         # Convert to DataFrame for easier processing
@@ -767,15 +789,11 @@ def recommend():
         filtered_df['match_score'] = match_scores
         filtered_df['component_scores'] = component_scores_list
         
-        # Normalize prices for display insights
-        price_normalized = profiler.normalize_continuous(filtered_df['price'].tolist())
-        filtered_df['price_normalized'] = price_normalized
-        
         # Sort by match score
         filtered_df = filtered_df.sort_values('match_score', ascending=False)
         
-        # Get top recommendations (limit to 15)
-        top_properties = filtered_df.head(15)
+        # Get top recommendations (limit to 10 for better curation)
+        top_properties = filtered_df.head(10)
         
         # --- Step C: Bucketing Algorithm ---
         print(f"\n📊 Step C: Bucketing Algorithm")
@@ -793,18 +811,25 @@ def recommend():
                 'bedrooms': int(prop['bedrooms']),
                 'bathrooms': int(prop['bathrooms']),
                 'amenities': prop['amenities'],
-                'pet_friendly': bool(prop.get('pet_friendly', False)),
-                'lease_duration': prop['lease_duration'],
+                'petFriendly': bool(prop.get('pet_friendly', False)),
+                'leaseDuration': prop['lease_duration'],
                 'rating': float(prop.get('rating', 0)),
-                'match_score': round(float(prop['match_score']), 1),
-                'match_percentage': f"{round(float(prop['match_score']), 1)}%",
+                'furnished': prop.get('furnished', False),
+                'areaSqm': prop.get('area_sqm', 0),
+                'floor': prop.get('floor', 0),
+                'distanceToItParkKm': prop.get('distance_to_it_park_km', 0),
+                'availableDate': prop.get('available_date', 'Immediate'),
+                'imageUrl': prop.get('image_url', 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00'),
+                'description': prop.get('description', 'Modern property with great amenities.'),
+                'matchScore': round(float(prop['match_score']), 1),
+                'matchPercentage': f"{round(float(prop['match_score']), 1)}%",
                 'features': extract_key_features(prop_dict, user_prefs),
-                'view_type': prop.get('view_type', ''),
-                'connectivity_score': prop.get('connectivity_score', 0),
-                'anchor_point_distance': prop.get('anchor_point_distance', 0),
-                'commute_minutes': prop.get('commute_minutes', 0),
-                'value_ratio': prop.get('value_ratio', 0),
-                'component_scores': prop.get('component_scores', {})
+                'viewType': prop.get('view_type', ''),
+                'connectivityScore': prop.get('connectivity_score', 0),
+                'anchorPointDistance': prop.get('anchor_point_distance', 0),
+                'commuteMinutes': prop.get('commute_minutes', 0),
+                'valueRatio': prop.get('value_ratio', 0),
+                'componentScores': prop.get('component_scores', {})
             }
             properties_list.append(prop_data)
         
@@ -830,40 +855,41 @@ def recommend():
         
         # Build response
         response = {
-            "recommended_ids": [p['id'] for p in properties_list],
+            "recommendedIds": [p['id'] for p in properties_list],
             "properties": properties_list,
-            "categorized_recommendations": categorized,
-            "total_matches": len(filtered_df),
-            "match_insights": match_insights,
-            "tenant_profile": {
-                "budget_range": f"₱{int(user_prefs.get('min_budget', 0)):,} - ₱{int(user_prefs.get('max_budget', 999999)):,}",
-                "preferred_locations": user_prefs.get('area_preferences', []),
-                "priority_features": user_prefs.get('must_have_features', []),
+            "categorizedRecommendations": categorized,
+            "totalMatches": len(filtered_df),
+            "matchInsights": match_insights,
+            "tenantProfile": {
+                "budgetRange": f"₱{user_prefs.get('min_budget', 0):,} - ₱{user_prefs.get('max_budget', 30000):,}",
+                "preferredLocations": user_prefs.get('area_preferences', []),
+                "priorityFeatures": user_prefs.get('must_have_features', []),
                 "lifestyle": user_prefs.get('daily_rhythm', 'Not specified'),
                 "transportation": user_prefs.get('transportation', 'Not specified'),
-                "work_type": user_prefs.get('work_type', 'Not specified'),
-                "mathematical_scores": {
-                    "finance_weight": profiler.weights['finance'],
-                    "commute_weight": profiler.weights['commute'],
-                    "lifestyle_weight": profiler.weights['lifestyle'],
-                    "anchor_point": profiler.anchor_point
+                "workType": user_prefs.get('work_type', 'Not specified'),
+                "mathematicalScores": {
+                    "financeWeight": profiler.weights['finance'],
+                    "commuteWeight": profiler.weights['commute'],
+                    "lifestyleWeight": profiler.weights['lifestyle'],
+                    "anchorPoint": profiler.anchor_point
                 }
             },
-            "scoring_summary": {
-                "properties_scored": len(filtered_df),
-                "scoring_method": "Weighted Sum Model",
+            "scoringSummary": {
+                "propertiesScored": len(filtered_df),
+                "scoringMethod": "Weighted Sum Model",
                 "formula": "Score = (W_finance × S_finance) + (W_commute × S_commute) + (W_lifestyle × S_lifestyle)",
-                "category_thresholds": {
-                    "safe_bet": "Score > 85% + passes hard filters",
-                    "stretch": "Constraint relaxation logic",
-                    "wildcard": "Discovery radius (<15 mins, not in preferred areas, high value ratio)"
+                "categoryThresholds": {
+                    "safeBet": "Score > 75% + passes hard filters + within budget",
+                    "stretch": "Score > 65% + within 30% of budget",
+                    "wildcard": "Score > 50% + good value or short commute"
                 }
-            }
+            },
+            "message": f"Found {len(filtered_df)} properties matching your preferences"
         }
         
         print(f"\n✅ Recommendation Summary:")
         print(f"   Total matches: {len(filtered_df)}")
-        print(f"   Top match score: {properties_list[0]['match_score'] if properties_list else 0}%")
+        print(f"   Top match score: {properties_list[0]['matchScore'] if properties_list else 0}%")
         print(f"   Categories: {safe_bet_count} Safe Bet, {stretch_count} Stretch, {wildcard_count} Wildcard")
         
         # Convert snake_case keys back to camelCase for frontend
@@ -876,34 +902,64 @@ def recommend():
         
         return jsonify(format_response_keys({
             "error": str(e),
-            "recommended_ids": [],
+            "recommendedIds": [],
             "properties": [],
-            "total_matches": 0
+            "totalMatches": 0,
+            "message": "An error occurred while processing your request"
         })), 500
 
 @app.route('/properties', methods=['GET'])
 def get_properties():
     """Get all properties with enhanced fields"""
     try:
-        limit = int(request.args.get('limit', 10))
-        properties_list = properties[:limit]
+        limit = int(request.args.get('limit', 20))
+        offset = int(request.args.get('offset', 0))
         
-        # Add mathematical framework metadata
+        # Apply pagination
+        end_idx = min(offset + limit, len(properties))
+        properties_list = properties[offset:end_idx]
+        
+        # Ensure all properties have image_url
+        for prop in properties_list:
+            if 'image_url' not in prop or not prop['image_url']:
+                prop['image_url'] = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800"
+        
         response_data = {
             "total": len(properties),
             "limit": limit,
+            "offset": offset,
+            "hasMore": end_idx < len(properties),
             "properties": properties_list,
-            "mathematical_framework": {
-                "has_required_fields": True,
-                "fields_present": [
-                    "latitude", "longitude", "view_type", "gender_preference",
-                    "connectivity_score", "anchor_point_distance", "commute_minutes", "value_ratio"
+            "mathematicalFramework": {
+                "hasRequiredFields": True,
+                "fieldsPresent": [
+                    "latitude", "longitude", "viewType", "genderPreference",
+                    "connectivityScore", "anchorPointDistance", "commuteMinutes", "valueRatio"
                 ],
-                "scoring_ready": True
+                "scoringReady": True
             }
         }
         
         return jsonify(format_response_keys(response_data))
+    except Exception as e:
+        return jsonify(format_response_keys({"error": str(e)})), 500
+
+@app.route('/properties/<int:property_id>', methods=['GET'])
+def get_property(property_id):
+    """Get a single property by ID"""
+    try:
+        property_data = next((p for p in properties if p['id'] == property_id), None)
+        
+        if not property_data:
+            return jsonify(format_response_keys({
+                "error": f"Property with ID {property_id} not found"
+            })), 404
+        
+        # Ensure image_url exists
+        if 'image_url' not in property_data or not property_data['image_url']:
+            property_data['image_url'] = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800"
+        
+        return jsonify(format_response_keys(property_data))
     except Exception as e:
         return jsonify(format_response_keys({"error": str(e)})), 500
 
@@ -912,30 +968,33 @@ def health():
     """Health check with mathematical framework info"""
     return jsonify(format_response_keys({
         "status": "healthy",
-        "service": "Enhanced Property Recommendation",
-        "properties_loaded": len(properties),
-        "price_range": f"₱{properties_df['price'].min():,} - ₱{properties_df['price'].max():,}",
-        "mathematical_framework": {
+        "service": "Enhanced Property Recommendation API",
+        "propertiesLoaded": len(properties),
+        "priceRange": f"₱{properties_df['price'].min():,} - ₱{properties_df['price'].max():,}",
+        "averagePrice": f"₱{properties_df['price'].mean():,.0f}",
+        "mathematicalFramework": {
             "implemented": True,
             "components": [
                 "Weighted Sum Model",
                 "Haversine Distance",
                 "Constraint Relaxation",
-                "Discovery Radius",
-                "Vector Similarity"
+                "Value Ratio Scoring",
+                "Sensory Compatibility"
             ],
             "weights": {
                 "finance": 0.4,
                 "commute": 0.3,
                 "lifestyle": 0.3
             },
-            "category_logic": {
-                "safe_bet": "Score > 85% + hard filters",
-                "stretch": "Constraint relaxation",
-                "wildcard": "Discovery radius + value ratio"
+            "categoryLogic": {
+                "safeBet": "Score > 75% + within budget",
+                "stretch": "Score > 65% + within 30% over budget",
+                "wildcard": "Score > 50% + good value or short commute"
             }
         },
-        "input_format": "camelCase supported"
+        "inputFormat": "camelCase supported",
+        "imageSupport": True,
+        "curatedRecommendations": True
     }))
 
 @app.route('/framework/explain', methods=['GET'])
@@ -943,52 +1002,61 @@ def explain_framework():
     """Explain the mathematical framework"""
     explanation = {
         "title": "Mathematical Framework for Property Matching",
+        "description": "Advanced recommendation system using mathematical optimization",
         "components": [
             {
                 "name": "Weighted Sum Model",
-                "formula": "Score = (W_finance × S_finance) + (W_commute × S_commute) + (W_lifestyle × S_lifestyle)",
+                "formula": "Score = (0.4×Finance) + (0.3×Commute) + (0.3×Lifestyle)",
                 "weights": {
                     "W_finance": 0.4,
                     "W_commute": 0.3,
                     "W_lifestyle": 0.3
                 },
-                "description": "Linear combination of normalized scores"
+                "description": "Linear combination of normalized scores with configurable weights"
             },
             {
                 "name": "S_finance (Financial Score)",
-                "formula": "Normalized based on budget range",
-                "description": "Penalizes properties far outside budget, bonuses for under budget"
+                "formula": "Normalized based on budget range with bonuses/penalties",
+                "description": "1.0 if within budget, bonus if under budget, penalty if over budget"
             },
             {
                 "name": "S_commute (Geo-Spatial Score)",
-                "formula": "Haversine distance to anchor point",
-                "description": "1.0 if <1km, 0.0 if >5km, linear interpolation between"
+                "formula": "Exponential decay based on Haversine distance",
+                "description": "1.0 if <1km, decays to 0.2 at 5km, considers walking vs transport"
             },
             {
                 "name": "S_lifestyle (Feature Match)",
-                "formula": "Sensory check + Jaccard similarity for amenities",
-                "description": "Bonus for night owl + interior view, plus amenity matching"
+                "formula": "Amenity matching + sensory compatibility + connectivity",
+                "description": "50% must-have amenities, 20% preferred amenities, 15% sensory, 15% connectivity"
             },
             {
                 "name": "Bucketing Algorithm",
                 "categories": [
                     {
                         "name": "Safe Bet",
-                        "criteria": "Score > 85% AND passes all hard filters",
-                        "logic": "High compliance across all vectors"
+                        "criteria": "Score ≥ 75% AND within budget AND passes all hard filters",
+                        "logic": "High compliance across all dimensions"
                     },
                     {
                         "name": "Stretch",
-                        "criteria": "Constraint relaxation logic",
-                        "logic": "Excellent in most dimensions but fails one constraint"
+                        "criteria": "Score ≥ 65% AND within 30% over budget",
+                        "logic": "Excellent match with minor budget flexibility needed"
                     },
                     {
                         "name": "Wildcard",
-                        "criteria": "Discovery radius + value ratio",
-                        "logic": "Not in preferred areas but great value and <15 mins commute"
+                        "criteria": "Score ≥ 50% AND (good value OR short commute)",
+                        "logic": "Good options outside preferred areas with strong value proposition"
                     }
                 ]
             }
+        ],
+        "keyFeatures": [
+            "🎯 Personalized scoring based on user preferences",
+            "📍 Accurate distance calculations using Haversine formula",
+            "🦉 Sensory compatibility for night owls/early birds",
+            "💰 Value ratio calculation (amenities per peso)",
+            "🏆 Curated bucketing for better decision making",
+            "🖼️ High-quality property images included"
         ]
     }
     return jsonify(format_response_keys(explanation))
@@ -996,34 +1064,39 @@ def explain_framework():
 if __name__ == '__main__':
     print("\n" + "="*70)
     print("🏠 ENHANCED PROPERTY RECOMMENDATION API")
-    print("   with Mathematical Framework Integration")
+    print("   with Mathematical Framework & Image Support")
     print("="*70)
     print("\n📊 MATHEMATICAL FRAMEWORK IMPLEMENTED:")
     print("   ✓ Weighted Sum Model (0.4×Finance + 0.3×Commute + 0.3×Lifestyle)")
-    print("   ✓ Haversine Distance for geo-spatial scoring")
+    print("   ✓ Haversine Distance for accurate geo-spatial scoring")
     print("   ✓ Constraint Relaxation for Stretch candidates")
-    print("   ✓ Discovery Radius for Wildcard candidates")
-    print("   ✓ Jaccard Similarity for amenity matching")
-    print("   ✓ Sensory Checks (Night Owl + Interior View)")
+    print("   ✓ Value Ratio Scoring for Wildcard identification")
+    print("   ✓ Sensory Compatibility (Night Owl + Interior View)")
+    print("   ✓ Personalized Feature Matching")
     
     print(f"\n📈 DATA SUMMARY:")
     print(f"   Properties: {len(properties)}")
     print(f"   Price Range: ₱{properties_df['price'].min():,} - ₱{properties_df['price'].max():,}")
     print(f"   Avg Price: ₱{properties_df['price'].mean():,.0f}")
-    print(f"   Property Types: {properties_df['type'].unique().tolist()}")
+    print(f"   Property Types: {', '.join(properties_df['type'].unique())}")
+    print(f"   All Properties Have Images: {all('image_url' in p for p in properties)}")
     
     print("\n📍 ANCHOR POINT (Default):")
     print("   IT Park, Cebu City (10.3190°N, 123.9020°E)")
     
     print("\n📡 ENDPOINTS:")
-    print("  POST /recommend        - Get recommendations (camelCase input)")
-    print("  GET  /properties       - List all properties")
-    print("  GET  /health           - Health check with framework info")
-    print("  GET  /framework/explain - Explain the mathematical framework")
-    print("\n🎯 BUCKETING LOGIC:")
-    print("   Safe Bet: Score > 85% + passes hard filters")
-    print("   Stretch: Constraint relaxation (e.g., over budget but great amenities)")
-    print("   Wildcard: Not in preferred areas + <15 mins + high value ratio")
+    print("  POST /recommend          - Get personalized recommendations")
+    print("  GET  /properties         - List all properties with pagination")
+    print("  GET  /properties/<id>    - Get single property details")
+    print("  GET  /health             - Health check with framework info")
+    print("  GET  /framework/explain  - Explain the mathematical framework")
+    
+    print("\n🎯 RECOMMENDATION FEATURES:")
+    print("   ✓ Curated list (max 10 properties)")
+    print("   ✓ Safe Bet / Stretch / Wildcard categorization")
+    print("   ✓ Personalized feature highlighting")
+    print("   ✓ Mathematical insights and explanations")
+    print("   ✓ Image support for all properties")
     print("="*70)
     
     app.run(debug=True, port=5000, host='0.0.0.0')

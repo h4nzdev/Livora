@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -13,10 +13,12 @@ import {
   Bell,
   DollarSign,
 } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
 
 const DwellerSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
+  const { user } = useContext(AuthContext);
 
   const mainMenuItems = [
     {
@@ -44,12 +46,6 @@ const DwellerSidebar = () => {
 
   const bottomMenuItems = [
     {
-      id: "profile",
-      label: "Profile",
-      icon: <User className="w-6 h-6" />,
-      path: "/dweller-profile",
-    },
-    {
       id: "messages",
       label: "Messages",
       icon: <MessageSquare className="w-6 h-6" />,
@@ -61,13 +57,6 @@ const DwellerSidebar = () => {
       label: "Payments",
       icon: <DollarSign className="w-6 h-6" />,
       path: "/dweller-payments",
-    },
-    {
-      id: "notifications",
-      label: "Notifications",
-      icon: <Bell className="w-6 h-6" />,
-      badge: "3",
-      path: "/dweller-notifications",
     },
     {
       id: "settings",
@@ -128,7 +117,7 @@ const DwellerSidebar = () => {
       </div>
 
       {/* Main Navigation Area */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
         <div className="space-y-2 mb-8">
           {mainMenuItems.map((item) => (
             <Link
@@ -236,7 +225,9 @@ const DwellerSidebar = () => {
           </div>
           {!isCollapsed && (
             <div>
-              <p className="font-medium text-gray-900 text-sm">Alex Sterling</p>
+              <p className="font-medium text-gray-900 text-sm">
+                {user?.full_name}
+              </p>
               <p className="text-xs text-gray-500">Apt 402</p>
             </div>
           )}

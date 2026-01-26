@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   AlertCircle,
   Thermometer,
@@ -24,8 +24,10 @@ import {
   HardHat,
   CheckCircle,
 } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
 
 const DwellerDashboard = () => {
+  const { user } = useContext(AuthContext);
   // Maintenance tickets - updated with progress pipeline
   const maintenanceTickets = [
     {
@@ -141,31 +143,6 @@ const DwellerDashboard = () => {
     },
   ];
 
-  // Marketplace items
-  const marketplaceItems = [
-    {
-      id: 1,
-      name: "Oak Side Table",
-      location: "Apt 4B • $45",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBwmkkzXkBYXbM9UpI5uD1No0mgHEJejB8sSuEO3mNk1sCcuma4u-Tpexc1Ggh1Ss0p7xUUElZkVNSNKA9bpc-4TzMn1EbeT2VzrUcdHNpaY6QL5-eubzx0QBarf5g9l9GB2r_DiKE7WLomdmNcpkDFxFMQDQ1tzSk-nYqxzFbjU57nU_fYePZZ8FDiWVoVfgAaBuYEJLtne6bvfD1kVmGOuwbN6J8FnMuTZrO-oH4wtvWA3dr_kzZ5G0fVJRhDNitjQZ2z0qfzb2ia",
-    },
-    {
-      id: 2,
-      name: "Monstera Plant",
-      location: "Apt 12C • Free",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuDmYtUkVQyFZcoj2ca63fj9cTn1xRBER0CZx0JoRmmuF65lZw4p4YNq5YR_a15EFKtVyoLJIF2eE0u5lc8KHxF7MNeOE5fSZBe0Cs0Wz35Rt7wCqjoDhdunILW2ET1pvE5JVGqBDYd-IvPtSDDvOvOYSLcMBmp9fdTjYKTflMtn2wgbMrzzDDoCmA41oWYHk1zbUV3T4Puuvi94xsClo1wk3ntsxknMKw8hTSM6KUJ6i4e6g9m2dY9agad0f5oe_aAAYQ57pNMI-jcv",
-    },
-    {
-      id: 3,
-      name: "Phone Charger",
-      location: "Apt 8A • $5",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAlsN8fvXXyU-V4HsIiAiSzc08OzHATid0G9hr6mtBNwRALKB1ekIUArJgCkoV7odZcxJ3oHJANlQdep5PrlYkWG8VFwMqPpJUUx7xdc4MqdMSupi2MlB_JRnmqVTofEDOY4QH3-15oBMkWn8boVCx_3CM01SXqO-pqtFRvpnh0FfueHtb1MoMuf2QzFhStBxH8aqYFFnIGgPralCgt2vSw02KDloYVYiUBi5le8CVDliyd68cstWVbT9MFHRlxHKYIaYw87Td99LXF",
-    },
-  ];
-
   const [nightModeEnabled, setNightModeEnabled] = useState(true);
   const [vendorRatings, setVendorRatings] = useState({});
 
@@ -183,7 +160,7 @@ const DwellerDashboard = () => {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
-            Good Morning, Alex
+            Good Morning, {user?.full_name}
           </h1>
           <p className="text-gray-500 mt-1">
             Welcome to your smart rental command center.
@@ -515,35 +492,6 @@ const DwellerDashboard = () => {
             <button className="text-xs text-emerald-500 font-bold hover:text-emerald-600">
               RSVP
             </button>
-          </div>
-
-          {/* Marketplace Feed */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Marketplace</h2>
-              <button className="text-xs text-emerald-500 font-bold hover:text-emerald-600">
-                View All
-              </button>
-            </div>
-            <div className="space-y-4">
-              {marketplaceItems.map((item) => (
-                <div key={item.id} className="flex gap-4">
-                  <div
-                    className="w-16 h-16 rounded-lg bg-cover bg-center shrink-0"
-                    style={{ backgroundImage: `url(${item.image})` }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 truncate">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-gray-500">{item.location}</p>
-                    <button className="text-[10px] text-emerald-500 font-bold uppercase mt-1 hover:text-emerald-600">
-                      Message
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Quick Community Action */}
