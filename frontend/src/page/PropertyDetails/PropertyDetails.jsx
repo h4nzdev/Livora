@@ -477,17 +477,276 @@ const PropertyDetails = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Mobile View */}
       <div className="md:hidden">
-        {/* ... (Mobile view remains the same) ... */}
-        {/* Keeping mobile view as is since you only asked to enhance desktop layout */}
+        {/* Header */}
+        <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between p-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex gap-2">
+              <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setIsFavorite(!isFavorite)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm"
+              >
+                <Heart
+                  className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Image Gallery */}
+        <div className="relative">
+          <div className="relative h-80 w-full overflow-hidden">
+            <img
+              src={
+                propertyData.images?.[currentImage] ||
+                propertyData.image_url ||
+                "https://images.unsplash.com/photo-1518780664697-55e3ad937233"
+              }
+              alt="Property"
+              className="w-full h-full object-cover"
+            />
+            {propertyData.images && propertyData.images.length > 1 && (
+              <>
+                <button
+                  onClick={handlePreviousImage}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNextImage}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg rotate-180"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Availability Badge */}
+          {propertyData.is_available && (
+            <div className="absolute top-4 right-4">
+              <div className="px-3 py-1.5 bg-emerald-500 text-white text-sm font-semibold rounded-full">
+                Available Now
+              </div>
+            </div>
+          )}
+
+          {/* Image Counter */}
+          {propertyData.images && propertyData.images.length > 1 && (
+            <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+              {currentImage + 1} / {propertyData.images.length}
+            </div>
+          )}
+
+          {/* Thumbnails */}
+          {propertyData.images && propertyData.images.length > 1 && (
+            <div className="flex gap-2 p-4 overflow-x-auto">
+              {propertyData.images.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImage(index)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
+                    currentImage === index
+                      ? "border-emerald-500"
+                      : "border-gray-300"
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Main Content */}
+        <div className="p-4 space-y-6">
+          {/* Title and Rating */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {propertyData.name}
+              </h1>
+              <div className="flex items-center gap-1">
+                <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                <span className="font-bold">{propertyData.rating || 4.6}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-gray-600">
+              <MapPin className="w-4 h-4" />
+              <span>{propertyData.location}</span>
+            </div>
+          </div>
+
+          {/* Match Badge */}
+          <div className="flex items-center justify-between">
+            <div className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-bold">
+              {matchPercentage}% Match
+            </div>
+            <div className="text-2xl font-bold text-emerald-600">
+              ₱{propertyData.price?.toLocaleString() || "20,000"}
+              <span className="text-sm font-normal text-gray-500">/month</span>
+            </div>
+          </div>
+
+          {/* Quick Specs */}
+          <div className="grid grid-cols-2 gap-3">
+            {propertySpecs.slice(0, 4).map((spec, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 p-3 rounded-xl flex items-center gap-3"
+              >
+                <div className="text-gray-500">{spec.icon}</div>
+                <div>
+                  <p className="text-sm text-gray-500">{spec.label}</p>
+                  <p className="font-semibold">{spec.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Match Analysis */}
+          {matchAnalysis.length > 0 && (
+            <div className="bg-emerald-50 p-4 rounded-xl">
+              <h3 className="font-bold text-emerald-700 mb-3 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Why this matches your preferences
+              </h3>
+              <ul className="space-y-2">
+                {matchAnalysis.map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700 text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Description */}
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              About this Property
+            </h3>
+            <p className="text-gray-600">
+              {propertyData.description ||
+                `This beautiful ${propertyData.type?.toLowerCase() || "property"} located in ${propertyData.location} offers ${propertyData.bedrooms || 3} bedrooms and ${propertyData.bathrooms || 2} bathrooms.`}
+            </p>
+          </div>
+
+          {/* Amenities */}
+          {propertyData.amenities && propertyData.amenities.length > 0 && (
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-3">
+                Amenities & Features
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {propertyData.amenities.map((amenity, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-3 border border-gray-200 rounded-xl"
+                  >
+                    {renderAmenityIcon(amenity)}
+                    <span className="text-sm font-medium text-gray-700">
+                      {amenity.charAt(0).toUpperCase() + amenity.slice(1)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Property Info */}
+          <div className="bg-gray-50 p-4 rounded-xl">
+            <h3 className="font-bold text-gray-900 mb-3">
+              Property Information
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Property ID</p>
+                <p className="font-medium">{propertyData.id}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Pet Policy</p>
+                <p
+                  className={`font-medium ${
+                    propertyData.pet_friendly
+                      ? "text-emerald-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {propertyData.pet_friendly ? "Pet Friendly" : "No Pets"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Availability</p>
+                <p className="font-medium">
+                  {propertyData.available_date || "Immediate"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Lease Type</p>
+                <p className="font-medium">
+                  {propertyData.lease_duration === "long-term"
+                    ? "Long-term"
+                    : "Short-term"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky Action Buttons */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+          <div className="space-y-3">
+            <button
+              onClick={handleMessageOwner}
+              className="w-full py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Message Property Owner
+            </button>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setIsFavorite(!isFavorite)}
+                className="py-3 border border-gray-300 rounded-xl font-medium flex items-center justify-center gap-2"
+              >
+                <Heart
+                  className={`w-5 h-5 ${
+                    isFavorite ? "fill-red-500 text-red-500" : ""
+                  }`}
+                />
+                {isFavorite ? "Saved" : "Save"}
+              </button>
+              <button className="py-3 border border-gray-300 rounded-xl font-medium flex items-center justify-center gap-2">
+                <Share2 className="w-5 h-5" />
+                Share
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Desktop View - ENHANCED LAYOUT */}
+      {/* Desktop View */}
       <div className="hidden md:block min-h-screen p-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-12 gap-8">
             {/* Left Column - Images and Property Features */}
             <div className="col-span-7 space-y-8">
-              {/* Image Gallery - REMOVED STICKY */}
+              {/* Image Gallery */}
               <div>
                 {/* Main Image */}
                 <div className="relative h-[500px] rounded-3xl overflow-hidden mb-4 border border-gray-200 shadow-sm">
@@ -516,7 +775,11 @@ const PropertyDetails = () => {
                         className="size-12 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-gray-700 border border-gray-200 shadow-sm hover:bg-white transition-colors"
                       >
                         <Heart
-                          className={`w-6 h-6 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"}`}
+                          className={`w-6 h-6 ${
+                            isFavorite
+                              ? "fill-red-500 text-red-500"
+                              : "text-gray-500"
+                          }`}
                         />
                       </button>
                     </div>
@@ -596,7 +859,23 @@ const PropertyDetails = () => {
                 <div className="prose prose-lg max-w-none">
                   <p className="text-gray-600 leading-relaxed">
                     {propertyData.description ||
-                      `This beautiful ${propertyData.type?.toLowerCase() || "property"} located in ${propertyData.location} offers ${propertyData.bedrooms || 3} bedrooms and ${propertyData.bathrooms || 2} bathrooms. With a floor area of ${propertyData.floor_area || propertyData.area_sqm || 110} square meters, this ${propertyData.furnished ? "fully furnished" : "unfurnished"} property is available for ${propertyData.lease_duration === "long-term" ? "long-term" : "short-term"} lease.`}
+                      `This beautiful ${
+                        propertyData.type?.toLowerCase() || "property"
+                      } located in ${propertyData.location} offers ${
+                        propertyData.bedrooms || 3
+                      } bedrooms and ${
+                        propertyData.bathrooms || 2
+                      } bathrooms. With a floor area of ${
+                        propertyData.floor_area || propertyData.area_sqm || 110
+                      } square meters, this ${
+                        propertyData.furnished
+                          ? "fully furnished"
+                          : "unfurnished"
+                      } property is available for ${
+                        propertyData.lease_duration === "long-term"
+                          ? "long-term"
+                          : "short-term"
+                      } lease.`}
                   </p>
 
                   {propertyData.distance_to_it_park_km && (
@@ -664,7 +943,11 @@ const PropertyDetails = () => {
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Pet Policy</p>
                     <p
-                      className={`font-medium ${propertyData.pet_friendly ? "text-emerald-600" : "text-red-600"}`}
+                      className={`font-medium ${
+                        propertyData.pet_friendly
+                          ? "text-emerald-600"
+                          : "text-red-600"
+                      }`}
                     >
                       {propertyData.pet_friendly
                         ? "Pet Friendly"
@@ -793,7 +1076,11 @@ const PropertyDetails = () => {
                         className="flex-1 py-4 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                       >
                         <Heart
-                          className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"}`}
+                          className={`w-5 h-5 ${
+                            isFavorite
+                              ? "fill-red-500 text-red-500"
+                              : "text-gray-500"
+                          }`}
                         />
                         {isFavorite ? "Saved" : "Save Property"}
                       </button>

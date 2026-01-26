@@ -179,46 +179,50 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-display">
       {/* Enhanced Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-lg py-4 px-6 border-b border-gray-100 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-            <img src={logo} alt="Livora Logo" />
+      <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-lg py-3 px-4 sm:py-4 sm:px-6 border-b border-gray-100 shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md">
+            <img
+              src={logo}
+              alt="Livora Logo"
+              className="w-6 h-6 sm:w-8 sm:h-8"
+            />
           </div>
           <div>
-            <h1 className="text-gray-900 text-2xl font-bold leading-tight bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+            <h1 className="text-gray-900 text-xl sm:text-2xl font-bold leading-tight bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
               Livora
             </h1>
-            <p className="text-gray-500 text-xs font-medium">
+            <p className="text-gray-500 text-xs font-medium hidden xs:block">
               From "Finding the One" to "Loving the Stay"
             </p>
           </div>
         </div>
         <button
           onClick={() => navigate("/login")}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          className="flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold transition-all duration-300 hover:shadow-lg active:scale-95 sm:hover:-translate-y-0.5"
         >
-          <User size={18} />
-          <span className="text-sm">Get Started</span>
+          <User size={16} className="sm:size-[18px]" />
+          <span className="text-xs sm:text-sm">Get Started</span>
         </button>
       </header>
 
       <main>
         {/* Enhanced Match Finder CTA */}
-        <section className="px-6 mb-12 mt-8">
-          <div className="bg-gradient-to-br from-green-600 via-emerald-500 to-teal-500 rounded-3xl overflow-hidden shadow-2xl relative">
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+        <section className="px-4 sm:px-6 mb-8 sm:mb-12 mt-6 sm:mt-8">
+          <div className="bg-gradient-to-br from-green-600 via-emerald-500 to-teal-500 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl relative">
+            {/* Decorative elements - reduced on mobile */}
+            <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-white/5 rounded-full -translate-y-16 translate-x-16 sm:-translate-y-32 sm:translate-x-32"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-white/5 rounded-full translate-y-12 -translate-x-12 sm:translate-y-24 sm:-translate-x-24"></div>
 
-            <div className="p-8 relative z-10">
-              <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center shadow-lg">
-                      <Sparkles className="text-white" size={32} />
+            <div className="p-5 sm:p-8 relative z-10">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10">
+                <div className="flex-1 w-full">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 backdrop-blur-lg rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg mb-2 sm:mb-0">
+                      <Sparkles className="text-white" size={24} sm:size={32} />
                     </div>
                     <div>
-                      <h3 className="text-white text-3xl font-bold mb-2">
+                      <h3 className="text-white text-2xl sm:text-3xl font-bold mb-2">
                         Intelligent Profiling
                       </h3>
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
@@ -229,104 +233,123 @@ const LandingPage = () => {
                     </div>
                   </div>
 
-                  <h4 className="text-white text-4xl font-bold mb-5 leading-tight">
+                  <h4 className="text-white text-3xl sm:text-4xl font-bold mb-4 sm:mb-5 leading-tight">
                     Your Perfect
                     <br />
                     Match
                   </h4>
 
-                  <p className="text-white/90 text-lg mb-8 max-w-2xl leading-relaxed">
+                  <p className="text-white/90 text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl leading-relaxed">
                     Find your perfect match in just 2 minutes! Get personalized
                     property matches based on your budget, lifestyle, and
                     preferences.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
-                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
-                      <div className="text-white font-bold text-3xl mb-2">
+                  {/* Stats grid - single column on mobile */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-8 sm:mb-10">
+                    <div className="bg-white/15 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                      <div className="text-white font-bold text-2xl sm:text-3xl mb-1 sm:mb-2">
                         5 Steps
                       </div>
-                      <div className="text-white/80 text-sm font-medium">
+                      <div className="text-white/80 text-xs sm:text-sm font-medium">
                         Quick & Easy
                       </div>
                     </div>
-                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
-                      <div className="text-white font-bold text-3xl mb-2">
+                    <div className="bg-white/15 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                      <div className="text-white font-bold text-2xl sm:text-3xl mb-1 sm:mb-2">
                         95%
                       </div>
-                      <div className="text-white/80 text-sm font-medium">
+                      <div className="text-white/80 text-xs sm:text-sm font-medium">
                         Match Accuracy
+                      </div>
+                    </div>
+                    {/* Hidden on mobile, shown on tablet+ */}
+                    <div className="hidden sm:block bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                      <div className="text-white font-bold text-3xl mb-2">
+                        2 min
+                      </div>
+                      <div className="text-white/80 text-sm font-medium">
+                        Quick Start
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-5">
+                  {/* Buttons - stacked on mobile */}
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
                     <button
                       onClick={handleStartMatching}
-                      className="group bg-white hover:bg-gray-50 text-gray-900 font-bold py-5 px-10 rounded-2xl flex items-center justify-center gap-3 text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 shadow-lg"
+                      className="group bg-white hover:bg-gray-50 text-gray-900 font-bold py-4 sm:py-5 px-6 sm:px-10 rounded-xl sm:rounded-2xl flex items-center justify-center gap-3 text-base sm:text-lg transition-all duration-300 hover:shadow-xl sm:hover:shadow-2xl active:scale-95 sm:hover:-translate-y-1 active:translate-y-0 shadow-lg w-full sm:w-auto"
                     >
-                      <Sparkles size={22} className="text-emerald-600" />
-                      Start your journey
-                      <ArrowRight
+                      <Sparkles
                         size={20}
-                        className="group-hover:translate-x-1 transition-transform"
+                        sm:size={22}
+                        className="text-emerald-600"
+                      />
+                      <span className="whitespace-nowrap">
+                        Start your journey
+                      </span>
+                      <ArrowRight
+                        size={18}
+                        sm:size={20}
+                        className="group-hover:translate-x-1 transition-transform hidden sm:inline"
                       />
                     </button>
-                    <button className="bg-transparent border-2 border-white/40 hover:border-white text-white font-bold py-5 px-10 rounded-2xl transition-all duration-300 hover:bg-white/10">
-                      Get Started
+                    <button className="bg-transparent border-2 border-white/40 hover:border-white text-white font-bold py-4 sm:py-5 px-6 sm:px-10 rounded-xl sm:rounded-2xl transition-all duration-300 hover:bg-white/10 text-base sm:text-lg w-full sm:w-auto">
+                      How it works
                     </button>
                   </div>
                 </div>
 
-                {/* Enhanced Stats Sidebar */}
-                <div className="lg:w-96">
-                  <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-7 border border-white/25">
-                    <div className="flex items-center gap-3 mb-6">
-                      <Zap className="text-white" size={24} />
-                      <h5 className="text-white text-xl font-bold">
+                {/* Enhanced Stats Sidebar - full width on mobile */}
+                <div className="lg:w-96 w-full mt-8 sm:mt-0">
+                  <div className="bg-white/15 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-white/25">
+                    <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                      <Zap className="text-white" size={20} sm:size={24} />
+                      <h5 className="text-white text-lg sm:text-xl font-bold">
                         Weekly Performance
                       </h5>
                     </div>
-                    <div className="space-y-6">
-                      <div className="pb-5 border-b border-white/10">
-                        <div className="text-white/80 text-sm font-medium mb-2">
+                    <div className="space-y-5 sm:space-y-6">
+                      <div className="pb-4 sm:pb-5 border-b border-white/10">
+                        <div className="text-white/80 text-xs sm:text-sm font-medium mb-2">
                           Properties Matched
                         </div>
-                        <div className="flex items-end gap-3">
-                          <div className="text-white text-3xl font-bold">
+                        <div className="flex items-end gap-2 sm:gap-3">
+                          <div className="text-white text-2xl sm:text-3xl font-bold">
                             1,247
                           </div>
-                          <div className="text-emerald-300 text-sm font-medium bg-emerald-500/20 px-2 py-1 rounded-full">
+                          <div className="text-emerald-300 text-xs sm:text-sm font-medium bg-emerald-500/20 px-2 py-1 rounded-full">
                             +12%
                           </div>
                         </div>
                       </div>
-                      <div className="pb-5 border-b border-white/10">
-                        <div className="text-white/80 text-sm font-medium mb-2">
+                      <div className="pb-4 sm:pb-5 border-b border-white/10">
+                        <div className="text-white/80 text-xs sm:text-sm font-medium mb-2">
                           Average Time Saved
                         </div>
-                        <div className="flex items-end gap-3">
-                          <div className="text-white text-3xl font-bold">
+                        <div className="flex items-end gap-2 sm:gap-3">
+                          <div className="text-white text-2xl sm:text-3xl font-bold">
                             8.5 hours
                           </div>
-                          <div className="text-emerald-300 text-sm font-medium bg-emerald-500/20 px-2 py-1 rounded-full">
+                          <div className="text-emerald-300 text-xs sm:text-sm font-medium bg-emerald-500/20 px-2 py-1 rounded-full">
                             Per User
                           </div>
                         </div>
                       </div>
                       <div>
-                        <div className="text-white/80 text-sm font-medium mb-2">
+                        <div className="text-white/80 text-xs sm:text-sm font-medium mb-2">
                           User Satisfaction
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-white text-3xl font-bold">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="text-white text-2xl sm:text-3xl font-bold">
                             96%
                           </div>
                           <div className="flex">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                size={16}
+                                size={14}
+                                sm:size={16}
                                 className="fill-amber-400 text-amber-400"
                               />
                             ))}
