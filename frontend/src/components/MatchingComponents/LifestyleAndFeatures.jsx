@@ -899,23 +899,6 @@ const LifestyleAndFeatures = ({
           <SelectedSummary localData={localData} isStepValid={isStepValid} />
           <InfoBox />
         </div>
-
-        {/* Continue Button */}
-        <button
-          onClick={() => {
-            if (validateStep()) {
-              console.log("Step completed successfully!");
-            }
-          }}
-          className={`w-full py-3 rounded-xl font-bold text-lg mt-6 transition-all ${
-            isStepValid
-              ? "bg-green-600 text-white hover:bg-green-700"
-              : "bg-gray-300 text-gray-500"
-          }`}
-          disabled={!isStepValid}
-        >
-          Continue
-        </button>
       </div>
     </div>
   );
