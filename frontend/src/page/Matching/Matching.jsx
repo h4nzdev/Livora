@@ -608,7 +608,7 @@ const Matching = () => {
         </div>
 
         {/* Mobile Arrow Navigation */}
-        <div className="lg:hidden  mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="lg:hidden max-w-[480px] mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
@@ -646,7 +646,7 @@ const Matching = () => {
         </div>
 
         {/* Current Step Component */}
-        <div className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8">
+        <div className="flex-1 overflow-y-auto lg:p-6 xl:p-8">
           <div className="max-w-[480px] mx-auto lg:max-w-none lg:w-full">
             <div className="lg:max-w-3xl xl:max-w-4xl lg:mx-auto">
               {steps[currentStep].component}
