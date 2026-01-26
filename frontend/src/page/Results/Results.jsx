@@ -83,22 +83,24 @@ const Results = () => {
   // Preload images function
   const preloadImages = (propertiesArray) => {
     const imagePromises = propertiesArray
-      .filter(property => property.image_url)
-      .map(property => {
+      .filter((property) => property.image_url)
+      .map((property) => {
         return new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => {
-            setPreloadedImages(prev => new Set([...prev, property.image_url]));
-            setImageLoadingStates(prev => ({
+            setPreloadedImages(
+              (prev) => new Set([...prev, property.image_url]),
+            );
+            setImageLoadingStates((prev) => ({
               ...prev,
-              [property.image_url]: 'loaded'
+              [property.image_url]: "loaded",
             }));
             resolve(property.image_url);
           };
           img.onerror = () => {
-            setImageLoadingStates(prev => ({
+            setImageLoadingStates((prev) => ({
               ...prev,
-              [property.image_url]: 'error'
+              [property.image_url]: "error",
             }));
             reject(property.image_url);
           };
@@ -107,8 +109,10 @@ const Results = () => {
       });
 
     // Start preloading
-    Promise.allSettled(imagePromises).then(results => {
-      console.log(`Preloaded ${results.filter(r => r.status === 'fulfilled').length} images successfully`);
+    Promise.allSettled(imagePromises).then((results) => {
+      console.log(
+        `Preloaded ${results.filter((r) => r.status === "fulfilled").length} images successfully`,
+      );
     });
   };
 
@@ -1116,7 +1120,10 @@ const Results = () => {
                                 }}
                               />
                             ) : (
-                              <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100"></div>
+                              <img
+                                src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop"
+                                alt="photo"
+                              />
                             )}
 
                             {/* Badges */}

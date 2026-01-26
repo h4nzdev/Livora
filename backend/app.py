@@ -11,6 +11,17 @@ import time
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Any
 
+# Scikit-learn imports
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import NearestNeighbors
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+import joblib
+
 app = Flask(__name__)
 CORS(app)
 
@@ -84,26 +95,269 @@ except ImportError as e:
 
 properties_df = pd.DataFrame(properties)
 
-class EnhancedProfiler:
-    """Enhanced tenant profiler with lifestyle and habit matching"""
+class MLPropertyRecommender:
+    """Machine Learning-based property recommender using scikit-learn"""
     
     def __init__(self):
-        # Define weight categories for comprehensive matching
-        self.weights = {
-            'dealbreaker': 0.40,     # Hard constraints that must be met
-            'lifestyle': 0.35,       # Daily habits and preferences
-            'quality': 0.25          # Amenities and property features
+        self.properties_df = pd.DataFrame(properties)
+        self.feature_columns = None
+        self.scaler = StandardScaler()
+        self.knn_model = NearestNeighbors(n_neighbors=10, metric='cosine')
+        self.similarity_matrix = None
+        self.property_features = None
+        self.clustering_model = None
+        
+        # Initialize encoders
+        self.label_encoders = {}
+        self.onehot_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
+        self.tfidf_vectorizer = TfidfVectorizer(max_features=50, stop_words='english')
+        
+        # Random Forest for value scoring
+        self.value_model = RandomForestRegressor(n_estimators=100, random_state=42)
+        
+        self.initialize_models()
+    
+    def initialize_models(self):
+        """Initialize and train ML models"""
+        print("🔬 Initializing ML models...")
+        
+        # Prepare features for ML
+        self.prepare_features()
+        
+        # Train KNN for similarity matching
+        self.train_similarity_model()
+        
+        # Train clustering for property segmentation
+        self.train_clustering_model()
+        
+        # Train value prediction model
+        self.train_value_model()
+    
+    def prepare_features(self):
+        """Prepare features for machine learning"""
+        df = self.properties_df.copy()
+        
+        # Numerical features
+        numerical_features = ['price', 'area_sqm', 'floor', 'distance_to_it_park_km', 
+                             'rating', 'bedrooms', 'bathrooms', 'ac_temperature_min', 
+                             'ac_temperature_max']
+        
+        # Categorical features
+        categorical_features = ['type', 'location', 'lease_duration', 'noise_level', 
+                               'kitchen_type', 'view_type', 'ventilation']
+        
+        # Boolean features
+        boolean_features = ['pet_friendly', 'furnished', 'fiber_optic', 'parking_available']
+        
+        # Handle missing values
+        for col in numerical_features:
+            if col in df.columns:
+                df[col] = df[col].fillna(df[col].median())
+        
+        for col in categorical_features + boolean_features:
+            if col in df.columns:
+                df[col] = df[col].fillna('unknown')
+        
+        # Encode amenities as text
+        df['amenities_text'] = df['amenities'].apply(lambda x: ' '.join(x) if isinstance(x, list) else '')
+        
+        # TF-IDF on amenities
+        if len(df) > 0:
+            amenities_tfidf = self.tfidf_vectorizer.fit_transform(df['amenities_text'])
+            amenities_df = pd.DataFrame(amenities_tfidf.toarray(), 
+                                       columns=self.tfidf_vectorizer.get_feature_names_out())
+            
+            # One-hot encode categorical features
+            if len(categorical_features) > 0:
+                categorical_data = df[categorical_features]
+                onehot_encoded = self.onehot_encoder.fit_transform(categorical_data)
+                onehot_df = pd.DataFrame(onehot_encoded, 
+                                        columns=self.onehot_encoder.get_feature_names_out(categorical_features))
+            else:
+                onehot_df = pd.DataFrame()
+            
+            # Convert boolean features to numeric
+            boolean_df = df[boolean_features].astype(int)
+            
+            # Combine all features
+            numerical_df = df[numerical_features].reset_index(drop=True)
+            
+            # Combine all features
+            self.property_features = pd.concat([
+                numerical_df.reset_index(drop=True),
+                boolean_df.reset_index(drop=True),
+                onehot_df.reset_index(drop=True),
+                amenities_df.reset_index(drop=True)
+            ], axis=1)
+            
+            # Fill any NaN values
+            self.property_features = self.property_features.fillna(0)
+            
+            # Scale features
+            self.property_features_scaled = self.scaler.fit_transform(self.property_features)
+            
+            print(f"✅ Prepared {self.property_features.shape[1]} features for ML")
+    
+    def train_similarity_model(self):
+        """Train KNN model for property similarity"""
+        if self.property_features_scaled is not None and len(self.property_features_scaled) > 0:
+            self.knn_model.fit(self.property_features_scaled)
+            
+            # Precompute similarity matrix
+            self.similarity_matrix = cosine_similarity(self.property_features_scaled)
+            print("✅ Trained similarity model")
+    
+    def train_clustering_model(self):
+        """Train K-means clustering for property segmentation"""
+        if self.property_features_scaled is not None and len(self.property_features_scaled) > 0:
+            # Use optimal number of clusters (max 5 for small datasets)
+            n_clusters = min(5, len(self.property_features_scaled))
+            self.clustering_model = KMeans(n_clusters=n_clusters, random_state=42)
+            self.clustering_model.fit(self.property_features_scaled)
+            
+            # Add cluster labels to properties
+            cluster_labels = self.clustering_model.predict(self.property_features_scaled)
+            self.properties_df['cluster'] = cluster_labels
+            
+            print(f"✅ Trained clustering model with {n_clusters} clusters")
+    
+    def train_value_model(self):
+        """Train Random Forest model for value prediction"""
+        if self.property_features is not None and len(self.property_features) > 0:
+            # Create value score based on price per square meter and rating
+            self.properties_df['value_score'] = (
+                (self.properties_df['rating'] * 20) -  # Rating contribution
+                (self.properties_df['price'] / self.properties_df['area_sqm'].clip(lower=1)) / 100  # Price per sqm penalty
+            )
+            
+            # Normalize value score
+            self.properties_df['value_score'] = (
+                (self.properties_df['value_score'] - self.properties_df['value_score'].min()) /
+                (self.properties_df['value_score'].max() - self.properties_df['value_score'].min())
+            ) * 100
+            
+            # Train model
+            X = self.property_features
+            y = self.properties_df['value_score']
+            
+            if len(X) > 10:  # Need enough data for training
+                self.value_model.fit(X, y)
+                print("✅ Trained value prediction model")
+    
+    def user_prefs_to_features(self, user_prefs):
+        """Convert user preferences to feature vector"""
+        if self.property_features is None:
+            return None
+        
+        # Create a feature vector matching the property features
+        user_vector = np.zeros(self.property_features.shape[1])
+        
+        # Get feature names
+        feature_names = list(self.property_features.columns)
+        
+        # Map user preferences to features
+        pref_mapping = {
+            'price': ('price', user_prefs.get('max_budget', 0)),
+            'area_sqm': ('area_sqm', user_prefs.get('min_area', 20)),
+            'bedrooms': ('bedrooms', user_prefs.get('bedrooms', 1)),
+            'bathrooms': ('bathrooms', user_prefs.get('bathrooms', 1)),
+            'pet_friendly': ('pet_friendly', 1 if user_prefs.get('has_pets', False) else 0),
+            'furnished': ('furnished', 1 if user_prefs.get('furnished', True) else 0),
+            'fiber_optic': ('fiber_optic', 1 if user_prefs.get('wfh_frequency', '') in ['daily', 'frequent'] else 0),
+            'distance_to_it_park_km': ('distance_to_it_park_km', 
+                                     0.5 if user_prefs.get('transportation', '') == 'walk' else 5),
+            'noise_level': ('noise_level', 'low' if user_prefs.get('light_sleeper', False) else 'medium'),
+            'kitchen_type': ('kitchen_type', 'full' if user_prefs.get('cooking_frequency', '') in ['daily', 'heavy'] else 'basic')
         }
+        
+        # Set numerical and boolean features
+        for pref_name, (feature_name, value) in pref_mapping.items():
+            if feature_name in feature_names:
+                idx = feature_names.index(feature_name)
+                user_vector[idx] = value
+        
+        # Handle categorical features via one-hot encoding
+        for feature in ['type', 'lease_duration']:
+            if feature in user_prefs:
+                pref_value = user_prefs[feature]
+                # Find one-hot encoded column
+                for col in feature_names:
+                    if f"{feature}_{pref_value}" in col.lower():
+                        idx = feature_names.index(col)
+                        user_vector[idx] = 1
+        
+        # Scale the user vector
+        user_vector_scaled = self.scaler.transform([user_vector])
+        
+        return user_vector_scaled[0]
+    
+    def calculate_ml_similarity(self, user_prefs):
+        """Calculate ML-based similarity scores for all properties"""
+        user_vector = self.user_prefs_to_features(user_prefs)
+        
+        if user_vector is None or self.similarity_matrix is None:
+            return {}
+        
+        # Calculate cosine similarity between user vector and all properties
+        similarities = cosine_similarity([user_vector], self.property_features_scaled)[0]
+        
+        # Apply dealbreaker filters
+        filtered_scores = {}
+        for idx, similarity in enumerate(similarities):
+            property_data = self.properties_df.iloc[idx].to_dict()
+            
+            # Check dealbreakers
+            if self.check_ml_dealbreakers(property_data, user_prefs):
+                # Combine ML similarity with rule-based adjustments
+                ml_score = similarity * 100  # Convert to percentage
+                
+                # Apply rule-based adjustments
+                adjusted_score = self.adjust_score_with_rules(property_data, user_prefs, ml_score)
+                
+                filtered_scores[idx] = {
+                    'property': property_data,
+                    'ml_similarity': ml_score,
+                    'adjusted_score': adjusted_score,
+                    'explanations': self.generate_ml_explanations(property_data, user_prefs, ml_score)
+                }
+        
+        return filtered_scores
+    
+    def check_ml_dealbreakers(self, property_data, user_prefs):
+        """ML-enhanced dealbreaker checking"""
+        # Hard budget constraint
+        property_price = property_data.get('price', 0)
+        max_budget = self.normalize_budget(user_prefs.get('max_budget', 999999))
+        
+        if property_price > max_budget * 1.3:  # 30% buffer
+            return False
+        
+        # Pet policy
+        has_pets = user_prefs.get('has_pets', False)
+        pet_friendly = property_data.get('pet_friendly', False)
+        if has_pets and not pet_friendly:
+            return False
+        
+        # Walking distance constraint
+        transportation = user_prefs.get('transportation', '').lower()
+        distance = property_data.get('distance_to_it_park_km', 10)
+        if transportation == 'walk' and distance > 1.5:
+            return False
+        
+        # Parking for car users
+        if transportation == 'private car' and not property_data.get('parking_available', False):
+            return False
+        
+        return True
     
     def normalize_budget(self, budget_str):
-        """Convert budget string to integer, handle various formats"""
+        """Convert budget string to integer"""
         if isinstance(budget_str, (int, float)):
             return int(budget_str)
         
         if not isinstance(budget_str, str):
             return 0
         
-        # Remove currency symbols, commas, and whitespace
         cleaned = str(budget_str).replace('₱', '').replace(',', '').strip()
         
         try:
@@ -111,399 +365,233 @@ class EnhancedProfiler:
         except:
             return 0
     
-    def check_dealbreaker_filters(self, property_data, user_prefs):
-        """Apply HARD filters that properties MUST pass (dealbreakers)"""
-        results = {
-            'passed': True,
-            'failed_reasons': [],
-            'warnings': []
-        }
+    def adjust_score_with_rules(self, property_data, user_prefs, ml_score):
+        """Adjust ML score with rule-based factors"""
+        adjusted_score = ml_score
         
-        property_id = property_data.get('id', 'unknown')
-        
-        # 1. STRICT BUDGET FILTER - Non-negotiable
-        property_price = property_data.get('price', 0)
-        min_budget = self.normalize_budget(user_prefs.get('min_budget', 0))
-        max_budget = self.normalize_budget(user_prefs.get('max_budget', 999999))
-        
-        if property_price < min_budget:
-            # Property is cheaper than min budget - this is acceptable
-            pass
-        elif property_price > max_budget * 1.3:  # Allow 30% buffer for potential value
-            results['passed'] = False
-            results['failed_reasons'].append(f"Exceeds budget by ₱{(property_price - max_budget):,}")
-            return results
-        
-        # 2. TRAFFIC TOLERANCE FILTER - Based on commute preference
-        transportation = user_prefs.get('transportation', '').lower()
-        distance = property_data.get('distance_to_it_park_km', 10)
-        
-        if transportation == 'walk' and distance > 1.5:
-            results['passed'] = False
-            results['failed_reasons'].append(f"Too far ({distance}km) for walking commute")
-            return results
-        elif transportation == 'private car' and not property_data.get('parking_available', False):
-            results['passed'] = False
-            results['failed_reasons'].append("No parking available (required for car commute)")
-            return results
-        
-        # 3. PET POLICY FILTER - Detailed pet matching
-        has_pets = user_prefs.get('has_pets', False)
-        pet_type = user_prefs.get('pet_type', '').lower()
-        pet_friendly = property_data.get('pet_friendly', False)
-        
-        if has_pets and not pet_friendly:
-            results['passed'] = False
-            results['failed_reasons'].append("Property not pet-friendly")
-            return results
-        elif has_pets and pet_friendly:
-            # Check for pet size restrictions if specified
-            if pet_type == 'dog >15kg' and not property_data.get('allows_large_dogs', True):
-                results['passed'] = False
-                results['failed_reasons'].append("Does not allow large dogs (>15kg)")
-                return results
-        
-        # 4. CONNECTIVITY FILTER - For WFH users
-        wfh_preference = user_prefs.get('wfh_frequency', '').lower()
-        if wfh_preference in ['daily', 'frequent']:
-            if not property_data.get('fiber_optic', False):
-                results['warnings'].append("No fiber optic internet (important for WFH)")
-        
-        # 5. MUST-HAVE FEATURES FILTER - Non-negotiable requirements
-        must_haves = user_prefs.get('must_have_features', [])
-        if must_haves:
-            property_amenities = [str(a).lower() for a in property_data.get('amenities', [])]
-            user_must_haves = [str(m).lower() for m in must_haves]
-            
-            missing_features = []
-            for feature in user_must_haves:
-                found = False
-                for amenity in property_amenities:
-                    if feature in amenity:
-                        found = True
-                        break
-                if not found:
-                    missing_features.append(feature)
-            
-            if missing_features:
-                results['failed_reasons'].append(f"Missing must-have features: {', '.join(missing_features[:3])}")
-        
-        # 6. NOISE SENSITIVITY FILTER
-        light_sleeper = user_prefs.get('light_sleeper', False)
-        if light_sleeper:
-            noise_level = property_data.get('noise_level', 'unknown').lower()
-            if noise_level in ['high', 'very high']:
-                results['warnings'].append("High noise area - may affect light sleepers")
-        
-        # 7. KITCHEN HABITS FILTER
-        cooking_frequency = user_prefs.get('cooking_frequency', '').lower()
-        if cooking_frequency in ['daily', 'heavy']:
-            kitchen_type = property_data.get('kitchen_type', 'basic').lower()
-            if kitchen_type == 'basic' and property_data.get('type', '').lower() == 'studio':
-                results['warnings'].append("Basic kitchen - may not suit heavy cooking")
-        
-        return results
-    
-    def calculate_dealbreaker_score(self, property_data, user_prefs):
-        """Calculate score for dealbreaker requirements"""
-        score = 1.0
-        explanations = []
-        
-        # Budget compliance (weighted heavily)
+        # Budget factor
         property_price = property_data.get('price', 0)
         max_budget = self.normalize_budget(user_prefs.get('max_budget', 999999))
         
         if property_price <= max_budget:
-            budget_percentage = (max_budget - property_price) / max_budget * 100
-            if budget_percentage > 20:
-                score = 1.0
-                explanations.append("💰 Excellent value - well below budget")
-            else:
-                score = 0.9
-                explanations.append("✅ Within budget")
-        elif property_price <= max_budget * 1.1:
-            score = 0.7
-            explanations.append("⚠️ Slightly above budget (10% over)")
+            budget_factor = (max_budget - property_price) / max_budget * 20
+            adjusted_score += budget_factor
         else:
-            score = 0.5
-            explanations.append("⚠️ Above budget but exceptional value")
+            penalty = (property_price - max_budget) / max_budget * 30
+            adjusted_score -= min(penalty, 50)
         
-        # Location proximity (if destination specified)
-        primary_destination = user_prefs.get('primary_destination', '').lower()
+        # Location proximity bonus
+        transportation = user_prefs.get('transportation', '').lower()
         distance = property_data.get('distance_to_it_park_km', 10)
         
-        if primary_destination and 'it park' in primary_destination:
-            if distance <= 1:
-                score *= 1.0
-                explanations.append("📍 Prime IT Park location")
-            elif distance <= 3:
-                score *= 0.9
-                explanations.append("📍 Good proximity to IT Park")
-            elif distance <= 5:
-                score *= 0.8
-                explanations.append("📍 Moderate commute to IT Park")
-            else:
-                score *= 0.6
-                explanations.append("📍 Further from IT Park")
+        if transportation == 'walk' and distance <= 1:
+            adjusted_score += 15
+        elif transportation == 'walk' and distance <= 1.5:
+            adjusted_score += 10
         
-        return min(1.0, score), explanations
-    
-    def calculate_lifestyle_score(self, property_data, user_prefs):
-        """Calculate lifestyle compatibility score"""
-        score = 0.0
-        explanations = []
-        
-        # 1. Daily rhythm compatibility
-        daily_rhythm = user_prefs.get('daily_rhythm', '').lower()
-        property_type = property_data.get('type', '').lower()
-        
-        if daily_rhythm == 'night owl':
-            # Night owls need 24/7 access and sound insulation
-            if property_data.get('sound_insulation', False):
-                score += 0.3
-                explanations.append("🦉 Good sound insulation for night owls")
-            if property_data.get('twenty_four_seven_access', False):
-                score += 0.2
-                explanations.append("🔓 24/7 access")
-        elif daily_rhythm == 'early bird':
-            # Early birds need natural light and morning amenities
-            if property_data.get('view_type', '').lower() in ['garden', 'pool', 'east']:
-                score += 0.3
-                explanations.append("🌅 East-facing for morning light")
-            if property_data.get('floor', 0) > 3:
-                score += 0.2
-                explanations.append("🏢 High floor for better light")
-        else:  # flexible
-            score += 0.2
-            explanations.append("🔄 Flexible schedule compatible")
-        
-        # 2. Noise sensitivity matching
-        light_sleeper = user_prefs.get('light_sleeper', False)
-        noise_level = property_data.get('noise_level', 'medium').lower()
-        floor = property_data.get('floor', 1)
-        
-        if light_sleeper:
-            if floor >= 5 and noise_level == 'low':
-                score += 0.3
-                explanations.append("🔇 Quiet high-floor for light sleepers")
-            elif noise_level == 'low':
-                score += 0.2
-                explanations.append("🔇 Quiet location")
-        else:
-            if noise_level == 'medium':
-                score += 0.1
-                explanations.append("🎵 Normal noise level")
-        
-        # 3. Cooking habits compatibility
-        cooking_frequency = user_prefs.get('cooking_frequency', '').lower()
-        kitchen_type = property_data.get('kitchen_type', 'basic').lower()
-        ventilation = property_data.get('ventilation', 'basic').lower()
-        
-        if cooking_frequency in ['daily', 'heavy']:
-            if kitchen_type == 'full' and ventilation == 'good':
-                score += 0.3
-                explanations.append("👨‍🍳 Full kitchen with good ventilation")
-            elif kitchen_type == 'full':
-                score += 0.2
-                explanations.append("👨‍🍳 Full kitchen available")
-        elif cooking_frequency == 'occasional':
-            score += 0.1
-            explanations.append("🍽️ Suitable for occasional cooking")
-        else:  # rarely/never
-            score += 0.1
-            explanations.append("☕ Basic kitchen sufficient")
-        
-        # 4. AC temperature preference (for roommate matching)
-        ac_pref = user_prefs.get('ac_temperature_pref', 22)  # Default 22°C
-        ac_min = property_data.get('ac_temperature_min', 18)
-        ac_max = property_data.get('ac_temperature_max', 26)
-        
-        if ac_min <= ac_pref <= ac_max:
-            score += 0.2
-            explanations.append("🌡️ AC temperature compatible")
-        else:
-            explanations.append("🌡️ AC temperature may require adjustment")
-        
-        # 5. Shift/work schedule compatibility (for roommates)
-        shift_type = user_prefs.get('shift_type', '').lower()
-        if shift_type in ['night', 'graveyard']:
-            if property_data.get('blackout_curtains', False):
-                score += 0.2
-                explanations.append("🌙 Blackout curtains for night shift")
-        
-        return min(1.0, score), explanations
-    
-    def calculate_quality_score(self, property_data, user_prefs):
-        """Calculate quality and amenities score"""
-        score = 0.0
-        explanations = []
-        
-        # 1. Rating and reviews
-        rating = property_data.get('rating', 0)
-        if rating >= 4.5:
-            score += 0.4
-            explanations.append("⭐⭐⭐⭐⭐ Excellent reviews")
-        elif rating >= 4.0:
-            score += 0.3
-            explanations.append("⭐⭐⭐⭐ Very good reviews")
-        elif rating >= 3.5:
-            score += 0.2
-            explanations.append("⭐⭐⭐ Good reviews")
-        elif rating >= 3.0:
-            score += 0.1
-            explanations.append("⭐⭐ Average reviews")
-        
-        # 2. Amenities quality and match
+        # Amenities match bonus
         amenities = property_data.get('amenities', [])
         preferred_amenities = user_prefs.get('preferred_amenities', [])
         
-        amenity_count = len(amenities)
-        if amenity_count >= 8:
-            score += 0.3
-            explanations.append("🏆 Premium amenities package")
-        elif amenity_count >= 5:
-            score += 0.2
-            explanations.append("✅ Good range of amenities")
-        elif amenity_count >= 3:
-            score += 0.1
-            explanations.append("📝 Basic amenities included")
+        if preferred_amenities:
+            matched = sum(1 for pref in preferred_amenities 
+                         if any(pref.lower() in str(a).lower() for a in amenities))
+            match_percentage = matched / len(preferred_amenities) * 15
+            adjusted_score += match_percentage
         
-        # Match preferred amenities
-        matched_amenities = []
-        for pref in preferred_amenities:
-            pref_lower = str(pref).lower()
-            for amenity in amenities:
-                if pref_lower in str(amenity).lower():
-                    matched_amenities.append(pref)
-                    break
+        # Rating bonus
+        rating = property_data.get('rating', 0)
+        if rating >= 4.0:
+            adjusted_score += 10
+        elif rating >= 3.5:
+            adjusted_score += 5
         
-        if matched_amenities:
-            match_ratio = len(matched_amenities) / len(preferred_amenities) if preferred_amenities else 0
-            score += match_ratio * 0.3
-            explanations.append(f"🎯 {len(matched_amenities)} preferred amenities matched")
-        
-        # 3. Property condition and features
-        if property_data.get('furnished', False):
-            score += 0.2
-            explanations.append("🛋️ Fully furnished")
-        
-        if property_data.get('new_renovation', False):
-            score += 0.1
-            explanations.append("🆕 Recently renovated")
-        
-        if property_data.get('balcony', False):
-            score += 0.1
-            explanations.append("🌿 Private balcony")
-        
-        return min(1.0, score), explanations
+        return min(100, max(0, adjusted_score))
     
-    def calculate_total_match_score(self, property_data, user_prefs):
-        """Calculate total match score with comprehensive profiling"""
+    def generate_ml_explanations(self, property_data, user_prefs, ml_score):
+        """Generate explanations based on ML features"""
+        explanations = []
         
-        # First check dealbreaker filters
-        filter_check = self.check_dealbreaker_filters(property_data, user_prefs)
+        # Feature importance explanations
+        important_features = self.get_important_features(property_data, user_prefs)
         
-        if not filter_check['passed']:
-            return 0.0, filter_check['failed_reasons'], filter_check['warnings'], {}
+        for feature, importance in important_features[:3]:
+            if importance > 0.1:
+                if feature == 'price':
+                    explanations.append("💰 Good budget match")
+                elif feature == 'distance_to_it_park_km':
+                    explanations.append("📍 Location compatibility")
+                elif feature == 'amenities':
+                    explanations.append("🎯 Amenities alignment")
+                elif 'pet' in feature:
+                    explanations.append("🐾 Pet policy match")
+                elif 'fiber' in feature:
+                    explanations.append("💻 WFH ready")
         
-        # Calculate component scores
-        dealbreaker_score, dealbreaker_explanations = self.calculate_dealbreaker_score(property_data, user_prefs)
-        lifestyle_score, lifestyle_explanations = self.calculate_lifestyle_score(property_data, user_prefs)
-        quality_score, quality_explanations = self.calculate_quality_score(property_data, user_prefs)
+        # Cluster-based explanation
+        cluster = property_data.get('cluster', -1)
+        if cluster != -1:
+            cluster_props = self.properties_df[self.properties_df['cluster'] == cluster]
+            cluster_desc = self.describe_cluster(cluster_props)
+            explanations.append(f"🏘️ Similar to {cluster_desc} properties")
         
-        # Apply weightings
-        total_score = (
-            self.weights['dealbreaker'] * dealbreaker_score +
-            self.weights['lifestyle'] * lifestyle_score +
-            self.weights['quality'] * quality_score
+        # Value prediction explanation
+        if hasattr(self, 'value_model'):
+            value_score = self.predict_property_value(property_data)
+            if value_score > 70:
+                explanations.append("🏆 High value proposition")
+            elif value_score > 50:
+                explanations.append("✅ Good value for money")
+        
+        return explanations[:3]
+    
+    def get_important_features(self, property_data, user_prefs):
+        """Get important features for this match"""
+        # Simplified feature importance based on property characteristics
+        feature_importance = []
+        
+        # Budget importance
+        property_price = property_data.get('price', 0)
+        max_budget = self.normalize_budget(user_prefs.get('max_budget', 999999))
+        budget_ratio = 1 - min(property_price / max_budget, 1.5) / 1.5
+        feature_importance.append(('price', budget_ratio))
+        
+        # Location importance
+        distance = property_data.get('distance_to_it_park_km', 10)
+        location_importance = max(0, 1 - distance / 10)
+        feature_importance.append(('distance_to_it_park_km', location_importance))
+        
+        # Amenities importance
+        amenities = property_data.get('amenities', [])
+        amenity_importance = min(len(amenities) / 10, 1.0)
+        feature_importance.append(('amenities', amenity_importance))
+        
+        return sorted(feature_importance, key=lambda x: x[1], reverse=True)
+    
+    def describe_cluster(self, cluster_df):
+        """Describe a cluster of properties"""
+        if len(cluster_df) == 0:
+            return "similar"
+        
+        avg_price = cluster_df['price'].mean()
+        avg_rating = cluster_df['rating'].mean()
+        
+        if avg_price < 5000:
+            price_desc = "budget"
+        elif avg_price < 10000:
+            price_desc = "mid-range"
+        else:
+            price_desc = "premium"
+        
+        if avg_rating >= 4.0:
+            rating_desc = "highly-rated"
+        elif avg_rating >= 3.0:
+            rating_desc = "well-rated"
+        else:
+            rating_desc = "average"
+        
+        return f"{price_desc} {rating_desc}"
+    
+    def predict_property_value(self, property_data):
+        """Predict value score for a property"""
+        if not hasattr(self, 'value_model') or self.property_features is None:
+            return 50  # Default score
+        
+        try:
+            # Convert property to feature vector
+            prop_idx = self.properties_df[self.properties_df['id'] == property_data['id']].index
+            if len(prop_idx) > 0:
+                features = self.property_features.iloc[prop_idx[0]]
+                value_score = self.value_model.predict([features])[0]
+                return max(0, min(100, value_score))
+        except:
+            pass
+        
+        return 50
+    
+    def find_similar_properties(self, property_id, n=5):
+        """Find similar properties using KNN"""
+        if self.knn_model is None or self.property_features_scaled is None:
+            return []
+        
+        # Find property index
+        prop_idx = self.properties_df[self.properties_df['id'] == property_id].index
+        if len(prop_idx) == 0:
+            return []
+        
+        # Get similar properties
+        distances, indices = self.knn_model.kneighbors(
+            [self.property_features_scaled[prop_idx[0]]], 
+            n_neighbors=min(n+1, len(self.property_features_scaled))
         )
         
-        # Convert to percentage
-        total_score_percent = round(total_score * 100, 1)
+        similar_properties = []
+        for i, idx in enumerate(indices[0]):
+            if idx != prop_idx[0]:  # Exclude the property itself
+                prop_data = self.properties_df.iloc[idx].to_dict()
+                similarity = (1 - distances[0][i]) * 100
+                similar_properties.append({
+                    'property': prop_data,
+                    'similarity': similarity
+                })
         
-        # Combine all explanations
-        all_explanations = dealbreaker_explanations + lifestyle_explanations + quality_explanations
-        warnings = filter_check['warnings']
-        
-        # Component scores for transparency
-        component_scores = {
-            'dealbreaker': round(dealbreaker_score * 100, 1),
-            'lifestyle': round(lifestyle_score * 100, 1),
-            'quality': round(quality_score * 100, 1)
-        }
-        
-        return total_score_percent, all_explanations, warnings, component_scores
+        return similar_properties
 
-class ConciergeRecommendationEngine:
-    """Concierge-style recommendation engine with strategic presentation"""
+class MLConciergeEngine:
+    """ML-powered concierge recommendation engine"""
     
     def __init__(self):
-        self.profiler = EnhancedProfiler()
+        self.ml_recommender = MLPropertyRecommender()
         self.work_animations = [
-            "Scanning Flood Hazard Maps (MGB Data)...",
-            "Verifying Fiber Optic Availability with PLDT...",
-            "Filtering out 'Ghost Listings'...",
-            "Checking Commute Times during Rush Hour...",
-            "Analyzing Noise Pollution Levels...",
-            "Cross-referencing with Verified Reviews...",
-            "Calculating True Cost of Commute...",
-            "Checking Building Safety Certifications...",
-            "Verifying Landlord Response Rates...",
-            "Analyzing Micro-climate Data for Ventilation..."
+            "Training similarity models...",
+            "Analyzing property clusters...",
+            "Calculating feature importance...",
+            "Predicting value scores...",
+            "Optimizing recommendations..."
         ]
     
-    def generate_concierge_recommendations(self, user_prefs, simulate_delay=True):
-        """Generate curated recommendations with concierge experience"""
+    def generate_ml_recommendations(self, user_prefs):
+        """Generate ML-powered recommendations"""
+        print(f"\n🤖 ML CONCIERGE ACTIVATED")
         
-        print(f"\n🔍 CONCIERGE SERVICE ACTIVATED")
-        print(f"   Budget: ₱{self.profiler.normalize_budget(user_prefs.get('min_budget', 0)):,} - ₱{self.profiler.normalize_budget(user_prefs.get('max_budget', 999999)):,}")
-        print(f"   Lifestyle: {user_prefs.get('daily_rhythm', 'Unknown')}, {user_prefs.get('transportation', 'Unknown')}")
-        print(f"   Dealbreakers: {user_prefs.get('must_have_features', [])}")
+        # Simulate ML processing
+        print("\n🔧 Running ML algorithms...")
+        for i in range(2):
+            animation = random.choice(self.work_animations)
+            print(f"   {animation}")
+            time.sleep(0.3)
         
-        # Simulate concierge work (Labor Illusion)
-        if simulate_delay:
-            print("\n🤔 Curating your perfect matches...")
-            for i in range(3):  # Show 3 animations
-                animation = random.choice(self.work_animations)
-                print(f"   {animation}")
-                time.sleep(0.5)
+        # Get ML similarity scores
+        all_scores = self.ml_recommender.calculate_ml_similarity(user_prefs)
         
-        all_scored_properties = []
+        if not all_scores:
+            return self.generate_fallback_recommendations(user_prefs)
         
-        # Score all properties
-        for prop in properties:
-            prop_dict = prop.copy()
-            
-            # Calculate comprehensive match score
-            match_score, explanations, warnings, component_scores = self.profiler.calculate_total_match_score(
-                prop_dict, user_prefs
+        # Convert to list and sort
+        scored_list = []
+        for idx, data in all_scores.items():
+            property_data = self.prepare_property_response(
+                data['property'], 
+                data['adjusted_score'],
+                user_prefs
             )
-            
-            if match_score > 0:  # Include all properties that pass dealbreakers
-                # Prepare enhanced property data
-                property_data = self.prepare_property_response(prop_dict, match_score, user_prefs)
-                property_data.update({
-                    'explanations': explanations[:4],  # Top 4 explanations
-                    'warnings': warnings,
-                    'componentScores': component_scores,
-                    'tenantProfileMatch': self.generate_tenant_profile_match(prop_dict, user_prefs)
-                })
-                
-                all_scored_properties.append(property_data)
+            property_data.update({
+                'mlSimilarity': round(data['ml_similarity'], 1),
+                'explanations': data['explanations'],
+                'featureAnalysis': self.analyze_property_features(data['property'], user_prefs)
+            })
+            scored_list.append(property_data)
         
-        # Sort by match score
-        all_scored_properties.sort(key=lambda x: x['matchScore'], reverse=True)
+        # Sort by adjusted score
+        scored_list.sort(key=lambda x: x['matchScore'], reverse=True)
         
         # Generate strategic recommendations
-        curated_recommendations = self.curate_strategic_recommendations(all_scored_properties, user_prefs)
+        curated = self.curate_ml_recommendations(scored_list, user_prefs)
         
-        # Generate tenant profile for landlords
-        tenant_profile = self.generate_tenant_resume(user_prefs)
-        
-        return curated_recommendations, tenant_profile
+        return curated
     
     def prepare_property_response(self, prop, match_score, user_prefs):
-        """Prepare comprehensive property response"""
+        """Prepare property response with ML insights"""
         return {
             'id': prop['id'],
             'name': prop['name'],
@@ -523,17 +611,14 @@ class ConciergeRecommendationEngine:
             'availableDate': prop.get('available_date', 'Immediate'),
             'imageUrl': prop.get('image_url', 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00'),
             'description': prop.get('description', 'Modern property with great amenities.'),
-            'matchScore': match_score,
-            'matchPercentage': f"{match_score}%",
-            'keyFeatures': self.extract_key_features(prop, user_prefs),
-            'commuteAnalysis': self.generate_commute_analysis(prop, user_prefs),
-            'lifestyleCompatibility': self.assess_lifestyle_compatibility(prop, user_prefs),
-            'valueProposition': self.calculate_value_proposition(prop, user_prefs)
+            'matchScore': round(match_score, 1),
+            'matchPercentage': f"{round(match_score, 1)}%",
+            'mlCluster': f"Cluster {prop.get('cluster', 0)}",
+            'valuePrediction': self.ml_recommender.predict_property_value(prop)
         }
     
-    def curate_strategic_recommendations(self, scored_properties, user_prefs):
-        """Curate strategic recommendations using decoy effect"""
-        
+    def curate_ml_recommendations(self, scored_properties, user_prefs):
+        """Curate recommendations using ML insights"""
         if not scored_properties:
             return {
                 'safeBet': None,
@@ -542,587 +627,333 @@ class ConciergeRecommendationEngine:
                 'allMatches': []
             }
         
-        # Group properties by match score ranges
-        safe_bets = [p for p in scored_properties if p['matchScore'] >= 85]
-        strong_matches = [p for p in scored_properties if 70 <= p['matchScore'] < 85]
-        good_options = [p for p in scored_properties if 50 <= p['matchScore'] < 70]
-        considerations = [p for p in scored_properties if p['matchScore'] < 50]
-        
-        # STRATEGY 1: The Decoy Effect Implementation
-        # We'll select properties strategically to guide user decision
+        # Use ML clustering to diversify recommendations
+        clusters = {}
+        for prop in scored_properties[:20]:  # Consider top 20
+            cluster = prop.get('mlCluster', '0')
+            if cluster not in clusters:
+                clusters[cluster] = []
+            clusters[cluster].append(prop)
         
         curated = {}
         
-        # Safe Bet (Target) - The best overall match
-        if safe_bets:
-            # Pick the safe bet based on comprehensive scoring
-            safe_bet = max(safe_bets, key=lambda x: (
-                x['matchScore'] * 0.4 +
-                (1 - x['price'] / self.profiler.normalize_budget(user_prefs.get('max_budget', 999999))) * 0.3 +
-                x['rating'] / 5 * 0.3
-            ))
-            curated['safeBet'] = self.enhance_for_presentation(safe_bet, 'safe_bet')
-        else:
-            # If no safe bet, use best strong match
-            if strong_matches:
-                curated['safeBet'] = self.enhance_for_presentation(strong_matches[0], 'safe_bet')
+        # Safe Bet: Best overall from largest cluster
+        if clusters:
+            largest_cluster = max(clusters.keys(), key=lambda k: len(clusters[k]))
+            safe_bet = max(clusters[largest_cluster], key=lambda x: x['matchScore'])
+            curated['safeBet'] = self.enhance_ml_presentation(safe_bet, 'safe_bet', largest_cluster)
         
-        # Stretch Option (Decoy) - Slightly worse but similar price
-        if curated.get('safeBet'):
-            # Find a property that's similar but slightly worse to make safe bet look better
-            safe_bet_price = curated['safeBet']['price']
-            similar_priced = [p for p in scored_properties 
-                            if p['id'] != curated['safeBet']['id'] 
-                            and abs(p['price'] - safe_bet_price) / safe_bet_price < 0.2]
-            
-            if similar_priced:
-                # Pick one with lower score but similar price
-                stretch = min(similar_priced, key=lambda x: x['matchScore'])
-                curated['stretchOption'] = self.enhance_for_presentation(stretch, 'stretch')
+        # Stretch Option: Best from different cluster
+        if len(clusters) > 1:
+            other_clusters = [k for k in clusters.keys() if k != largest_cluster]
+            if other_clusters:
+                second_cluster = max(other_clusters, key=lambda k: len(clusters[k]))
+                stretch = max(clusters[second_cluster], key=lambda x: x['matchScore'])
+                curated['stretchOption'] = self.enhance_ml_presentation(stretch, 'stretch', second_cluster)
         
-        # Wildcard - Different value proposition
-        if good_options or considerations:
-            # Look for properties that offer different value (cheaper but further, or more amenities)
-            max_budget = self.profiler.normalize_budget(user_prefs.get('max_budget', 999999))
-            
-            # Find properties that are significantly cheaper or offer unique value
-            wildcard_candidates = []
-            for prop in scored_properties:
-                if prop.get('id') in [curated.get('safeBet', {}).get('id'), curated.get('stretchOption', {}).get('id')]:
-                    continue
-                
-                # Value proposition: either much cheaper or much better amenities
-                price_ratio = prop['price'] / max_budget
-                if price_ratio < 0.7 or len(prop.get('amenities', [])) >= 8:
-                    wildcard_candidates.append(prop)
-            
-            if wildcard_candidates:
-                # Pick the wildcard with best value proposition
-                wildcard = max(wildcard_candidates, key=lambda x: (
-                    (1 - x['price'] / max_budget) * 0.6 +
-                    len(x.get('amenities', [])) / 10 * 0.4
-                ))
-                curated['wildcard'] = self.enhance_for_presentation(wildcard, 'wildcard')
+        # Wildcard: Best value prediction
+        if scored_properties:
+            wildcard = max(scored_properties[:10], key=lambda x: x.get('valuePrediction', 0))
+            curated['wildcard'] = self.enhance_ml_presentation(wildcard, 'wildcard', 'value')
         
-        # Ensure we have at least one recommendation
-        if not curated and scored_properties:
-            curated['safeBet'] = self.enhance_for_presentation(scored_properties[0], 'safe_bet')
-        
-        curated['allMatches'] = scored_properties[:10]  # Top 10 matches for browsing
+        curated['allMatches'] = scored_properties[:10]
         
         return curated
     
-    def enhance_for_presentation(self, property_data, category):
-        """Add presentation enhancements for each category"""
+    def enhance_ml_presentation(self, property_data, category, ml_info):
+        """Add ML-based presentation enhancements"""
         enhanced = property_data.copy()
         
         if category == 'safe_bet':
-            enhanced['presentationTitle'] = "The Safe Bet 🏆"
-            enhanced['presentationSubtitle'] = "Excellent match across all criteria"
-            enhanced['presentationHighlights'] = [
-                "✓ Meets all your dealbreakers",
-                "✓ Strong lifestyle compatibility",
-                "✓ Great value for money",
-                "✓ Highly rated by previous tenants"
+            enhanced['presentationTitle'] = f"ML Top Match 🏆"
+            enhanced['presentationSubtitle'] = f"Best match from {ml_info}"
+            enhanced['mlInsights'] = [
+                "🤖 Selected by similarity algorithm",
+                "📊 High feature alignment",
+                "🎯 Optimal balance of preferences"
             ]
-            enhanced['recommendationReason'] = "This property aligns perfectly with your preferences and represents the best overall value."
             
         elif category == 'stretch':
-            enhanced['presentationTitle'] = "The Stretch Option ⚖️"
-            enhanced['presentationSubtitle'] = "Good match with some trade-offs"
-            enhanced['presentationHighlights'] = [
-                "✓ Meets most requirements",
-                "⚠️ Some compromises needed",
-                "💰 Similar price point",
-                "📍 Alternative location"
+            enhanced['presentationTitle'] = f"Diverse Option 🔄"
+            enhanced['presentationSubtitle'] = f"Alternative from {ml_info}"
+            enhanced['mlInsights'] = [
+                "🔄 Different property cluster",
+                "🎲 Alternative feature combination",
+                "💡 Expands your options"
             ]
-            enhanced['recommendationReason'] = "Consider this if you're flexible on some preferences or want to compare options."
             
         elif category == 'wildcard':
-            enhanced['presentationTitle'] = "The Wildcard 💎"
-            enhanced['presentationSubtitle'] = "Different approach, exceptional value"
-            enhanced['presentationHighlights'] = [
-                "🎯 Excels in specific areas",
-                "💰 Better value proposition",
-                "📍 Different neighborhood",
-                "🏆 Unique features"
+            enhanced['presentationTitle'] = f"Value Pick 💎"
+            enhanced['presentationSubtitle'] = "Best predicted value"
+            enhanced['mlInsights'] = [
+                "💰 High value prediction score",
+                "📈 Strong price-to-features ratio",
+                "🏆 ML-identified hidden gem"
             ]
-            enhanced['recommendationReason'] = "This option offers outstanding value or features that might outweigh location or other factors."
         
         return enhanced
     
-    def extract_key_features(self, property_data, user_prefs):
-        """Extract key features based on user preferences"""
-        features = []
+    def analyze_property_features(self, property_data, user_prefs):
+        """Analyze key feature matches"""
+        analysis = {
+            'strongMatches': [],
+            'weakMatches': [],
+            'suggestions': []
+        }
         
-        # Budget features
-        price = property_data.get('price', 0)
-        max_budget = self.profiler.normalize_budget(user_prefs.get('max_budget', 999999))
+        # Budget analysis
+        property_price = property_data.get('price', 0)
+        max_budget = self.ml_recommender.normalize_budget(user_prefs.get('max_budget', 999999))
         
-        if price <= max_budget * 0.7:
-            features.append("💰 Exceptional value (30%+ under budget)")
-        elif price <= max_budget:
-            features.append("✅ Within budget")
+        if property_price <= max_budget:
+            analysis['strongMatches'].append(f"Within budget (₱{property_price:,})")
+        else:
+            analysis['weakMatches'].append(f"Above budget by ₱{property_price - max_budget:,}")
         
-        # Location features
+        # Location analysis
         distance = property_data.get('distance_to_it_park_km', 10)
         transportation = user_prefs.get('transportation', '')
         
         if transportation == 'walk' and distance <= 1:
-            features.append("🚶 Walking distance to IT Park")
-        elif transportation == 'private car' and property_data.get('parking_available', False):
-            features.append("🚗 Dedicated parking included")
-        elif distance <= 2:
-            features.append("📍 Prime location")
+            analysis['strongMatches'].append("Walking distance to IT Park")
+        elif distance <= 3:
+            analysis['strongMatches'].append("Good location")
+        else:
+            analysis['weakMatches'].append("Further commute")
         
-        # Lifestyle features
-        if property_data.get('fiber_optic', False):
-            features.append("💻 Fiber optic ready (Great for WFH)")
+        # Amenities analysis
+        amenities = property_data.get('amenities', [])
+        preferred = user_prefs.get('preferred_amenities', [])
         
-        if property_data.get('sound_insulation', False):
-            features.append("🔇 Sound insulated")
+        matched = sum(1 for pref in preferred 
+                     if any(pref.lower() in str(a).lower() for a in amenities))
+        if matched > 0:
+            analysis['strongMatches'].append(f"{matched} preferred amenities")
         
-        if property_data.get('blackout_curtains', False):
-            features.append("🌙 Shift-worker friendly")
-        
-        # Property features
-        if property_data.get('furnished', False):
-            features.append("🛋️ Move-in ready")
-        
-        if property_data.get('balcony', False):
-            features.append("🌿 Private outdoor space")
-        
-        if property_data.get('gym', False):
-            features.append("💪 On-site gym")
-        
-        return features[:6]
-    
-    def generate_commute_analysis(self, property_data, user_prefs):
-        """Generate detailed commute analysis"""
-        distance = property_data.get('distance_to_it_park_km', 10)
-        transportation = user_prefs.get('transportation', '').lower()
-        
-        analysis = {
-            'distanceKm': distance,
-            'estimatedCommuteTime': self.calculate_commute_time(distance, transportation),
-            'transportationOptions': self.get_transportation_options(property_data),
-            'rushHourImpact': self.assess_rush_hour_impact(distance, transportation),
-            'monthlyCommuteCost': self.estimate_commute_cost(distance, transportation)
-        }
+        # ML suggestions
+        cluster = property_data.get('cluster', -1)
+        if cluster != -1:
+            analysis['suggestions'].append(f"Similar properties in cluster {cluster}")
         
         return analysis
     
-    def calculate_commute_time(self, distance, transportation):
-        """Calculate estimated commute time"""
-        if transportation == 'walk':
-            return f"{int(distance * 15)}-{int(distance * 20)} minutes"
-        elif transportation == 'private car':
-            base_time = distance * 3  # 3 minutes per km without traffic
-            rush_hour = base_time * 2
-            return f"{int(base_time)}-{int(rush_hour)} minutes"
-        elif transportation == 'jeepney':
-            base_time = distance * 5  # 5 minutes per km
-            rush_hour = base_time * 2.5
-            return f"{int(base_time)}-{int(rush_hour)} minutes"
-        else:
-            return f"{int(distance * 4)}-{int(distance * 8)} minutes"
-    
-    def get_transportation_options(self, property_data):
-        """Get available transportation options"""
-        options = []
-        location = property_data.get('location', '').lower()
+    def generate_fallback_recommendations(self, user_prefs):
+        """Generate fallback recommendations if ML fails"""
+        print("⚠️ ML models not ready, using fallback logic")
         
-        if 'it park' in location or 'cebu business park' in location:
-            options.append('Jeepney routes: 01K, 12L, 17B')
-            options.append('Angkas/Move It available')
-            options.append('GrabCar frequently available')
+        # Simple rule-based fallback
+        scored = []
+        for prop in properties:
+            score = self.simple_scoring(prop, user_prefs)
+            if score > 0:
+                property_data = self.prepare_property_response(prop, score, user_prefs)
+                scored.append(property_data)
         
-        if property_data.get('near_lrt_station', False):
-            options.append('Walking distance to LRT station')
+        scored.sort(key=lambda x: x['matchScore'], reverse=True)
         
-        if property_data.get('parking_available', False):
-            options.append('Private parking available')
-        
-        return options[:3]
-    
-    def assess_rush_hour_impact(self, distance, transportation):
-        """Assess rush hour impact on commute"""
-        if distance <= 2:
-            return "Minimal impact - short distance"
-        elif transportation == 'private car':
-            return "Moderate traffic during rush hour (6-9AM, 5-8PM)"
-        elif transportation == 'jeepney':
-            return "Heavier congestion during peak hours"
-        else:
-            return "Variable depending on route"
-    
-    def estimate_commute_cost(self, distance, transportation):
-        """Estimate monthly commute cost"""
-        if transportation == 'walk':
-            return 0
-        elif transportation == 'private car':
-            # Fuel + parking + maintenance
-            daily_cost = distance * 2 * 10  # 10 pesos per km
-            return int(daily_cost * 22)  # 22 working days
-        elif transportation == 'jeepney':
-            # Jeepney fare: 10 pesos minimum
-            daily_cost = 10 * 2  # To and from
-            return int(daily_cost * 22)
-        else:
-            return int(distance * 15 * 22)  # Rough estimate
-    
-    def assess_lifestyle_compatibility(self, property_data, user_prefs):
-        """Assess lifestyle compatibility score"""
-        compatibility = {
-            'overallScore': 0,
-            'categories': {}
+        curated = {
+            'safeBet': scored[0] if scored else None,
+            'stretchOption': scored[1] if len(scored) > 1 else None,
+            'wildcard': scored[2] if len(scored) > 2 else None,
+            'allMatches': scored[:10]
         }
         
-        # Noise compatibility
-        light_sleeper = user_prefs.get('light_sleeper', False)
-        noise_level = property_data.get('noise_level', 'medium')
-        
-        if light_sleeper and noise_level == 'low':
-            compatibility['categories']['noise'] = 'Excellent'
-            compatibility['overallScore'] += 25
-        elif not light_sleeper and noise_level in ['medium', 'low']:
-            compatibility['categories']['noise'] = 'Good'
-            compatibility['overallScore'] += 20
-        else:
-            compatibility['categories']['noise'] = 'Fair'
-            compatibility['overallScore'] += 10
-        
-        # Kitchen compatibility
-        cooking_frequency = user_prefs.get('cooking_frequency', 'occasional')
-        kitchen_type = property_data.get('kitchen_type', 'basic')
-        
-        if cooking_frequency in ['daily', 'heavy'] and kitchen_type == 'full':
-            compatibility['categories']['kitchen'] = 'Excellent'
-            compatibility['overallScore'] += 25
-        elif cooking_frequency == 'occasional' and kitchen_type in ['basic', 'full']:
-            compatibility['categories']['kitchen'] = 'Good'
-            compatibility['overallScore'] += 20
-        else:
-            compatibility['categories']['kitchen'] = 'Fair'
-            compatibility['overallScore'] += 10
-        
-        # Work-from-home compatibility
-        wfh_frequency = user_prefs.get('wfh_frequency', '')
-        fiber_optic = property_data.get('fiber_optic', False)
-        
-        if wfh_frequency in ['daily', 'frequent'] and fiber_optic:
-            compatibility['categories']['wfh'] = 'Excellent'
-            compatibility['overallScore'] += 25
-        elif wfh_frequency and fiber_optic:
-            compatibility['categories']['wfh'] = 'Good'
-            compatibility['overallScore'] += 20
-        else:
-            compatibility['categories']['wfh'] = 'Fair'
-            compatibility['overallScore'] += 10
-        
-        # AC temperature compatibility (for roommates)
-        ac_pref = user_prefs.get('ac_temperature_pref', 22)
-        ac_min = property_data.get('ac_temperature_min', 18)
-        ac_max = property_data.get('ac_temperature_max', 26)
-        
-        if ac_min <= ac_pref <= ac_max:
-            compatibility['categories']['temperature'] = 'Compatible'
-            compatibility['overallScore'] += 25
-        else:
-            compatibility['categories']['temperature'] = 'May need adjustment'
-            compatibility['overallScore'] += 15
-        
-        compatibility['overallScore'] = min(100, compatibility['overallScore'])
-        
-        return compatibility
+        return curated
     
-    def calculate_value_proposition(self, property_data, user_prefs):
-        """Calculate value proposition score"""
+    def simple_scoring(self, property_data, user_prefs):
+        """Simple rule-based scoring for fallback"""
+        score = 50
+        
+        # Budget factor
         price = property_data.get('price', 0)
-        max_budget = self.profiler.normalize_budget(user_prefs.get('max_budget', 999999))
-        area = property_data.get('area_sqm', 20)
-        amenities = len(property_data.get('amenities', []))
+        max_budget = self.ml_recommender.normalize_budget(user_prefs.get('max_budget', 999999))
         
-        # Price per square meter
-        price_per_sqm = price / area if area > 0 else 0
-        
-        # Amenity score
-        amenity_score = min(amenities / 10 * 100, 100)
-        
-        # Budget utilization
-        budget_utilization = (max_budget - price) / max_budget * 100 if max_budget > 0 else 0
-        
-        # Overall value score
-        value_score = (
-            (100 - min(price_per_sqm * 10, 100)) * 0.4 +  # Lower price per sqm is better
-            amenity_score * 0.4 +                         # More amenities is better
-            max(budget_utilization, 0) * 0.2              # More budget leftover is better
-        )
-        
-        return {
-            'pricePerSqm': round(price_per_sqm, 2),
-            'amenityScore': round(amenity_score, 1),
-            'budgetUtilization': round(budget_utilization, 1),
-            'overallValueScore': round(value_score, 1),
-            'valueCategory': 'Premium' if value_score >= 80 else 'Good' if value_score >= 60 else 'Fair'
-        }
-    
-    def generate_tenant_profile_match(self, property_data, user_prefs):
-        """Generate tenant profile match for landlords"""
-        match_areas = []
-        
-        # Budget match
-        price = property_data.get('price', 0)
-        max_budget = self.profiler.normalize_budget(user_prefs.get('max_budget', 999999))
         if price <= max_budget:
-            match_areas.append("✅ Budget aligned")
+            score += 30
+        elif price <= max_budget * 1.2:
+            score += 10
+        else:
+            score -= 20
         
-        # Pet policy match
+        # Pet policy
         has_pets = user_prefs.get('has_pets', False)
         pet_friendly = property_data.get('pet_friendly', False)
-        if not has_pets or (has_pets and pet_friendly):
-            match_areas.append("✅ Pet policy compatible")
+        if has_pets and pet_friendly:
+            score += 10
+        elif not has_pets:
+            score += 5
         
-        # Location preference match
-        preferred_areas = user_prefs.get('area_preferences', [])
-        location = property_data.get('location', '').lower()
-        if any(area.lower() in location for area in preferred_areas if area):
-            match_areas.append("✅ Preferred location")
+        # Location
+        distance = property_data.get('distance_to_it_park_km', 10)
+        if distance <= 2:
+            score += 15
+        elif distance <= 5:
+            score += 5
         
-        # Lifestyle compatibility
-        wfh_frequency = user_prefs.get('wfh_frequency', '')
-        if wfh_frequency and property_data.get('fiber_optic', False):
-            match_areas.append("✅ WFH ready")
-        
-        return match_areas
-    
-    def generate_tenant_resume(self, user_prefs):
-        """Generate tenant resume for landlords"""
-        # Map user preferences to readable profile
-        transportation_map = {
-            'walk': 'Walks to work',
-            'private_car': 'Drives to work',
-            'jeepney': 'Takes public transport',
-            'motorcycle': 'Rides motorcycle'
-        }
-        
-        cooking_map = {
-            'daily': 'Cooks daily',
-            'heavy': 'Enjoys cooking',
-            'occasional': 'Cooks occasionally',
-            'rarely': 'Eats out often',
-            'never': 'Does not cook'
-        }
-        
-        rhythm_map = {
-            'early_bird': 'Early riser',
-            'night_owl': 'Night owl',
-            'flexible': 'Flexible schedule'
-        }
-        
-        # Build tenant resume
-        resume = {
-            'tenantType': self.determine_tenant_type(user_prefs),
-            'stabilityIndicator': self.assess_stability(user_prefs),
-            'lifestyleBrief': self.generate_lifestyle_brief(user_prefs),
-            'dealbreakerSummary': user_prefs.get('must_have_features', []),
-            'preferredMoveIn': user_prefs.get('move_in_plan', 'Flexible'),
-            'leasePreference': user_prefs.get('lease_duration', '12 months').replace('-', ' ').title(),
-            'incomeStability': self.assess_income_stability(user_prefs),
-            'communicationStyle': 'Responsive & Professional',
-            'viewingAvailability': 'Weekdays after 5PM or Weekends',
-            'decisionTimeline': 'Within 1 week if match is good',
-            'compatibilityNotes': self.generate_compatibility_notes(user_prefs)
-        }
-        
-        # Add urgency badge (psychology lever)
-        resume['urgencyBadge'] = {
-            'text': 'High Intent Tenant',
-            'expiry': '48 hours',
-            'currentlyViewing': '2 other properties this week'
-        }
-        
-        return resume
-    
-    def determine_tenant_type(self, user_prefs):
-        """Determine tenant type based on preferences"""
-        wfh_frequency = user_prefs.get('wfh_frequency', '')
-        daily_rhythm = user_prefs.get('daily_rhythm', '')
-        
-        if wfh_frequency in ['daily', 'frequent']:
-            return 'Digital Nomad / Remote Worker'
-        elif daily_rhythm == 'night_owl':
-            return 'Night Shift Professional'
-        elif daily_rhythm == 'early_bird':
-            return 'Corporate Professional'
-        else:
-            return 'General Tenant'
-    
-    def assess_stability(self, user_prefs):
-        """Assess tenant stability"""
-        lease_pref = user_prefs.get('lease_duration', '')
-        move_in_plan = user_prefs.get('move_in_plan', '')
-        
-        if 'long' in lease_pref.lower() and 'immediate' in move_in_plan.lower():
-            return 'High Stability - Long term, ready to move'
-        elif 'long' in lease_pref.lower():
-            return 'Stable - Prefers long term lease'
-        else:
-            return 'Flexible - Open to various arrangements'
-    
-    def generate_lifestyle_brief(self, user_prefs):
-        """Generate lifestyle brief"""
-        brief_parts = []
-        
-        transportation = user_prefs.get('transportation', '')
-        if transportation:
-            brief_parts.append(f"Commutes by {transportation.replace('_', ' ')}")
-        
-        cooking = user_prefs.get('cooking_frequency', '')
-        if cooking:
-            brief_parts.append(f"Cooks {cooking}")
-        
-        pets = user_prefs.get('has_pets', False)
-        if pets:
-            pet_type = user_prefs.get('pet_type', 'pet')
-            brief_parts.append(f"Has a {pet_type}")
-        
-        wfh = user_prefs.get('wfh_frequency', '')
-        if wfh in ['daily', 'frequent']:
-            brief_parts.append("Works from home frequently")
-        
-        return "; ".join(brief_parts)
-    
-    def assess_income_stability(self, user_prefs):
-        """Assess income stability based on preferences"""
-        max_budget = self.profiler.normalize_budget(user_prefs.get('max_budget', 0))
-        
-        if max_budget >= 30000:
-            return 'High Income / Executive Level'
-        elif max_budget >= 15000:
-            return 'Stable Professional Income'
-        elif max_budget >= 8000:
-            return 'Entry Level / Student Budget'
-        else:
-            return 'Budget Conscious'
-    
-    def generate_compatibility_notes(self, user_prefs):
-        """Generate compatibility notes for landlords"""
-        notes = []
-        
-        if not user_prefs.get('has_pets', False):
-            notes.append("No pets - low maintenance")
-        
-        if not user_prefs.get('smoking', True):
-            notes.append("Non-smoker - keeps property fresh")
-        
-        if user_prefs.get('lease_duration', '').lower() == 'long-term':
-            notes.append("Seeks long-term tenancy - low turnover")
-        
-        if user_prefs.get('move_in_plan', '').lower() == 'immediate':
-            notes.append("Ready to move immediately - no gap")
-        
-        return notes
+        return max(0, min(100, score))
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
-    """Main recommendation endpoint with concierge service"""
+    """Main recommendation endpoint with ML concierge"""
     try:
-        # Get raw camelCase data from frontend
         raw_user_prefs = request.get_json()
         
         if not raw_user_prefs:
             return jsonify(format_response_keys({
                 "error": "No preferences provided",
                 "curatedMatches": {},
-                "tenantResume": {},
-                "totalMatches": 0,
-                "conciergeNotes": []
+                "totalMatches": 0
             })), 400
         
-        print(f"\n📝 CONCIERGE SERVICE REQUEST:")
-        print(f"   Tenant Type: {raw_user_prefs.get('dailyRhythm', 'Unknown')}")
+        print(f"\n📝 ML CONCIERGE REQUEST:")
         print(f"   Budget: ₱{raw_user_prefs.get('minBudget', 0):,} - ₱{raw_user_prefs.get('maxBudget', 0):,}")
-        print(f"   Commute: {raw_user_prefs.get('transportation', 'Unknown')}")
-        print(f"   Lifestyle: {raw_user_prefs.get('cookingFrequency', 'Unknown')}")
         
-        # Normalize to snake_case for processing
+        # Normalize preferences
         user_prefs = normalize_user_prefs(raw_user_prefs)
         
-        # Initialize concierge engine
-        engine = ConciergeRecommendationEngine()
+        # Initialize ML engine
+        engine = MLConciergeEngine()
         
-        # Generate curated recommendations with concierge experience
-        curated_recommendations, tenant_resume = engine.generate_concierge_recommendations(user_prefs)
+        # Generate ML-powered recommendations
+        curated_recommendations = engine.generate_ml_recommendations(user_prefs)
         
-        # Generate concierge notes
-        concierge_notes = [
-            "🎯 Curated using strategic matchmaking algorithm",
-            "🤝 Tenant resume generated for landlord engagement",
-            "💰 Value analysis included for each property",
-            "🚗 Commute impact calculated based on your preferences",
-            "🏠 Lifestyle compatibility assessed in detail"
-        ]
-        
-        # Count total matches
+        # Count matches
         all_matches = curated_recommendations.get('allMatches', [])
         total_matches = len(all_matches)
         
-        # Build comprehensive response
+        # Build response
         response = {
-            "conciergeService": "Livora Concierge Matchmaking",
+            "conciergeService": "Livora ML Concierge",
+            "mlModels": {
+                "similarity": "Cosine Similarity + KNN",
+                "clustering": "K-means Property Segmentation",
+                "valuePrediction": "Random Forest Regressor",
+                "featureEngineering": "TF-IDF + One-Hot Encoding"
+            },
             "curatedMatches": curated_recommendations,
-            "tenantResume": tenant_resume,
             "totalMatches": total_matches,
-            "matchBreakdown": {
-                "safeBet": 1 if curated_recommendations.get('safeBet') else 0,
-                "stretchOption": 1 if curated_recommendations.get('stretchOption') else 0,
-                "wildcard": 1 if curated_recommendations.get('wildcard') else 0,
-                "otherMatches": max(0, total_matches - 3)
-            },
-            "conciergeNotes": concierge_notes,
-            "matchingStrategy": {
-                "approach": "Decoy Effect + Value Proposition",
-                "presentation": "Safe Bet | Stretch Option | Wildcard",
-                "tenantFocus": "Lifestyle Compatibility Profiling",
-                "landlordFocus": "Qualified Lead Generation"
-            },
-            "tenantProfile": {
-                "tenantType": tenant_resume.get('tenantType', 'General Tenant'),
-                "stability": tenant_resume.get('stabilityIndicator', 'Flexible'),
-                "lifestyle": tenant_resume.get('lifestyleBrief', ''),
-                "dealbreakers": user_prefs.get('must_have_features', []),
-                "urgencyStatus": tenant_resume.get('urgencyBadge', {})
-            },
+            "mlInsights": [
+                "🤖 Powered by scikit-learn algorithms",
+                "📊 Feature-based similarity matching",
+                "🏘️ Property clustering for diversity",
+                "💰 ML value prediction scores"
+            ],
             "nextSteps": [
-                "Review your curated matches below",
-                "Compare Safe Bet vs Stretch Option vs Wildcard",
-                "Use Tenant Resume when contacting landlords",
-                "Schedule viewings for top 2-3 properties"
+                "Review ML-curated matches",
+                "Check feature analysis for each property",
+                "Compare different ML clusters",
+                "Consider value prediction scores"
             ]
         }
         
-        print(f"\n✅ CONCIERGE SERVICE COMPLETE:")
+        print(f"\n✅ ML CONCIERGE COMPLETE:")
         print(f"   Total properties analyzed: {len(properties)}")
-        print(f"   Matches found: {total_matches}")
-        print(f"   Curated presentation: 3 strategic options")
-        print(f"   Tenant resume: Generated with urgency badge")
+        print(f"   ML matches found: {total_matches}")
+        print(f"   Algorithms used: KNN, K-means, Random Forest")
         
-        # Convert snake_case keys back to camelCase for frontend
         return jsonify(format_response_keys(response))
         
     except Exception as e:
-        print(f"❌ Concierge Service Error: {e}")
+        print(f"❌ ML Concierge Error: {e}")
         import traceback
         traceback.print_exc()
         
         return jsonify(format_response_keys({
             "error": str(e),
             "curatedMatches": {},
-            "tenantResume": {},
-            "totalMatches": 0,
-            "message": "An error occurred in the concierge service"
+            "totalMatches": 0
         })), 500
+
+@app.route('/ml/similar/<int:property_id>', methods=['GET'])
+def get_similar_properties(property_id):
+    """Get similar properties using ML"""
+    try:
+        engine = MLConciergeEngine()
+        similar = engine.ml_recommender.find_similar_properties(property_id, n=5)
+        
+        return jsonify(format_response_keys({
+            "propertyId": property_id,
+            "similarProperties": similar,
+            "algorithm": "K-Nearest Neighbors (cosine similarity)"
+        }))
+    except Exception as e:
+        return jsonify(format_response_keys({"error": str(e)})), 500
+
+@app.route('/ml/clusters', methods=['GET'])
+def get_property_clusters():
+    """Get property clustering information"""
+    try:
+        engine = MLConciergeEngine()
+        clusters = {}
+        
+        if hasattr(engine.ml_recommender, 'clustering_model'):
+            for cluster_id in range(engine.ml_recommender.clustering_model.n_clusters):
+                cluster_props = engine.ml_recommender.properties_df[
+                    engine.ml_recommender.properties_df['cluster'] == cluster_id
+                ]
+                
+                clusters[cluster_id] = {
+                    "count": len(cluster_props),
+                    "avgPrice": cluster_props['price'].mean(),
+                    "avgRating": cluster_props['rating'].mean(),
+                    "commonTypes": cluster_props['type'].value_counts().head(3).to_dict()
+                }
+        
+        return jsonify(format_response_keys({
+            "clusters": clusters,
+            "algorithm": "K-means Clustering",
+            "totalClusters": engine.ml_recommender.clustering_model.n_clusters if hasattr(engine.ml_recommender, 'clustering_model') else 0
+        }))
+    except Exception as e:
+        return jsonify(format_response_keys({"error": str(e)})), 500
+
+@app.route('/ml/explain', methods=['GET'])
+def explain_ml_system():
+    """Explain the ML system"""
+    explanation = {
+        "title": "Livora ML Property Recommender",
+        "description": "Machine Learning-powered property matching system",
+        "mlAlgorithms": [
+            {
+                "algorithm": "K-Nearest Neighbors (KNN)",
+                "purpose": "Property similarity matching",
+                "metric": "Cosine similarity",
+                "output": "Similarity scores between properties"
+            },
+            {
+                "algorithm": "K-means Clustering",
+                "purpose": "Property segmentation",
+                "features": "Price, location, amenities, etc.",
+                "output": "Property clusters for diverse recommendations"
+            },
+            {
+                "algorithm": "Random Forest Regressor",
+                "purpose": "Value prediction",
+                "features": "Property characteristics",
+                "output": "Value score (0-100)"
+            },
+            {
+                "algorithm": "TF-IDF Vectorizer",
+                "purpose": "Amenities text processing",
+                "output": "Numerical representation of amenities"
+            }
+        ],
+        "featureEngineering": [
+            "Numerical features: Price, area, distance, rating",
+            "Categorical features: Type, location, amenities (one-hot encoded)",
+            "Boolean features: Pet-friendly, furnished, etc.",
+            "Text features: Amenities (TF-IDF vectorized)"
+        ],
+        "matchingProcess": [
+            "1. Convert user preferences to feature vector",
+            "2. Calculate cosine similarity with all properties",
+            "3. Apply dealbreaker filters",
+            "4. Adjust scores with rule-based factors",
+            "5. Use clustering to ensure diversity",
+            "6. Apply value prediction scores"
+        ]
+    }
+    return jsonify(format_response_keys(explanation))
 
 @app.route('/properties', methods=['GET'])
 def get_properties():
@@ -1131,11 +962,9 @@ def get_properties():
         limit = int(request.args.get('limit', 20))
         offset = int(request.args.get('offset', 0))
         
-        # Apply pagination
         end_idx = min(offset + limit, len(properties))
         properties_list = properties[offset:end_idx]
         
-        # Ensure all properties have image_url
         for prop in properties_list:
             if 'image_url' not in prop or not prop['image_url']:
                 prop['image_url'] = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800"
@@ -1152,165 +981,43 @@ def get_properties():
     except Exception as e:
         return jsonify(format_response_keys({"error": str(e)})), 500
 
-@app.route('/properties/<int:property_id>', methods=['GET'])
-def get_property(property_id):
-    """Get a single property by ID"""
-    try:
-        property_data = next((p for p in properties if p['id'] == property_id), None)
-        
-        if not property_data:
-            return jsonify(format_response_keys({
-                "error": f"Property with ID {property_id} not found"
-            })), 404
-        
-        # Ensure image_url exists
-        if 'image_url' not in property_data or not property_data['image_url']:
-            property_data['image_url'] = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800"
-        
-        return jsonify(format_response_keys(property_data))
-    except Exception as e:
-        return jsonify(format_response_keys({"error": str(e)})), 500
-
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint"""
     return jsonify(format_response_keys({
         "status": "healthy",
-        "service": "Livora Concierge Matchmaking API",
+        "service": "Livora ML Concierge Matchmaking",
         "propertiesLoaded": len(properties),
-        "matchingEngine": "Enhanced Profiler with Lifestyle Compatibility",
-        "presentationStrategy": "Decoy Effect (Safe Bet | Stretch | Wildcard)",
-        "tenantProfiling": "Comprehensive Lifestyle Assessment",
-        "landlordTools": "Tenant Resume with Urgency Badge"
-    }))
-
-@app.route('/concierge/explain', methods=['GET'])
-def explain_concierge():
-    """Explain the concierge matchmaking framework"""
-    explanation = {
-        "title": "Livora Concierge Matchmaking Framework",
-        "description": "Psychology-driven property matching with strategic presentation",
-        "corePrinciples": [
-            "Shift from search engine to concierge service",
-            "Address paradox of choice through curation",
-            "Solve landlord lead fatigue through qualified leads"
-        ],
-        "tenantProfilingLayers": [
-            {
-                "layer": "Dealbreaker Layer",
-                "description": "Hard filters that must be satisfied",
-                "components": [
-                    "Traffic Tolerance Check: Filters based on commute preference",
-                    "Pet Policy Nuance: Detailed pet type matching",
-                    "Connectivity Check: Fiber optic for WFH users",
-                    "Must-Have Features: Non-negotiable requirements"
-                ]
-            },
-            {
-                "layer": "Lifestyle Layer",
-                "description": "Soft matches for daily living compatibility",
-                "components": [
-                    "Noise Sensitivity: Matches property noise levels with sleep patterns",
-                    "Kitchen Habits: Aligns cooking frequency with kitchen facilities",
-                    "Daily Rhythm: Accommodates night owls vs early birds",
-                    "Temperature Preferences: AC compatibility for roommates"
-                ]
-            },
-            {
-                "layer": "Quality Layer",
-                "description": "Amenities and property features assessment",
-                "components": [
-                    "Rating & Reviews: Verified tenant feedback",
-                    "Amenity Match: Preferred vs available amenities",
-                    "Property Condition: Furnishing, renovations, maintenance"
-                ]
-            }
-        ],
-        "strategicPresentation": {
-            "strategy": "Decoy Effect (Asymmetric Dominance)",
-            "presentation": "Three curated options to guide decision-making",
-            "options": [
-                {
-                    "option": "The Safe Bet",
-                    "role": "Target choice",
-                    "characteristics": "Best overall match, excellent value, meets all criteria"
-                },
-                {
-                    "option": "The Stretch Option",
-                    "role": "Decoy choice",
-                    "characteristics": "Similar price but slightly worse to make Safe Bet look better"
-                },
-                {
-                    "option": "The Wildcard",
-                    "role": "Alternative value proposition",
-                    "characteristics": "Different approach (cheaper/further or premium/expensive)"
-                }
-            ]
-        },
-        "landlordTools": {
-            "tenantResume": "Snapshot of tenant profile for qualified leads",
-            "urgencyBadge": "48-hour expiry to encourage prompt response",
-            "compatibilityNotes": "Highlights tenant-property alignment"
-        },
-        "psychologicalElements": [
-            "Labor Illusion: Shows work being done to increase perceived value",
-            "Endowed Progress Effect: Gamified profiling with tenant 'leveling up'",
-            "Loss Aversion: Urgency badges to prevent landlord procrastination",
-            "Barnum Effect: Personalized feedback during profiling"
-        ]
-    }
-    return jsonify(format_response_keys(explanation))
-
-@app.route('/concierge/simulate-work', methods=['GET'])
-def simulate_concierge_work():
-    """Simulate concierge work animation"""
-    engine = ConciergeRecommendationEngine()
-    animations = random.sample(engine.work_animations, 5)
-    
-    return jsonify(format_response_keys({
-        "conciergeWork": animations,
-        "estimatedTime": "5-10 seconds",
-        "purpose": "Labor illusion to increase perceived value"
+        "mlAlgorithms": "KNN, K-means, Random Forest, TF-IDF",
+        "matchingEngine": "scikit-learn powered"
     }))
 
 if __name__ == '__main__':
     print("\n" + "="*80)
-    print("🏠 LIVORA CONCIERGE MATCHMAKING API")
-    print("   Psychology-Driven Property Matching with Strategic Presentation")
+    print("🤖 LIVORA ML CONCIERGE MATCHMAKING API")
+    print("   Powered by scikit-learn")
     print("="*80)
-    print("\n🎯 CORE INNOVATIONS:")
-    print("   ✓ Shift from search engine to concierge model")
-    print("   ✓ Psychology-driven presentation (Decoy Effect)")
-    print("   ✓ Comprehensive lifestyle profiling")
-    print("   ✓ Tenant resume for qualified landlord leads")
+    print("\n🔬 ML ALGORITHMS:")
+    print("   ✓ K-Nearest Neighbors (KNN) - Similarity matching")
+    print("   ✓ K-means Clustering - Property segmentation")
+    print("   ✓ Random Forest - Value prediction")
+    print("   ✓ TF-IDF - Amenities processing")
     
     print(f"\n📊 DATA SUMMARY:")
-    print(f"   Properties loaded from properties.py: {len(properties)}")
-    if len(properties_df) > 0:
-        print(f"   Price Range: ₱{properties_df['price'].min():,} - ₱{properties_df['price'].max():,}")
-        print(f"   Average Price: ₱{properties_df['price'].mean():,.0f}")
-        print(f"   Property Types: {', '.join(properties_df['type'].unique())}")
+    print(f"   Properties loaded: {len(properties)}")
     
-    print("\n🧠 PSYCHOLOGY ELEMENTS:")
-    print("   Labor Illusion: Showing work to increase perceived value")
-    print("   Decoy Effect: Strategic option presentation")
-    print("   Urgency Badges: 48-hour tenant profile expiry")
-    print("   Tenant RPG: Gamified profiling experience")
+    print("\n🧠 FEATURE ENGINEERING:")
+    print("   Numerical features: Price, area, distance, rating")
+    print("   Categorical features: Type, location, amenities")
+    print("   Boolean features: Pet-friendly, furnished, etc.")
     
     print("\n📡 ENDPOINTS:")
-    print("  POST /recommend               - Get concierge-curated recommendations")
-    print("  GET  /properties              - List all properties")
-    print("  GET  /properties/<id>         - Get single property details")
-    print("  GET  /health                  - Health check")
-    print("  GET  /concierge/explain       - Explain the concierge framework")
-    print("  GET  /concierge/simulate-work - See concierge work animation")
-    
-    print("\n🎯 RESPONSE FEATURES:")
-    print("   ✓ Curated presentation (Safe Bet | Stretch | Wildcard)")
-    print("   ✓ Comprehensive lifestyle compatibility assessment")
-    print("   ✓ Detailed commute analysis and cost calculations")
-    print("   ✓ Tenant resume with urgency badge for landlords")
-    print("   ✓ Value proposition scoring for each property")
+    print("  POST /recommend         - Get ML-powered recommendations")
+    print("  GET  /ml/similar/<id>   - Find similar properties (KNN)")
+    print("  GET  /ml/clusters       - View property clusters")
+    print("  GET  /ml/explain        - Explain ML system")
+    print("  GET  /properties        - List all properties")
+    print("  GET  /health           - Health check")
     print("="*80)
     
     app.run(debug=True, port=5000, host='0.0.0.0')
