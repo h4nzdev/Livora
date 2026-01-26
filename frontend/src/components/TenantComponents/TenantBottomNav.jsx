@@ -29,13 +29,6 @@ const TenantBottomNav = () => {
       path: "/tenant-chat",
     },
     {
-      id: "listings",
-      label: "Listings",
-      icon: Filter,
-      badge: null,
-      path: "/tenant-listings",
-    },
-    {
       id: "transactions",
       label: "Transactions",
       icon: TrendingUp,
