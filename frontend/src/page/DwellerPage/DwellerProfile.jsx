@@ -254,7 +254,7 @@ const DwellerProfile = () => {
               </p>
             </section>
 
-            {/* Smart Living Settings Section */}
+            {/* Livora Settings Section */}
             <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <Settings className="w-5 h-5 text-emerald-600" />

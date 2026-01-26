@@ -442,7 +442,7 @@ const DwellerCommunityHub = () => {
           <div className="flex items-center gap-2 opacity-50">
             <Home className="w-4 h-4" />
             <span className="text-sm font-bold text-gray-600">
-              Smart Living © 2023
+              Livora © 2026
             </span>
           </div>
           <div className="flex gap-6 text-xs text-gray-500 font-medium uppercase tracking-wider">

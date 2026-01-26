@@ -3,10 +3,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // USE THE PROPERTY SERVICE INSTEAD OF DIRECT AXIOS
-import {
-  propertyService,
-  formatUserData,
-} from "../../services/propertyService";
+import { propertyService } from "../../services/api";
 
 // Use your existing imports
 import BudgetRange from "../../components/MatchingComponents/BudgetRange";
@@ -17,14 +14,8 @@ import LeaseAndHousehold from "../../components/MatchingComponents/LeaseAndHouse
 import logo from "../../assets/Livora.png";
 import ProfilingSplashScreen from "../../components/ProfilingSplashScreen";
 
-// REMOVE THIS - using service instead
-// const api = axios.create({
-//   baseURL: "http://localhost:5000",
-//   timeout: 10000,
-// });
-
-// LocalStorage key for saving user preferences
-const LOCAL_STORAGE_KEY = "userPreferences";
+// SessionStorage key for saving user preferences (changed from localStorage)
+const SESSION_STORAGE_KEY = "userPreferences";
 
 const Matching = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -99,8 +90,8 @@ const Matching = () => {
     return stepValidation[stepKey];
   };
 
-  // Function to save form data to localStorage
-  const saveToLocalStorage = () => {
+  // Function to save form data to sessionStorage (changed from localStorage)
+  const saveToSessionStorage = () => {
     try {
       const dataToSave = {
         formData,
@@ -108,17 +99,17 @@ const Matching = () => {
         stepValidation,
         lastUpdated: new Date().toISOString(),
       };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
-      console.log("Saved preferences to localStorage:", dataToSave);
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(dataToSave));
+      console.log("Saved preferences to sessionStorage:", dataToSave);
     } catch (error) {
-      console.error("Error saving to localStorage:", error);
+      console.error("Error saving to sessionStorage:", error);
     }
   };
 
-  // Function to load form data from localStorage
-  const loadFromLocalStorage = () => {
+  // Function to load form data from sessionStorage (changed from localStorage)
+  const loadFromSessionStorage = () => {
     try {
-      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const savedData = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (savedData) {
         const parsedData = JSON.parse(savedData);
 
@@ -133,38 +124,40 @@ const Matching = () => {
           setStepValidation(parsedData.stepValidation);
         }
 
-        console.log("Loaded preferences from localStorage:", parsedData);
+        console.log("Loaded preferences from sessionStorage:", parsedData);
         return true;
       }
     } catch (error) {
-      console.error("Error loading from localStorage:", error);
+      console.error("Error loading from sessionStorage:", error);
       // Clear corrupted data
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
     }
     return false;
   };
 
-  // Function to clear saved preferences
-  const clearLocalStorage = () => {
+  // Function to clear saved preferences including best match
+  const clearAllPreferences = () => {
     try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      console.log("Cleared preferences from localStorage");
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      sessionStorage.removeItem("recommendationResults");
+      sessionStorage.removeItem("bestMatchProperty");
+      console.log("Cleared all preferences and best match from sessionStorage");
     } catch (error) {
-      console.error("Error clearing localStorage:", error);
+      console.error("Error clearing sessionStorage:", error);
     }
   };
 
-  // Save form data to localStorage whenever it changes
+  // Save form data to sessionStorage whenever it changes
   useEffect(() => {
     if (hasLoadedSavedData) {
-      saveToLocalStorage();
+      saveToSessionStorage();
     }
   }, [formData, currentStep, stepValidation, hasLoadedSavedData]);
 
   // Load saved data when component mounts
   useEffect(() => {
     // Check if we have saved data immediately
-    const hasSavedData = loadFromLocalStorage();
+    const hasSavedData = loadFromSessionStorage();
     setHasLoadedSavedData(true);
 
     if (hasSavedData) {
@@ -185,7 +178,7 @@ const Matching = () => {
   const handleSplashFinish = () => {
     // Load data if not already loaded
     if (!hasLoadedSavedData) {
-      loadFromLocalStorage();
+      loadFromSessionStorage();
       setHasLoadedSavedData(true);
     }
     setShowSplash(false);
@@ -268,6 +261,41 @@ const Matching = () => {
     }
   };
 
+  // Clear best match when starting fresh (optional)
+  const handleStartFresh = () => {
+    clearAllPreferences();
+    setFormData({
+      minBudget: "",
+      maxBudget: "",
+      leaseDuration: "",
+      region: "",
+      otherRegion: "",
+      areaPreferences: [],
+      destinationAddress: "",
+      destinationLocation: "",
+      primaryDestination: "",
+      transportation: "",
+      householdSize: "",
+      hasChildren: false,
+      hasPets: false,
+      hasSmokeDrink: "",
+      roommateGender: "",
+      dailyRhythm: "",
+      lifestyleFeatures: [],
+      mustHaveFeatures: [],
+      preferredAmenities: [],
+      moveInPlan: "",
+    });
+    setCurrentStep(0);
+    setStepValidation({
+      step1: false,
+      step2: false,
+      step3: false,
+      step4: false,
+      step5: false,
+    });
+  };
+
   // API call to get recommendations - USING THE SERVICE
   const getRecommendations = async (formData) => {
     try {
@@ -276,6 +304,10 @@ const Matching = () => {
 
       console.log("=== FORM DATA TO SEND ===");
       console.log("Raw form data:", formData);
+
+      // IMPORTANT: Clear the previous best match when getting new recommendations
+      sessionStorage.removeItem("bestMatchProperty");
+      console.log("Cleared previous best match from sessionStorage");
 
       // USE THE FORMATTER FROM SERVICE
       const requestData = formatUserData(formData);
@@ -287,10 +319,10 @@ const Matching = () => {
 
       console.log("Backend response:", response);
 
-      // Store results in localStorage to pass to Results page
-      localStorage.setItem("recommendationResults", JSON.stringify(response));
+      // Store results in sessionStorage to pass to Results page
+      sessionStorage.setItem("recommendationResults", JSON.stringify(response));
 
-      console.log("✅ Recommendations saved to localStorage");
+      console.log("✅ Recommendations saved to sessionStorage");
 
       // Navigate to results page
       navigate("/results", { state: { recommendations: response } });
@@ -325,7 +357,7 @@ const Matching = () => {
         setSubmitError(`Request error: ${error.message}`);
       }
 
-      // Optional: Still navigate but with error state
+      // Optional: still navigate but with error state
       navigate("/results", {
         state: {
           recommendations: {

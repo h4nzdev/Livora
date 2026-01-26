@@ -149,48 +149,9 @@ const DwellerSidebar = () => {
           ))}
         </div>
 
-        {/* Additional Features Section */}
-        <div className="px-3 mb-8">
-          {!isCollapsed && (
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              Quick Access
-            </h3>
-          )}
-          <div className="space-y-2">
-            {bottomMenuItems.map((item) => (
-              <Link
-                key={item.id}
-                to={item.path}
-                className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
-                  isActive(item.path)
-                    ? "bg-emerald-50 text-emerald-600"
-                    : "text-gray-600 hover:bg-gray-50"
-                } ${isCollapsed ? "justify-center px-3" : ""}`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`${isActive(item.path) ? "text-emerald-600" : "text-gray-500"}`}
-                  >
-                    {item.icon}
-                  </div>
-                  {!isCollapsed && (
-                    <span className="font-medium text-sm">{item.label}</span>
-                  )}
-                </div>
-
-                {!isCollapsed && item.badge && (
-                  <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
-        </div>
-
         {/* Support Section */}
         {!isCollapsed && (
-          <div className="px-3 mt-8">
+          <div className="mt-8">
             <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
               <h4 className="font-bold text-emerald-700 text-sm mb-2">
                 Need Help?

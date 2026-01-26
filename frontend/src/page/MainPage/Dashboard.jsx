@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Home,
   Bell,
@@ -22,6 +22,7 @@ import {
   BadgeCheck,
   Shield,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +30,56 @@ const Dashboard = () => {
   // Verification state
   const navigate = useNavigate();
   const [verificationLevel, setVerificationLevel] = useState(2);
+  const [featuredProperty, setFeaturedProperty] = useState(null);
+  const [loadingBestMatch, setLoadingBestMatch] = useState(true);
+
+  // Load best match from localStorage on component mount
+  useEffect(() => {
+    const loadBestMatch = () => {
+      try {
+        const savedBestMatch = localStorage.getItem("bestMatchProperty");
+        if (savedBestMatch) {
+          const property = JSON.parse(savedBestMatch);
+
+          // Helper function to calculate match score (same as in Results)
+          const getMatchScore = (prop) => {
+            return prop.match_score || prop.matchScore || 85;
+          };
+
+          setFeaturedProperty({
+            ...property,
+            price: property.price
+              ? `₱${property.price.toLocaleString()}`
+              : "₱0",
+            match: `${getMatchScore(property)}%`,
+            location: property.location || "Location not specified",
+            description:
+              property.description ||
+              `A beautiful ${property.type || "property"} with great amenities.`,
+            bedrooms: property.bedrooms || 1,
+            bathrooms: property.bathrooms || 1,
+            type: property.type || "Property",
+            amenities: property.amenities || [],
+            image:
+              property.image_url ||
+              property.images?.[0] ||
+              "https://images.unsplash.com/photo-1518780664697-55e3ad937233",
+          });
+          console.log("Loaded best match from localStorage:", property.name);
+        } else {
+          console.log("No best match found in localStorage");
+          // Keep fallback featured property
+        }
+      } catch (error) {
+        console.error("Error loading best match from localStorage:", error);
+      } finally {
+        setLoadingBestMatch(false);
+      }
+    };
+
+    loadBestMatch();
+  }, []);
+
   const verificationBadges = [
     {
       level: 1,
@@ -59,6 +110,40 @@ const Dashboard = () => {
     if (verificationLevel < 3) {
       setVerificationLevel(verificationLevel + 1);
     }
+  };
+
+  // Fallback featured property if no best match is found
+  const fallbackFeaturedProperty = {
+    id: 1,
+    price: "₱120,000",
+    match: "98%",
+    location: "Premium Villa • Mactan, Cebu",
+    description:
+      "Luxury 4-bedroom villa with private pool, garden, and modern amenities. Perfect for families or executive living.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDtCZVhkwOygAKkuZkG28vZPk8erLjcJcsz_byyRxezbKUX9HLRmtwYC90ayVrGiUef5R9_1fEkO76m57Aouu0TeApxAkzQTjkek-9VgFeOQxW9WoHQhYS7smVsjLNli0v6yU8l3x-XNZN5ANMvZ0IuRPv6f_0LtMf8pfPkeYkx-xQIH-USAGMhymVyU3kA7imhCRJd0IDiQ4eWh6Rcv4UAWN4_8FvKB1nJ-qzuxz4G1CycOTq4yA9Ho6Urs0eiEQ2usm-nCk7PIUs",
+    bedrooms: 4,
+    bathrooms: 4,
+    floorArea: "280 sqm",
+    type: "Villa",
+    furnished: "Fully Furnished",
+    amenities: [
+      "Private Pool",
+      "Garden",
+      "3 Car Parking",
+      "Maid's Room",
+      "Security",
+      "Generator",
+    ],
+    leaseDuration: "12 months",
+    securityDeposit: "₱240,000",
+    matchReasons: [
+      "Fits your budget perfectly",
+      "Matches your preferred location in Cebu",
+      "Includes all your required amenities",
+      "Pet-friendly environment",
+      "Near schools and business districts",
+    ],
   };
 
   // Top Matches - expanded to 5
@@ -124,40 +209,6 @@ const Dashboard = () => {
       amenities: ["Security", "Elevator", "Near MRT"],
     },
   ];
-
-  // Featured Property - expanded details
-  const featuredProperty = {
-    id: 1,
-    price: "₱120,000",
-    match: "98%",
-    location: "Premium Villa • Mactan, Cebu",
-    description:
-      "Luxury 4-bedroom villa with private pool, garden, and modern amenities. Perfect for families or executive living.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDtCZVhkwOygAKkuZkG28vZPk8erLjcJcsz_byyRxezbKUX9HLRmtwYC90ayVrGiUef5R9_1fEkO76m57Aouu0TeApxAkzQTjkek-9VgFeOQxW9WoHQhYS7smVsjLNli0v6yU8l3x-XNZN5ANMvZ0IuRPv6f_0LtMf8pfPkeYkx-xQIH-USAGMhymVyU3kA7imhCRJd0IDiQ4eWh6Rcv4UAWN4_8FvKB1nJ-qzuxz4G1CycOTq4yA9Ho6Urs0eiEQ2usm-nCk7PIUs",
-    bedrooms: 4,
-    bathrooms: 4,
-    floorArea: "280 sqm",
-    type: "Villa",
-    furnished: "Fully Furnished",
-    amenities: [
-      "Private Pool",
-      "Garden",
-      "3 Car Parking",
-      "Maid's Room",
-      "Security",
-      "Generator",
-    ],
-    leaseDuration: "12 months",
-    securityDeposit: "₱240,000",
-    matchReasons: [
-      "Fits your budget perfectly",
-      "Matches your preferred location in Cebu",
-      "Includes all your required amenities",
-      "Pet-friendly environment",
-      "Near schools and business districts",
-    ],
-  };
 
   const popularAreas = [
     { name: "Siargao", color: "bg-rose-50 text-rose-600 border-rose-100" },
@@ -400,105 +451,222 @@ const Dashboard = () => {
 
           {/* Featured Property - Expanded */}
           <div className="px-4 py-4">
-            <div className="relative rounded-2xl bg-white p-4 shadow-lg border-2 border-emerald-200">
-              <div className="absolute -top-3 left-4 z-10 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-black tracking-widest shadow-lg flex items-center gap-1">
-                <Star className="w-3 h-3" />
-                {featuredProperty.match} MATCH
-              </div>
-
-              {/* Main Image */}
-              <div
-                className="relative w-full aspect-video bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden mb-4"
-                style={{
-                  backgroundImage: `url("${featuredProperty.image}")`,
-                }}
-              >
-                <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-lg text-xs font-bold">
-                  Featured Property
+            {loadingBestMatch ? (
+              <div className="rounded-2xl bg-white p-6 shadow-lg border-2 border-emerald-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-2">
+                    <Loader2 className="w-4 h-4 mx-auto text-emerald-600" />
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Loading your best match...
+                  </p>
                 </div>
               </div>
+            ) : featuredProperty ? (
+              <div className="relative rounded-2xl bg-white p-4 shadow-lg border-2 border-emerald-200">
+                <div className="absolute -top-3 left-4 z-10 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-black tracking-widest shadow-lg flex items-center gap-1">
+                  <Star className="w-3 h-3" />
+                  {featuredProperty.match} MATCH
+                </div>
 
-              {/* Property Details */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-xl font-extrabold text-gray-900">
-                      {featuredProperty.price}
-                      <span className="text-sm font-normal text-gray-500">
-                        /mo
+                {/* Main Image */}
+                <div
+                  className="relative w-full aspect-video bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden mb-4"
+                  style={{
+                    backgroundImage: `url("${featuredProperty.image}")`,
+                  }}
+                >
+                  <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-lg text-xs font-bold">
+                    Your Best Match
+                  </div>
+                </div>
+
+                {/* Property Details */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xl font-extrabold text-gray-900">
+                        {featuredProperty.price}
+                        <span className="text-sm font-normal text-gray-500">
+                          /mo
+                        </span>
+                      </h4>
+                      <p className="text-emerald-600 text-sm font-bold flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        {featuredProperty.location}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        navigate("/property", {
+                          state: { property: featuredProperty },
+                        })
+                      }
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-emerald-500/20"
+                    >
+                      View Details
+                    </button>
+                  </div>
+
+                  {/* Property Specs */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Home className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {featuredProperty.bedrooms} BR
                       </span>
-                    </h4>
-                    <p className="text-emerald-600 text-sm font-bold flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3" />
-                      {featuredProperty.location}
-                    </p>
-                  </div>
-                  <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-emerald-500/20">
-                    View Details
-                  </button>
-                </div>
-
-                {/* Property Specs */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2">
-                    <Home className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">
-                      {featuredProperty.bedrooms} BR
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">
-                      {featuredProperty.type}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-gray-600">
-                  {featuredProperty.description}
-                </p>
-
-                {/* Key Amenities */}
-                <div className="flex flex-wrap gap-2">
-                  {featuredProperty.amenities
-                    .slice(0, 4)
-                    .map((amenity, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full border border-emerald-100"
-                      >
-                        {amenity}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {featuredProperty.type}
                       </span>
-                    ))}
-                  {featuredProperty.amenities.length > 4 && (
-                    <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                      +{featuredProperty.amenities.length - 4} more
-                    </span>
-                  )}
-                </div>
+                    </div>
+                  </div>
 
-                {/* Match Reasons */}
-                <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
-                  <h5 className="text-sm font-bold text-emerald-700 mb-2">
-                    Why it's a great match:
-                  </h5>
-                  <ul className="space-y-1">
-                    {featuredProperty.matchReasons
-                      .slice(0, 3)
-                      .map((reason, index) => (
-                        <li
+                  {/* Description */}
+                  <p className="text-sm text-gray-600">
+                    {featuredProperty.description}
+                  </p>
+
+                  {/* Key Amenities */}
+                  <div className="flex flex-wrap gap-2">
+                    {featuredProperty.amenities
+                      .slice(0, 4)
+                      .map((amenity, index) => (
+                        <span
                           key={index}
-                          className="flex items-center gap-2 text-xs text-emerald-600"
+                          className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full border border-emerald-100"
                         >
-                          <CheckCircle className="w-3 h-3" />
-                          {reason}
-                        </li>
+                          {amenity.charAt(0).toUpperCase() + amenity.slice(1)}
+                        </span>
                       ))}
-                  </ul>
+                    {featuredProperty.amenities.length > 4 && (
+                      <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        +{featuredProperty.amenities.length - 4} more
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Match Reasons */}
+                  <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                    <h5 className="text-sm font-bold text-emerald-700 mb-2">
+                      Why it's your best match:
+                    </h5>
+                    <ul className="space-y-1">
+                      <li className="flex items-center gap-2 text-xs text-emerald-600">
+                        <CheckCircle className="w-3 h-3" />
+                        Matches your preferences perfectly
+                      </li>
+                      <li className="flex items-center gap-2 text-xs text-emerald-600">
+                        <CheckCircle className="w-3 h-3" />
+                        Best match score in your results
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="relative rounded-2xl bg-white p-4 shadow-lg border-2 border-emerald-200">
+                <div className="absolute -top-3 left-4 z-10 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-black tracking-widest shadow-lg flex items-center gap-1">
+                  <Star className="w-3 h-3" />
+                  {fallbackFeaturedProperty.match} MATCH
+                </div>
+
+                {/* Main Image */}
+                <div
+                  className="relative w-full aspect-video bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden mb-4"
+                  style={{
+                    backgroundImage: `url("${fallbackFeaturedProperty.image}")`,
+                  }}
+                >
+                  <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-lg text-xs font-bold">
+                    Featured Property
+                  </div>
+                </div>
+
+                {/* Property Details */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xl font-extrabold text-gray-900">
+                        {fallbackFeaturedProperty.price}
+                        <span className="text-sm font-normal text-gray-500">
+                          /mo
+                        </span>
+                      </h4>
+                      <p className="text-emerald-600 text-sm font-bold flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        {fallbackFeaturedProperty.location}
+                      </p>
+                    </div>
+                    <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-emerald-500/20">
+                      View Details
+                    </button>
+                  </div>
+
+                  {/* Property Specs */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Home className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {fallbackFeaturedProperty.bedrooms} BR
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {fallbackFeaturedProperty.type}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-sm text-gray-600">
+                    {fallbackFeaturedProperty.description}
+                  </p>
+
+                  {/* Key Amenities */}
+                  <div className="flex flex-wrap gap-2">
+                    {fallbackFeaturedProperty.amenities
+                      .slice(0, 4)
+                      .map((amenity, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full border border-emerald-100"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                    {fallbackFeaturedProperty.amenities.length > 4 && (
+                      <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        +{fallbackFeaturedProperty.amenities.length - 4} more
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Match Reasons */}
+                  <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                    <h5 className="text-sm font-bold text-emerald-700 mb-2">
+                      Why it's a great match:
+                    </h5>
+                    <ul className="space-y-1">
+                      {fallbackFeaturedProperty.matchReasons
+                        .slice(0, 3)
+                        .map((reason, index) => (
+                          <li
+                            key={index}
+                            className="flex items-center gap-2 text-xs text-emerald-600"
+                          >
+                            <CheckCircle className="w-3 h-3" />
+                            {reason}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Top Matches - 5 items */}
@@ -583,7 +751,10 @@ const Dashboard = () => {
                     your evolving lifestyle.
                   </p>
                 </div>
-                <button className="mt-2 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 bg-white text-gray-900 text-base font-bold leading-normal transition-all hover:bg-gray-50 active:scale-95 shadow-lg">
+                <button
+                  onClick={() => navigate("/matching")}
+                  className="mt-2 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 bg-white text-gray-900 text-base font-bold leading-normal transition-all hover:bg-gray-50 active:scale-95 shadow-lg"
+                >
                   <span className="truncate">Edit Questionnaire</span>
                   <Edit3 className="w-4 h-4 ml-2" />
                 </button>
@@ -745,11 +916,14 @@ const Dashboard = () => {
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-gray-900 text-2xl font-bold">
-                    Featured Property
+                    {featuredProperty ? "Your Best Match" : "Featured Property"}
                   </h3>
                   <div className="bg-emerald-500 text-white px-6 py-2 rounded-full text-sm font-black tracking-widest shadow-lg flex items-center gap-2">
                     <Star className="w-4 h-4" />
-                    {featuredProperty.match} MATCH
+                    {featuredProperty
+                      ? featuredProperty.match
+                      : fallbackFeaturedProperty.match}{" "}
+                    MATCH
                   </div>
                 </div>
 
@@ -758,21 +932,19 @@ const Dashboard = () => {
                   <div className="space-y-4">
                     <div className="relative rounded-xl overflow-hidden h-64">
                       <img
-                        src={featuredProperty.image}
-                        alt="Premium Villa"
+                        src={
+                          featuredProperty
+                            ? featuredProperty.image
+                            : fallbackFeaturedProperty.image
+                        }
+                        alt="Best Match Property"
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white px-4 py-2 rounded-lg text-sm font-bold">
-                        Featured Property
+                        {featuredProperty
+                          ? "Your Best Match"
+                          : "Featured Property"}
                       </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className="h-24 rounded-lg bg-gray-200"
-                        ></div>
-                      ))}
                     </div>
                   </div>
 
@@ -780,7 +952,9 @@ const Dashboard = () => {
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-gray-900 text-3xl font-extrabold">
-                        {featuredProperty.price}
+                        {featuredProperty
+                          ? featuredProperty.price
+                          : fallbackFeaturedProperty.price}
                         <span className="text-base font-normal text-gray-500">
                           {" "}
                           /month
@@ -788,7 +962,9 @@ const Dashboard = () => {
                       </h4>
                       <p className="text-emerald-600 text-lg font-semibold flex items-center gap-2 mt-2">
                         <MapPin className="w-5 h-5" />
-                        {featuredProperty.location}
+                        {featuredProperty
+                          ? featuredProperty.location
+                          : fallbackFeaturedProperty.location}
                       </p>
                     </div>
 
@@ -802,7 +978,9 @@ const Dashboard = () => {
                           </span>
                         </div>
                         <p className="text-lg font-bold text-gray-900">
-                          {featuredProperty.bedrooms}
+                          {featuredProperty
+                            ? featuredProperty.bedrooms
+                            : fallbackFeaturedProperty.bedrooms}
                         </p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
@@ -811,7 +989,9 @@ const Dashboard = () => {
                           <span className="text-sm text-gray-500">Type</span>
                         </div>
                         <p className="text-lg font-bold text-gray-900">
-                          {featuredProperty.type}
+                          {featuredProperty
+                            ? featuredProperty.type
+                            : fallbackFeaturedProperty.type}
                         </p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
@@ -820,14 +1000,18 @@ const Dashboard = () => {
                           <span className="text-sm text-gray-500">Lease</span>
                         </div>
                         <p className="text-lg font-bold text-gray-900">
-                          {featuredProperty.leaseDuration}
+                          {featuredProperty
+                            ? "12 months"
+                            : fallbackFeaturedProperty.leaseDuration}
                         </p>
                       </div>
                     </div>
 
                     {/* Description */}
                     <p className="text-gray-600 leading-relaxed">
-                      {featuredProperty.description}
+                      {featuredProperty
+                        ? featuredProperty.description
+                        : fallbackFeaturedProperty.description}
                     </p>
 
                     {/* Amenities */}
@@ -836,20 +1020,36 @@ const Dashboard = () => {
                         Key Amenities
                       </h5>
                       <div className="flex flex-wrap gap-2">
-                        {featuredProperty.amenities.map((amenity, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm rounded-full border border-emerald-100"
-                          >
-                            {amenity}
-                          </span>
-                        ))}
+                        {(featuredProperty
+                          ? featuredProperty.amenities
+                          : fallbackFeaturedProperty.amenities
+                        )
+                          .slice(0, 6)
+                          .map((amenity, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm rounded-full border border-emerald-100"
+                            >
+                              {amenity.charAt(0).toUpperCase() +
+                                amenity.slice(1)}
+                            </span>
+                          ))}
                       </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-4 pt-4">
-                      <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold shadow-md shadow-emerald-500/20">
+                      <button
+                        onClick={() =>
+                          navigate("/property", {
+                            state: {
+                              property:
+                                featuredProperty || fallbackFeaturedProperty,
+                            },
+                          })
+                        }
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold shadow-md shadow-emerald-500/20"
+                      >
                         View Full Details
                       </button>
                       <button className="px-6 py-3 border border-gray-300 rounded-xl font-medium hover:bg-gray-50">
@@ -870,7 +1070,7 @@ const Dashboard = () => {
                 </h3>
                 <div className="space-y-3">
                   <button
-                    onClick={() => navigate("/tenant-profile")}
+                    onClick={() => navigate("/matching")}
                     className="flex items-center justify-between w-full p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 transition-colors"
                   >
                     <div className="flex items-center gap-3">

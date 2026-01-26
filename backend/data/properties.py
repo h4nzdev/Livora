@@ -1,4 +1,4 @@
-[
+properties = [
     {
         "id": 1,
         "name": "Lahug Modern Apartment",

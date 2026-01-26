@@ -76,6 +76,42 @@ const Results = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showNotification, setShowNotification] = useState(true);
 
+  // Image preloading state
+  const [imageLoadingStates, setImageLoadingStates] = useState({});
+  const [preloadedImages, setPreloadedImages] = useState(new Set());
+
+  // Preload images function
+  const preloadImages = (propertiesArray) => {
+    const imagePromises = propertiesArray
+      .filter(property => property.image_url)
+      .map(property => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            setPreloadedImages(prev => new Set([...prev, property.image_url]));
+            setImageLoadingStates(prev => ({
+              ...prev,
+              [property.image_url]: 'loaded'
+            }));
+            resolve(property.image_url);
+          };
+          img.onerror = () => {
+            setImageLoadingStates(prev => ({
+              ...prev,
+              [property.image_url]: 'error'
+            }));
+            reject(property.image_url);
+          };
+          img.src = property.image_url;
+        });
+      });
+
+    // Start preloading
+    Promise.allSettled(imagePromises).then(results => {
+      console.log(`Preloaded ${results.filter(r => r.status === 'fulfilled').length} images successfully`);
+    });
+  };
+
   // Modal states
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -295,6 +331,11 @@ const Results = () => {
         }
 
         setProperties(propertiesData);
+
+        // Preload images for better performance
+        if (propertiesData.length > 0) {
+          preloadImages(propertiesData);
+        }
       } catch (err) {
         console.error("Error fetching properties:", err);
         setError("Failed to load properties. Please try again.");
