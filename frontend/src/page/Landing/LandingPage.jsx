@@ -644,23 +644,31 @@ const LandingPage = () => {
         </section>
 
         {/* Final CTA */}
-        <section className="px-6 mb-16">
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-12 text-center">
-            <h3 className="text-white text-3xl font-bold mb-6">
+        <section className="px-4 sm:px-6 mb-12 sm:mb-16">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center">
+            <h3 className="text-white text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
               Ready to Find Your Perfect Home?
             </h3>
-            <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-white/90 text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
               Join thousands of happy renters who found their perfect match with
               Livora
             </p>
-            <button
-              onClick={handleStartMatching}
-              className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-bold py-5 px-12 rounded-2xl text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 shadow-lg"
-            >
-              <Sparkles size={22} className="text-emerald-600" />
-              Start Your Free Questionnaire
-              <ArrowRight size={20} />
-            </button>
+            <div className="flex justify-center">
+              <button
+                onClick={handleStartMatching}
+                className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-white hover:bg-gray-50 text-gray-900 font-bold py-4 px-6 sm:py-5 sm:px-12 rounded-xl sm:rounded-2xl text-base sm:text-lg transition-all duration-300 hover:shadow-xl sm:hover:shadow-2xl hover:-translate-y-0.5 sm:hover:-translate-y-1 active:translate-y-0 shadow-md sm:shadow-lg w-full sm:w-auto max-w-md"
+              >
+                <Sparkles
+                  size={20}
+                  className="text-emerald-600 w-5 h-5 sm:w-[22px] sm:h-[22px]"
+                />
+                <span className="truncate">Start Your Free Questionnaire</span>
+                <ArrowRight
+                  size={18}
+                  className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                />
+              </button>
+            </div>
           </div>
         </section>
       </main>
