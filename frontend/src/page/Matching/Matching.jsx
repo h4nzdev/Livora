@@ -608,7 +608,7 @@ const Matching = () => {
         </div>
 
         {/* Mobile Arrow Navigation */}
-        <div className="lg:hidden max-w-[480px] mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="lg:hidden  mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
